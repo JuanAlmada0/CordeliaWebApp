@@ -1,0 +1,41 @@
+# Ignore virtual environment directory
+.venv/
+
+# Ignore compiled Python files
+*.pyc
+
+# Ignore Python bytecode cache directory
+__pycache__/
+
+# Ignore instance directory (used by Flask for local instance files)
+instance/
+
+# Ignore cache directory
+.cache/
+
+# Ignore pytest cache directory
+.pytest_cache/
+
+# Ignore coverage report file
+.coverage
+
+# Ignore HTML coverage report directory
+htmlcov/
+
+# Ignore distribution directory
+dist/
+
+# Ignore build directory
+build/
+
+# Ignore Python egg metadata directory
+*.egg-info/
+
+# Ignore JetBrains IDE directory
+.idea/
+
+# Ignore Vim swap files
+*.swp
+
+# Ignore backup files
+*~

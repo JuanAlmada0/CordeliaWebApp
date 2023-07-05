@@ -1,0 +1,15 @@
+[project]
+name = "cordelia"
+version = "0.1.0"
+description = "Dress Rental Store Web Application"
+dependencies = [
+    "flask",
+    "flask-sqlalchemy",
+    "sqlalchemy",
+    "flask-cli"
+]
+
+[build-system]
+requires = ["flit_core<4"]
+build-backend = "flit_core.buildapi"
+
