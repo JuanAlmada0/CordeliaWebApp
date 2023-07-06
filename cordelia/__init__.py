@@ -27,10 +27,16 @@ def create_app(test_config=None):
         pass
 
     # register the database commands
-    from . import db
+    from cordelia import db
 
     # Initialize the database
     db.init_app(app)
+
+    # Import the auth blueprint
+    from cordelia import auth
+    # Register the auth blueprint
+    app.register_blueprint(auth.authBp)
+
 
     @app.route('/hello')
     def hello():
