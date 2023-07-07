@@ -10,7 +10,8 @@ def create_app(test_config=None):
     app.config.from_mapping(
         SECRET_KEY='dev',
         SQLALCHEMY_DATABASE_URI='sqlite:///' + os.path.join(app.instance_path, 'CordeliaDB.db'),
-        SQLALCHEMY_TRACK_MODIFICATIONS=True
+        SQLALCHEMY_TRACK_MODIFICATIONS=True,
+        WTF_CSRF_ENABLED=True
     )
     
     if test_config is None:
@@ -27,10 +28,15 @@ def create_app(test_config=None):
         pass
 
     # register the database commands
-    from . import db
+    from cordelia import db
 
     # Initialize the database
     db.init_app(app)
+
+    # Import the auth blueprint
+    from cordelia import auth
+    # Register the auth blueprint
+    app.register_blueprint(auth.authBp)
 
     @app.route('/hello')
     def hello():

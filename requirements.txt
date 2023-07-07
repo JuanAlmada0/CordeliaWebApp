@@ -1,0 +1,8 @@
+flask
+flask-sqlalchemy
+sqlalchemy
+flask-cli
+flask-login
+flask-wtf
+phonenumbers
+email-validator
