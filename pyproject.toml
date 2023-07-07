@@ -6,7 +6,11 @@ dependencies = [
     "flask",
     "flask-sqlalchemy",
     "sqlalchemy",
-    "flask-cli"
+    "flask-cli",
+    "flask-login",
+    "flask-wtf",
+    "phonenumbers",
+    "email-validator"
 ]
 
 [build-system]
