@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash
 from cordelia.models import db, User
 from cordelia.forms import UserRegistrationForm
 
@@ -14,19 +14,15 @@ def register():
 
     if userForm.validate_on_submit():
         # Check if the username, email or phone already exists in the database
-        existing_user = User.query.filter_by(username=userForm.username.data).first()
-
-        if existing_user:
+        if User.query.filter_by(username=userForm.username.data).first():
             flash('Username already exists.', 'error')
             return redirect(url_for('auth.register'))
 
-        existing_email = User.query.filter_by(email=userForm.email.data).first()
-        if existing_email:
+        if User.query.filter_by(email=userForm.email.data).first():
             flash('Email already exists.', 'error')
             return redirect(url_for('auth.register'))
 
-        existing_phone = User.query.filter_by(phoneNumber=userForm.phoneNumber.data).first()
-        if existing_phone:
+        if User.query.filter_by(phoneNumber=userForm.phoneNumber.data).first():
             flash('Phone number already exists.', 'error')
             return redirect(url_for('auth.register'))
 

@@ -38,7 +38,6 @@ def create_app(test_config=None):
     # Register the auth blueprint
     app.register_blueprint(auth.authBp)
 
-
     @app.route('/hello')
     def hello():
         return 'Hello, World!'
