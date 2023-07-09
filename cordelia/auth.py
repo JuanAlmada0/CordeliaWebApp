@@ -1,16 +1,20 @@
 from flask import Blueprint, render_template, redirect, url_for, flash
+from flask_login import LoginManager, login_user
 from cordelia.models import db, User
-from cordelia.forms import UserRegistrationForm
+from cordelia.forms import RegistrationForm, LoginForm
 
 
-
+# Create auth blueprint
 authBp = Blueprint('auth', __name__, url_prefix='/auth')
 
+# Create login manager instance
+login_manager = LoginManager()
 
+# Register route
 @authBp.route('/register', methods=['GET', 'POST'])
 def register():
 
-    userForm = UserRegistrationForm()
+    userForm = RegistrationForm()
 
     if userForm.validate_on_submit():
         # Check if the username, email or phone already exists in the database
@@ -45,7 +49,29 @@ def register():
     
     return render_template('register.html', userForm=userForm)
 
+# Initialize login manager
+def init_app(app):
+    login_manager.init_app(app)
 
+# User loader
+@login_manager.user_loader
+def load_user(user_id):
+  return User.query.get(int(user_id))
+
+# Login route
 @authBp.route('/login', methods=['GET', 'POST'])
 def login():
-    return render_template('login.html')
+    loginForm = LoginForm()
+
+    if loginForm.validate_on_submit():
+        user = User.query.filter_by(email=loginForm.email.data).first()
+
+        if user and user.check_password(loginForm.password.data):
+            login_user(user, remember=loginForm.remember.data)
+            flash('Logged in successfully.', 'success')
+            return redirect(url_for('auth.login'))
+            
+        flash('Invalid username or password.', 'error')
+        return redirect(url_for('auth.login'))
+
+    return render_template('login.html', loginForm=loginForm)

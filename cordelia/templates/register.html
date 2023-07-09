@@ -1,7 +1,5 @@
 {% extends "base.html" %}
 
-{% block title %}Register{% endblock %}
-
 {% block content %}
   <h1>Register</h1>
 
@@ -16,10 +14,8 @@
   {% endwith %}
 
   <form method="POST" action="{{ url_for('auth.register') }}">
-    {% block csrf_token %}
-      {{ super() }}
-    {% endblock %}
-
+    {{ userForm.hidden_tag() }}
+    <p>
     {% for field in userForm %}
       <div class="form-group">
         {% if field.type != 'SubmitField' %}
@@ -33,5 +29,7 @@
         {% endif %}
       </div>
     {% endfor %}
+    </p>
   </form>
+  
 {% endblock %}

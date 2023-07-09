@@ -35,8 +35,12 @@ def create_app(test_config=None):
 
     # Import the auth blueprint
     from cordelia import auth
+
     # Register the auth blueprint
     app.register_blueprint(auth.authBp)
+    
+    # Initialize the LoginManager
+    auth.init_app(app)
 
     @app.route('/hello')
     def hello():
