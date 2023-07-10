@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Login</h1>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
+  <form method="POST" action="{{ url_for('auth.login') }}">
+    {{ loginForm.hidden_tag() }}
+    <p>
+      {% for field in loginForm %}
+        <div class="form-group">
+          {% if field.type != 'SubmitField' %}
+            {% if field.type == 'BooleanField' %}
+              <div class="form-check">
+                <label class="form-check-label">
+                  {{ field(class="form-check-input") }}
+                  {{ field.label.text }}
+                </label>
+              </div>
+            {% else %}
+              {{ field.label }}
+              {{ field(class="form-control", autocomplete="off") }}
+              {% for error in field.errors %}
+                <span class="text-danger">{{ error }}</span>
+              {% endfor %}
+            {% endif %}
+          {% else %}
+            {{ field(class="btn btn-primary") }}
+          {% endif %}
+        </div>
+      {% endfor %}
+    </p>
+  </form>  
+  
+{% endblock %}

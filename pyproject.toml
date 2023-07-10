@@ -6,10 +6,13 @@ dependencies = [
     "flask",
     "flask-sqlalchemy",
     "sqlalchemy",
-    "flask-cli"
+    "flask-cli",
+    "flask-login",
+    "flask-wtf",
+    "phonenumbers",
+    "email-validator"
 ]
 
 [build-system]
 requires = ["flit_core<4"]
 build-backend = "flit_core.buildapi"
-

@@ -1,5 +1,7 @@
-from .db import db
+from cordelia.db import db
 from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
 
 
 
@@ -18,6 +20,9 @@ class Dress(db.Model):
     timesRented = db.Column(db.Integer, default=0)
     sellable = db.Column(db.Boolean, default=False)
 
+    def __repr__(self):
+        return f"<Dress id={self.id}, style={self.style}, brand={self.brand}>"
+
     def increment_times_rented(self):
         # Method to increment the timesRented value and update sellable flag
         if self.timesRented is not None:
@@ -29,7 +34,7 @@ class Dress(db.Model):
 
 
 
-class User (db.Model):
+class User(UserMixin, db.Model):
     # User model representing a user in the database
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(60), index=True, unique=True)
@@ -39,6 +44,15 @@ class User (db.Model):
     phoneNumber = db.Column(db.Integer, unique=True)
     password_hash = db.Column(db.String(80))
     joinedAtDate = db.Column(db.DateTime(), index=True, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f"<User {self.username}>"
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+    
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
 
 
 
@@ -64,3 +78,6 @@ class Rent(db.Model):
         dress = self.dress
         tax = dress.rentPrice * 0.16
         self.paymentTotal = int(dress.rentPrice + tax)
+    
+    def __repr__(self):
+        return f"<Rent id={self.id}, dressId-{self.dressId}, clientId={self.clientId}>"
