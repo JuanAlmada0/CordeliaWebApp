@@ -11,7 +11,9 @@ def create_app(test_config=None):
         SECRET_KEY='dev',
         SQLALCHEMY_DATABASE_URI='sqlite:///' + os.path.join(app.instance_path, 'CordeliaDB.db'),
         SQLALCHEMY_TRACK_MODIFICATIONS=True,
-        WTF_CSRF_ENABLED=True
+        WTF_CSRF_ENABLED=True,
+        SERVER_NAME='127.0.0.1:5000',
+        PREFERRED_URL_SCHEME=None
     )
     
     if test_config is None:
@@ -27,7 +29,7 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    # register the database commands
+    # Register the database commands
     from cordelia import db
 
     # Initialize the database
@@ -36,14 +38,16 @@ def create_app(test_config=None):
     # Import the auth blueprint
     from cordelia import auth
 
-    # Register the auth blueprint
+    # Register auth blueprint
     app.register_blueprint(auth.authBp)
     
     # Initialize the LoginManager
     auth.init_app(app)
 
-    @app.route('/hello')
-    def hello():
-        return 'Hello, World!'
+    # Import the home blueprint
+    from cordelia import home
+
+    # Register home blueprint
+    app.register_blueprint(home.homeBp)
     
     return app

@@ -1,5 +1,9 @@
-from flask import Blueprint, render_template, redirect, url_for, flash
-from flask_login import LoginManager, login_user
+from flask import (
+    Blueprint, render_template, redirect, url_for, 
+    flash, request, abort
+)
+from flask_login import LoginManager, login_user, login_required, logout_user
+from werkzeug.urls import url_parse
 from cordelia.models import db, User
 from cordelia.forms import RegistrationForm, LoginForm
 
@@ -17,19 +21,6 @@ def register():
     userForm = RegistrationForm()
 
     if userForm.validate_on_submit():
-        # Check if the username, email or phone already exists in the database
-        if User.query.filter_by(username=userForm.username.data).first():
-            flash('Username already exists.', 'error')
-            return redirect(url_for('auth.register'))
-
-        if User.query.filter_by(email=userForm.email.data).first():
-            flash('Email already exists.', 'error')
-            return redirect(url_for('auth.register'))
-
-        if User.query.filter_by(phoneNumber=userForm.phoneNumber.data).first():
-            flash('Phone number already exists.', 'error')
-            return redirect(url_for('auth.register'))
-
         # Create new User
         user = User(
             username=userForm.username.data, 
@@ -67,11 +58,26 @@ def login():
         user = User.query.filter_by(email=loginForm.email.data).first()
 
         if user and user.check_password(loginForm.password.data):
+            # Log the user in by storing their ID in the user's session
             login_user(user, remember=loginForm.remember.data)
+
             flash('Logged in successfully.', 'success')
-            return redirect(url_for('auth.login'))
+
+            next_page = request.args.get('next')
+            # Check if the network location is valid for next_page
+            if next_page and url_parse(next_page).netloc:
+                return abort(400)
             
-        flash('Invalid username or password.', 'error')
+            return redirect(next_page) if next_page else redirect(url_for('home.home'))
+            
+        flash('Invalid email or password.', 'error')
         return redirect(url_for('auth.login'))
 
     return render_template('login.html', loginForm=loginForm)
+
+# Logout route
+@authBp.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect('/home')

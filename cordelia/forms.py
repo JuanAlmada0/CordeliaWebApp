@@ -4,6 +4,7 @@ from wtforms.validators import DataRequired, Email, EqualTo
 from wtforms.validators import ValidationError
 import phonenumbers
 from phonenumbers.phonenumberutil import NumberParseException
+from cordelia.models import User
 
 
 
@@ -29,6 +30,18 @@ class RegistrationForm(FlaskForm):
 
         except NumberParseException:
             raise ValidationError('Invalid phone number')
+    # Check if the username, email or phone already exists in the database    
+    def validate_username(self, field):
+        if User.query.filter_by(username=field.data).first():
+            raise ValidationError('Username already exists.')
+
+    def validate_email(self, field):
+        if User.query.filter_by(email=field.data).first():
+            raise ValidationError('Email already exists.')
+
+    def validate_phoneNumber_duplicate(self, field):
+        if User.query.filter_by(phoneNumber=field.data).first():
+            raise ValidationError('Phone number already exists.')
 
 
 class LoginForm(FlaskForm):
