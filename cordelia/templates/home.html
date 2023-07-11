@@ -1,7 +1,21 @@
 {% extends "base.html" %}
 
 {% block header %}
-<h2>Welcome {{ current_user }}</h2>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class="messages">
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+    {% endwith %}
+
+    {% if current_user.is_authenticated %}
+        <h2>Welcome {{ current_user }}</h2>
+    {% else %}
+        <h2>Welcome</h2>
+    {% endif %}
 {% endblock %}
 
 {% block content %}
@@ -64,7 +78,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="card text-center">
       <div class="card-header">
         Featured

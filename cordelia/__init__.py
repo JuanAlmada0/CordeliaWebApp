@@ -13,7 +13,7 @@ def create_app(test_config=None):
         SQLALCHEMY_TRACK_MODIFICATIONS=True,
         WTF_CSRF_ENABLED=True,
         SERVER_NAME='127.0.0.1:5000',
-        PREFERRED_URL_SCHEME=None
+        PREFERRED_URL_SCHEME='http'
     )
     
     if test_config is None:
