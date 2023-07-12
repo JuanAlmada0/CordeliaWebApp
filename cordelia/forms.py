@@ -1,10 +1,10 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, SelectField
 from wtforms.validators import DataRequired, Email, EqualTo
 from wtforms.validators import ValidationError
 import phonenumbers
 from phonenumbers.phonenumberutil import NumberParseException
-from cordelia.models import User
+from cordelia.models import User, Dress
 
 
 
@@ -49,3 +49,25 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
+
+
+class InventoryForm(FlaskForm):
+    brand = StringField('Brand', validators=[DataRequired()])
+    size = StringField('Size', validators=[DataRequired()])
+    color = StringField('Color', validators=[DataRequired()])
+    style = StringField('Style', validators=[DataRequired()])
+    description = StringField('Description', validators=[DataRequired()])
+    boughtPrice = IntegerField('Bought Price', validators=[DataRequired()])
+    marketPrice = IntegerField('Market Price', validators=[DataRequired()])
+    rentPrice = IntegerField('Rent Price', validators=[DataRequired()])
+    submit = SubmitField('Submit')
+
+
+class SearchForm(FlaskForm):
+    category = SelectField('Category', choices=[])
+    search = StringField('Search')
+    submit = SubmitField('Filter')
+    
+    def __init__(self, model_columns, *args, **kwargs):
+        super(SearchForm, self).__init__(*args, **kwargs)
+        self.category.choices = [(column, column) for column in model_columns]

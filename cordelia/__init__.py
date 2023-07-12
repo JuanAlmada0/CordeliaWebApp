@@ -1,5 +1,6 @@
 import os
 from flask import Flask
+from flask_wtf.csrf import CSRFProtect
 
 
 
@@ -11,11 +12,14 @@ def create_app(test_config=None):
         SECRET_KEY='dev',
         SQLALCHEMY_DATABASE_URI='sqlite:///' + os.path.join(app.instance_path, 'CordeliaDB.db'),
         SQLALCHEMY_TRACK_MODIFICATIONS=True,
-        WTF_CSRF_ENABLED=True,
         SERVER_NAME='127.0.0.1:5000',
-        PREFERRED_URL_SCHEME='http'
+        PREFERRED_URL_SCHEME='http',
+        WTF_CSRF_ENABLED=True
     )
     
+    csrf = CSRFProtect()
+    csrf.init_app(app)
+
     if test_config is None:
         # load the instance config, if it exists, when not testing
         app.config.from_pyfile('config.py', silent=True)
@@ -35,19 +39,17 @@ def create_app(test_config=None):
     # Initialize the database
     db.init_app(app)
 
-    # Import the auth blueprint
+    # Import blueprints
     from cordelia import auth
+    from cordelia import home
+    from cordelia import admin
 
-    # Register auth blueprint
+    # Register blueprintS
     app.register_blueprint(auth.authBp)
+    app.register_blueprint(home.homeBp)
+    app.register_blueprint(admin.adminBp)
     
     # Initialize the LoginManager
     auth.init_app(app)
 
-    # Import the home blueprint
-    from cordelia import home
-
-    # Register home blueprint
-    app.register_blueprint(home.homeBp)
-    
     return app

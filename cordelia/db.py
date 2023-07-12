@@ -36,7 +36,7 @@ def close_session(e=None):
     # Close the database session
     session = getattr(current_app, '_session', None)
     if session is not None:
-        session.remove()
+        session.close()
         setattr(current_app, '_session', None)
 
 
@@ -44,6 +44,21 @@ def init_db(app):
     with app.app_context():
         # Create all the database tables based on the defined models
         db.create_all()
+
+        # Create admin user
+        from cordelia.models import User
+        admin_user = User(
+            username='Admin',
+            email='admin@example.com',
+            name='Admin',
+            lastName='Example',
+            phoneNumber='526443569870',
+            isAdmin=True
+        )
+        admin_user.set_password('password1234')
+
+        db.session.add(admin_user)
+        db.session.commit()
 
 
 @click.command('init-db')

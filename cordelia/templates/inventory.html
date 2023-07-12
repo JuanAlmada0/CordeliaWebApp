@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container border border-dark p-2">
+  <table class="table table-sm">
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col">Dress Inventory</th>
+        <th scope="col" class="text-right">
+          <form method="POST" action="{{ url_for('admin.inventory') }}" class="form-inline justify-content-end">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+              {{ form.category(class="form-control mr-2") }}
+              {{ form.search(class="form-control mr-2") }}
+              <button type="submit" class="btn btn-primary">Filter</button>
+            </div>
+          </form>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for dress in inventory %}
+      <tr>
+        <td colspan="2">
+          <div class="accordion" id="accordion{{ loop.index }}">
+            <div class="card">
+              <div class="card-header" id="heading{{ loop.index }}">
+                <h2 class="mb-0">
+                  <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ loop.index }}" aria-expanded="true" aria-controls="collapse{{ loop.index }}">
+                    {{ dress }}
+                    <span class="badge badge-primary badge-pill">Rented</span>
+                  </button>
+                </h2>
+              </div>
+              <div id="collapse{{ loop.index }}" class="collapse" aria-labelledby="heading{{ loop.index }}" data-parent="#accordion{{ loop.index }}">
+                <div class="card-body">
+                  <table class="table table-sm">
+                    <tbody>
+                      <tr>
+                        <th scope="row">Brand:</th>
+                        <td>{{ dress.brand }}</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Size:</th>
+                        <td>{{ dress.size }}</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Color:</th>
+                        <td>{{ dress.color }}</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Style:</th>
+                        <td>{{ dress.style }}</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Description:</th>
+                        <td>{{ dress.dressDescription }}</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Dress Cost:</th>
+                        <td>{{ dress.boughtPrice }}</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Market Price:</th>
+                        <td>{{ dress.marketPrice }}</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Rent Price:</th>
+                        <td>{{ dress.rentPrice }}</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Rents to return Investment:</th>
+                        <td>{{ dress.rentsToReturnInvestment }}</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Times Rented:</th>
+                        <td>{{ dress.timesRented }}</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Sellable:</th>
+                        <td>{{ dress.sellable }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<br>
+<a href="{{ url_for('admin.update') }}">Update Inventory</a>
+
+{% endblock %}

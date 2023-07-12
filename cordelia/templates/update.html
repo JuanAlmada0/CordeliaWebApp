@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h1>Register</h1>
+  <h1>Register Dress</h1>
 
   {% with messages = get_flashed_messages() %}
     {% if messages %}
@@ -12,10 +12,9 @@
       </ul>
     {% endif %}
   {% endwith %}
-  
   <div class="container mt-4">
-    <form method="POST" action="{{ url_for('auth.register') }}">
-      {% for field in userForm %}
+    <form method="POST" action="{{ url_for('admin.update') }}">
+      {% for field in form %}
         <div class="form-group">
           {% if field.type != 'SubmitField' %}
             {{ field.label }}
@@ -29,6 +28,5 @@
         </div>
       {% endfor %}
     </form>
-  </div>  
-  
+  </div>
 {% endblock %}

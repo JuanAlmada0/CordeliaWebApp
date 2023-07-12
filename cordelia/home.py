@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template
 
 
+
 homeBp = Blueprint('home', __name__)
 
 

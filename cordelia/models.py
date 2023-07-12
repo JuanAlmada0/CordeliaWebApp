@@ -16,12 +16,19 @@ class Dress(db.Model):
     boughtPrice = db.Column(db.Integer, index=True, nullable=False)
     marketPrice = db.Column(db.Integer, nullable=False)
     rentPrice = db.Column(db.Integer, index=True, nullable=False)
-    rentsToReturnInvest = db.Column(db.Integer, nullable=False)
+    rentsToReturnInvestment = db.Column(db.Integer)
     timesRented = db.Column(db.Integer, default=0)
     sellable = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return f"<Dress id={self.id}, style={self.style}, brand={self.brand}>"
+    
+    def calculate_rents_to_return_investment(self):
+        self.rentsToReturnInvestment = self.boughtPrice // self.rentPrice
+
+    def __init__(self, *args, **kwargs):
+        super(Dress, self).__init__(*args, **kwargs)
+        self.calculate_rents_to_return_investment()
 
     def increment_times_rented(self):
         # Method to increment the timesRented value and update sellable flag
@@ -31,7 +38,6 @@ class Dress(db.Model):
         else:
             self.timesRented = 1
             self.sellable = False
-
 
 
 class User(UserMixin, db.Model):
@@ -44,6 +50,7 @@ class User(UserMixin, db.Model):
     phoneNumber = db.Column(db.Integer, unique=True)
     password_hash = db.Column(db.String(80))
     joinedAtDate = db.Column(db.DateTime(), index=True, default=datetime.utcnow)
+    isAdmin = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return f"<User {self.username}>"
@@ -53,7 +60,6 @@ class User(UserMixin, db.Model):
     
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
-
 
 
 class Rent(db.Model):
