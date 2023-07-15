@@ -1,6 +1,6 @@
 from flask import (
     Blueprint, render_template, redirect, url_for, 
-    flash, request, abort
+    flash, request, session
 )
 from flask_login import LoginManager, login_user, login_required, logout_user
 from urllib.parse import urlparse, urljoin 
@@ -28,6 +28,10 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
+# Set the login view
+login_manager.login_view = 'auth.login'
+
+
 def is_safe_url(target):
     """
     Checks if the target URL is safe by comparing its scheme and netloc with the current request's URL.
@@ -38,21 +42,6 @@ def is_safe_url(target):
     ref_url = urlparse(request.host_url)
     test_url = urlparse(urljoin(request.host_url, target))
     return test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc
-
-
-def redirect_to_next(next_page):
-    """
-    Redirects the user to the provided next_page if it is safe. Otherwise, redirects to a default page.
-
-    :param next_page: The URL to redirect the user to.
-    :return: A redirect response object.
-    """
-    if next_page and is_safe_url(next_page):
-        return redirect(next_page)
-    elif not next_page:
-        return redirect(url_for('home.home'))
-    else:
-        abort(400)
 
 
 # Register route
@@ -88,6 +77,8 @@ def login():
 
     loginForm = LoginForm()
 
+    next_page = session.get('next_page')
+
     if loginForm.validate_on_submit():
         user = User.query.filter_by(email=loginForm.email.data).first()
 
@@ -97,13 +88,16 @@ def login():
 
             flash('Logged in successfully.', 'success')
 
-            next_page = request.args.get('next')
-            
-            return redirect_to_next(next_page)
-        
-        else:    
-            flash('Invalid email or password.', 'error')
-            return redirect(url_for('auth.login'))
+            if next_page and is_safe_url(next_page):
+                session.pop('next_page')
+                return redirect(next_page)
+            else:
+                return redirect('home.home')
+           
+        flash('Invalid email or password.', 'error')
+        return redirect(url_for('auth.login'))
+
+    session['next_page'] = request.referrer
 
     return render_template('login.html', loginForm=loginForm)
 

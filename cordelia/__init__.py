@@ -41,13 +41,13 @@ def create_app(test_config=None):
 
     # Import blueprints
     from cordelia import auth
-    from cordelia import home
     from cordelia import admin
-
+    from cordelia import home
+    
     # Register blueprintS
     app.register_blueprint(auth.authBp)
-    app.register_blueprint(home.homeBp)
     app.register_blueprint(admin.adminBp)
+    app.register_blueprint(home.homeBp)
     
     # Initialize the LoginManager
     auth.init_app(app)

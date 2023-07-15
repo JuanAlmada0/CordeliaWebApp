@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <style>
+    .custom-bg {
+        background-color: #DCC6B6;
+        background-image: linear-gradient(to bottom, #aa9b90ec, #dcc6b6c0 1px, #BFAEA2);
+    }
+  </style>
+
+  <div class="d-flex justify-content-center">
+    <div class="jumbotron custom-bg" style="width: 70rem;">
+      <h1 class="display-4">Catalog</h1>
+    </div>
+  </div>
+
+  <style>
+    .container {
+      max-width: 70rem; 
+      margin: 2rem auto;
+    }
+    .card {
+      flex-basis: calc(33.333% - 1rem);
+      margin: 0.5rem;
+    }
+
+    .card-link-container {
+      position: absolute;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  </style>
+
+  <div class="container">
+    <table class="table custom-bg">
+      <tbody>
+        {% for dress in inventory %}
+          {% if loop.index0 % 3 == 0 %}
+            <tr>
+          {% endif %}
+          <td>
+            <div class="card">
+              <img src="{{ url_for('static', filename='images/dressExample1.jpg') }}" class="card-img-top" alt="...">
+              <div class="card-body">
+                <h6 class="card-title">{{ dress }}</h6>
+                <p class="card-text">{{ dress.dressDescription }}</p>
+                <p class="card-text"><small class="text-muted">Rent for: {{ dress.rentPrice }}</small></p>
+                <div class="card-link-container">
+                  <a href="{{ url_for('home.cart') }}" class="card-link">Add to Cart</a>
+                </div>
+              </div>
+            </div>
+          </td>
+          {% if loop.index % 3 == 0 or loop.last %}
+            </tr>
+          {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+{% endblock %}

@@ -48,7 +48,6 @@ def inventory():
     return render_template('inventory.html', inventory=inventory, form=form)
 
 
-
 @adminBp.route('/update', methods=['GET', 'POST'])
 @admin_required
 def update():
@@ -63,7 +62,7 @@ def update():
             color = form.color.data,
             style = form.style.data,
             dressDescription = form.description.data,
-            boughtPrice = form.boughtPrice.data,
+            dressCost = form.dressCost.data,
             marketPrice = form.marketPrice.data,
             rentPrice = form.rentPrice.data,
         )

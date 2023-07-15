@@ -57,17 +57,21 @@ class InventoryForm(FlaskForm):
     color = StringField('Color', validators=[DataRequired()])
     style = StringField('Style', validators=[DataRequired()])
     description = StringField('Description', validators=[DataRequired()])
-    boughtPrice = IntegerField('Bought Price', validators=[DataRequired()])
+    dressCost = IntegerField('Dress Cost', validators=[DataRequired()])
     marketPrice = IntegerField('Market Price', validators=[DataRequired()])
     rentPrice = IntegerField('Rent Price', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
 
 class SearchForm(FlaskForm):
-    category = SelectField('Category', choices=[])
+    category = SelectField('Category', choices=[], default='Select Category', validators=[DataRequired()])
     search = StringField('Search')
     submit = SubmitField('Filter')
     
     def __init__(self, model_columns, *args, **kwargs):
         super(SearchForm, self).__init__(*args, **kwargs)
-        self.category.choices = [(column, column) for column in model_columns]
+        self.category.choices = [('Select Category', 'Select Category')] + [(column, column) for column in model_columns]
+
+
+class RentForm(FlaskForm):
+    pass

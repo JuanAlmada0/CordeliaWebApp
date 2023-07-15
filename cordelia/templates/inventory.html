@@ -1,40 +1,58 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container border border-dark p-2">
-  <table class="table table-sm">
-    <thead class="thead-dark">
-      <tr>
-        <th scope="col">Dress Inventory</th>
-        <th scope="col" class="text-right">
-          <form method="POST" action="{{ url_for('admin.inventory') }}" class="form-inline justify-content-end">
-            {{ form.hidden_tag() }}
-            <div class="form-group">
-              {{ form.category(class="form-control mr-2") }}
-              {{ form.search(class="form-control mr-2") }}
-              <button type="submit" class="btn btn-primary">Filter</button>
+
+  <div class="d-flex justify-content-center">
+    <h3>Admin Dashboard</h3>
+  </div>
+
+  <div class="d-flex justify-content-center">
+    <table class="table table-sm table-bordered" style="width: 71.4rem;">
+      <thead class="thead-dark">
+        <tr>
+          <th colspan="2">
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="text-left">Dress Inventory</span>
+              <form method="POST" action="{{ url_for('admin.inventory') }}" class="form-inline">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                  {{ form.category(class="form-control mr-sm-2", id="category-input") }}
+                  {{ form.search(class="form-control mr-sm-2", type="search", placeholder="Search") }}
+                  <button type="submit" class="btn btn-light">Filter</button>
+                </div>
+              </form>
             </div>
-          </form>
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for dress in inventory %}
-      <tr>
-        <td colspan="2">
-          <div class="accordion" id="accordion{{ loop.index }}">
-            <div class="card">
-              <div class="card-header" id="heading{{ loop.index }}">
-                <h2 class="mb-0">
-                  <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ loop.index }}" aria-expanded="true" aria-controls="collapse{{ loop.index }}">
-                    {{ dress }}
-                    <span class="badge badge-primary badge-pill">Rented</span>
-                  </button>
-                </h2>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for dress in inventory %}
+        <tr>
+          <td colspan="2">
+            <div class="accordion" id="accordion{{ loop.index }}">
+              <div class="card">
+                <div class="card-header" id="heading{{ loop.index }}">
+                  <h6 class="mb-0">
+                    <div class="row align-items-center">
+                      <div class="col">
+                        <button class="btn btn-light" type="button" data-toggle="collapse" data-target="#collapse{{ loop.index }}" aria-expanded="true" aria-controls="collapse{{ loop.index }}">
+                          {{ dress }}
+                        </button>
+                      </div>
+                      <div class="col-auto">
+                        {% if not dress.rentStatus %}
+                        <span class="badge badge-success badge-pill badge-small">Available</span>
+                        {% else %}
+                        <span class="badge badge-secondary badge-pill badge-small">Rented</span>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </h6>
+                </div>
               </div>
               <div id="collapse{{ loop.index }}" class="collapse" aria-labelledby="heading{{ loop.index }}" data-parent="#accordion{{ loop.index }}">
                 <div class="card-body">
-                  <table class="table table-sm">
+                  <table class="table table-striped table-hover table-sm table-light">
                     <tbody>
                       <tr>
                         <th scope="row">Brand:</th>
@@ -58,7 +76,7 @@
                       </tr>
                       <tr>
                         <th scope="row">Dress Cost:</th>
-                        <td>{{ dress.boughtPrice }}</td>
+                        <td>{{ dress.dressCost }}</td>
                       </tr>
                       <tr>
                         <th scope="row">Market Price:</th>
@@ -85,15 +103,15 @@
                 </div>
               </div>
             </div>
-          </div>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 
-<br>
-<a href="{{ url_for('admin.update') }}">Update Inventory</a>
+  <br>
+
+  <a href="{{ url_for('admin.update') }}">Update Inventory</a>
 
 {% endblock %}

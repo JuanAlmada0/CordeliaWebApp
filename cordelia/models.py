@@ -13,22 +13,23 @@ class Dress(db.Model):
     style = db.Column(db.String(20), index=True, nullable=False)
     dressDescription = db.Column(db.String(30), index=True, nullable=False)
     brand = db.Column(db.String(20), index=True, nullable=False)
-    boughtPrice = db.Column(db.Integer, index=True, nullable=False)
+    dressCost = db.Column(db.Integer, index=True, nullable=False)
     marketPrice = db.Column(db.Integer, nullable=False)
     rentPrice = db.Column(db.Integer, index=True, nullable=False)
     rentsToReturnInvestment = db.Column(db.Integer)
     timesRented = db.Column(db.Integer, default=0)
     sellable = db.Column(db.Boolean, default=False)
-
-    def __repr__(self):
-        return f"<Dress id={self.id}, style={self.style}, brand={self.brand}>"
-    
-    def calculate_rents_to_return_investment(self):
-        self.rentsToReturnInvestment = self.boughtPrice // self.rentPrice
+    rentStatus = db.Column(db.Boolean, default=False)
 
     def __init__(self, *args, **kwargs):
         super(Dress, self).__init__(*args, **kwargs)
         self.calculate_rents_to_return_investment()
+
+    def __repr__(self):
+        return f"Dress ID: {self.id}, Brand: {self.brand}"
+    
+    def calculate_rents_to_return_investment(self):
+        self.rentsToReturnInvestment = self.dressCost // self.rentPrice
 
     def increment_times_rented(self):
         # Method to increment the timesRented value and update sellable flag
@@ -38,6 +39,9 @@ class Dress(db.Model):
         else:
             self.timesRented = 1
             self.sellable = False
+
+    def update_rent_status(self):
+        self.rentStatus = True
 
 
 class User(UserMixin, db.Model):
@@ -80,6 +84,7 @@ class Rent(db.Model):
         super(Rent, self).__init__(*args, **kwargs)
         # Increment timesRented value from the Dress instance.
         self.dress.increment_times_rented()
+        self.dress.update_rent_status()
         # Added Tax.
         dress = self.dress
         tax = dress.rentPrice * 0.16
