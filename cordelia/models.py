@@ -63,7 +63,7 @@ class User(UserMixin, db.Model):
     isAdmin = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
-        return f"<User {self.username}>"
+        return f"<{self.username}>"
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
