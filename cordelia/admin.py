@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, redirect, url_for, flash
+from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import current_user
-from cordelia.db import db, get_session
+from cordelia.db import db
 from cordelia.models import Dress
 from cordelia.forms import InventoryForm, SearchForm
 from functools import wraps
@@ -24,15 +24,13 @@ def admin_required(f):
 @adminBp.route('/inventory', methods=['GET', 'POST'])
 @admin_required
 def inventory():
-    session = get_session()
-
     # Get the column names from the Dress model
     model_columns = Dress.__table__.columns.keys()
 
     # Pass the model_columns list to the SearchForm constructor
     form = SearchForm(model_columns=model_columns)
 
-    inventory = session.query(Dress).all()
+    inventory = Dress.query.all()
 
     if form.validate_on_submit():
         category = form.category.data
@@ -43,7 +41,22 @@ def inventory():
 
         if category and filterSearch and category in category_to_column:
             column = category_to_column[category]
-            inventory = session.query(Dress).filter(column.ilike(f"%{filterSearch}%")).all()
+            inventory = Dress.query.filter(column.ilike(f"%{filterSearch}%")).all()
+
+    # Handles the DELETE button for inventory.
+    if request.method == 'POST':
+        dress_id = request.form.get('dress_id')
+
+        if dress_id:
+            dress = Dress.query.get(int(dress_id))
+
+            if dress:
+                db.session.delete(dress)
+                db.session.commit()
+                flash('Dress deleted successfully.', 'success')
+                return redirect(url_for('admin.inventory'))
+            else:
+                flash('Dress not found.', 'danger')
 
     return render_template('inventory.html', inventory=inventory, form=form)
 

@@ -1,50 +1,50 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block content %}
 
-<style>
-  .custom-bg {
-      background-color: #DCC6B6;
-      background-image: linear-gradient(to bottom, #aa9b90ec, #dcc6b6c0 1px, #BFAEA2);
-  }
-</style>
-
-<div class="container mt-4 px-4 custom-bg">
-  <div class="row">
-    <div class="col-md-6 mt-4 mb-4 px-4">
-      <h3>Shopping Cart</h3>
-      <ul>
-        <li>Product 1 - $19.99</li>
-        <li>Product 2 - $10.99</li>
-      </ul>
-      <p>Total: $30.98</p>
-    </div>
-    <div class="col-md-6 mt-4 mb-4 px-4">
-      <h3>Payment Information</h3>
-      <form>
-        <div class="form-group">
-          <label for="card-number">Card Number</label>
-          <input type="text" class="form-control" id="card-number" placeholder="Enter card number">
-        </div>
-        <div class="form-group">
-          <label for="expiry-date">Expiry Date</label>
-          <input type="text" class="form-control" id="expiry-date" placeholder="MM/YY">
-        </div>
-        <div class="form-group">
-          <label for="cvv">CVV</label>
-          <input type="text" class="form-control" id="cvv" placeholder="CVV">
-        </div>
-        <div class="form-check mt-4">
-          <input class="form-check-input" type="checkbox" value="" id="agreeTerms" required>
-          <label class="form-check-label" for="agreeTerms">
-            I agree to the <a href="#">terms and conditions</a>
-          </label>
-        </div>
-        <br>
-        <button type="submit" class="btn btn-primary btn-dark">Place Order</button>
-      </form>
+  <style>
+    .custom-bg {
+      background-color: #b8a495dc;
+    }  
+    .container {
+      max-width: 70rem;
+      margin: 2rem auto;
+    }
+  
+    .card {
+      flex-basis: calc(33.333% - 1rem);
+      margin: 0.5rem;
+    }
+  
+    .card-link-container {
+      position: absolute;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+    }    
+  </style>
+  
+  <div class="container mt-4 px-4 custom-bg">
+    <div class="row">
+      <div class="col-md-6 mt-4 mb-4 px-4">
+        <h5>{{ current_user }}</h5>
+        <h4>Shopping Cart</h4>
+        {% if dress %}
+          <ul>
+            <li>Dress {{ dress }}</li>
+          </ul>
+          <p>Rent for: {{ dress.rentPrice }}</p>
+          <form method="post" class="form-group">
+              {{ form.hidden_tag() }}
+              {{ form.rentDate.label }}
+              {{ form.rentDate(class="form-control") }}
+              {{ form.submit(class="btn btn-dark") }}
+          </form>
+        {% else %}
+          <p>Your cart is empty.</p>
+        {% endif %}
+      </div>
     </div>
   </div>
-</div>
 
 {% endblock %}

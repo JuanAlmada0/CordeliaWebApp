@@ -1,7 +1,11 @@
-from flask import Blueprint, render_template, redirect, url_for, flash
+from flask import (
+    Blueprint, render_template, redirect, url_for, 
+    flash
+)
 from flask_login import login_required, current_user
-from cordelia.db import db, get_session
-from cordelia.models import Dress, User, Rent
+from cordelia.db import db
+from cordelia.models import Dress, Rent
+from cordelia.forms import RentForm
 
 
 
@@ -16,16 +20,39 @@ def home():
 
 @homeBp.route('/catalog')
 def catalog():
-    
-    session = get_session()
-
-    inventory = session.query(Dress).all()
-
+    inventory = Dress.query.all()
     return render_template('catalog.html', inventory=inventory)
 
 
-@homeBp.route('/cart', methods=['GET', 'POST'])
+@homeBp.route('/cart/<int:dress_id>', methods=['GET', 'POST'])
 @login_required
-def cart():
+def cart(dress_id):
+    user = current_user
+    dress = Dress.query.get(dress_id)
 
-    return render_template('cart.html')
+    if not dress:
+        flash('Dress not found.', 'danger')
+        return redirect(url_for('home.catalog'))
+    
+    form = RentForm()
+
+    if form.validate_on_submit():
+        rent = Rent(
+            dressId=dress.id,
+            clientId=user.id,
+            rentDate=form.rentDate.data
+        )
+        db.session.add(rent)
+        db.session.commit()
+
+        flash('Dress added to cart.', 'success')
+        return redirect(url_for('home.checkout', rent_id=rent.id))
+
+    return render_template('cart.html', dress=dress, form=form) 
+
+
+@homeBp.route('/checkout/<int:rent_id>', methods=['GET', 'POST'])
+@login_required
+def checkout(rent_id):
+    rent = Rent.query.get(rent_id)
+    return render_template('checkout.html', rent=rent)

@@ -16,7 +16,7 @@
             top: 10px;
             left: 37.5%;
             right: 0;
-            width: 25%; /* Adjust the desired width */
+            width: 20%; 
             margin-left: auto;
             margin-right: auto;
         }
@@ -26,7 +26,7 @@
         }
         .custom-navbar {
             background-color: #DCC6B6;
-            width: 69.5rem;
+            width: 80rem;
             max-width: 100%;
             margin-left: auto;
             margin-right: auto; 
@@ -85,24 +85,26 @@
 
     {% with messages = get_flashed_messages() %}
       {% if messages %}
-        <div class="alert alert-sm alert-info alert-dismissible fade-out" role="alert">
+        <div class="alert alert-info alert-sm alert-dismissible fade-out" role="alert">
           <ul class="messages">
             {% for message in messages %}
               <li>{{ message }}</li>
             {% endfor %}
           </ul>
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <button type="button" class="close close-sm" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
       {% endif %}
     {% endwith %}
 
+
   {% endblock %}
   
-  <section class="container" style="max-width: 71.4rem; width: 100%;">
-    {% block content %}{% endblock %}
-  </section>
+
+  {% block content %}
+  {% endblock %}
+  
   
 
   {% block scripts %}

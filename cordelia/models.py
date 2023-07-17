@@ -1,5 +1,5 @@
 from cordelia.db import db
-from datetime import datetime
+from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 
@@ -33,15 +33,21 @@ class Dress(db.Model):
 
     def increment_times_rented(self):
         # Method to increment the timesRented value and update sellable flag
-        if self.timesRented is not None:
-            self.timesRented += 1
-            self.sellable = self.timesRented > self.rentsToReturnInvestment
-        else:
-            self.timesRented = 1
-            self.sellable = False
+        try:
+            if self.timesRented is not None:
+                self.timesRented += 1
+                self.sellable = self.timesRented > self.rentsToReturnInvestment
+            else:
+                self.timesRented = 1
+                self.sellable = False
+        except Exception as e:
+            print("Error in increment_times_rented: ", e)
 
     def update_rent_status(self):
-        self.rentStatus = True
+        try:
+            self.rentStatus = True
+        except Exception as e:
+            print("Error in update_rent_status: ", e)
 
 
 class User(UserMixin, db.Model):
@@ -71,10 +77,8 @@ class Rent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     dressId = db.Column(db.Integer, db.ForeignKey('dress.id'))
     clientId = db.Column(db.Integer, db.ForeignKey('user.id'))
-    price = db.Column(db.Integer, index=True, nullable=False)
-    rentDate = db.Column(db.Date, index=True, nullable=False)
-    returnDate = db.Column(db.Date, index=True, nullable=True, default=None)
-    paymentDate = db.Column(db.String(20), index=True, nullable=True)
+    rentDate = db.Column(db.Date, index=True)
+    returnDate = db.Column(db.Date, index=True)
     paymentTotal = db.Column(db.Integer, nullable=True)
 
     dress = db.relationship('Dress', backref='rents')     # One Dress to Many Rents relationship
@@ -82,13 +86,22 @@ class Rent(db.Model):
 
     def __init__(self, *args, **kwargs):
         super(Rent, self).__init__(*args, **kwargs)
+
+        if self.dressId:
+            self.dress = Dress.query.get(self.dressId)
+        if self.clientId:
+            self.user = User.query.get(self.clientId)
+
         # Increment timesRented value from the Dress instance.
         self.dress.increment_times_rented()
+        # Update rentStatus from Dress Instance.
         self.dress.update_rent_status()
+        # Calculate return date based on rentDate value.
+        if self.rentDate:
+            self.returnDate = self.rentDate + timedelta(days=5)
         # Added Tax.
-        dress = self.dress
-        tax = dress.rentPrice * 0.16
-        self.paymentTotal = int(dress.rentPrice + tax)
-    
+        tax = self.dress.rentPrice * 0.16
+        self.paymentTotal = int(self.dress.rentPrice + tax)
+
     def __repr__(self):
         return f"<Rent id={self.id}, dressId-{self.dressId}, clientId={self.clientId}>"

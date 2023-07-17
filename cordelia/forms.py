@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, SelectField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, SelectField, DateField
 from wtforms.validators import DataRequired, Email, EqualTo
 from wtforms.validators import ValidationError
 import phonenumbers
@@ -74,4 +74,5 @@ class SearchForm(FlaskForm):
 
 
 class RentForm(FlaskForm):
-    pass
+    rentDate = DateField('Rent Date')
+    submit = SubmitField('Check Out')
