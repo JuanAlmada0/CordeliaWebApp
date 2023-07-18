@@ -25,45 +25,44 @@ class Dress(db.Model):
         super(Dress, self).__init__(*args, **kwargs)
         self.calculate_rents_to_return_investment()
 
-    def __repr__(self):
-        return f"Dress Id - {self.id} Brand - {self.brand}"
     
     def calculate_rents_to_return_investment(self):
         self.rentsToReturnInvestment = self.dressCost // self.rentPrice
 
     def increment_times_rented(self):
         # Method to increment the timesRented value and update sellable flag
-        try:
-            if self.timesRented is not None:
-                self.timesRented += 1
-                self.sellable = self.timesRented > self.rentsToReturnInvestment
-            else:
-                self.timesRented = 1
-                self.sellable = False
-        except Exception as e:
-            print("Error in increment_times_rented: ", e)
+        if self.timesRented is not None:
+            self.timesRented += 1
+            self.sellable = self.timesRented > self.rentsToReturnInvestment
+        else:
+            self.timesRented = 1
+            self.sellable = False
+
+    def decrement_times_rented(self):
+        self.timesRented -= 1
+        self.sellable = self.timesRented > self.rentsToReturnInvestment
+        db.session.commit()
     
     def update_rent_status(self):
-        # Query the database to get the oldest rent associated with this dress
-        associatedRents = Rent.query.filter_by(dressId=self.id).order_by(Rent.rentDate).all()
+        # Query the database to get the latest rent associated with this dress
+        associated_rent = Rent.query.filter_by(dressId=self.id).order_by(Rent.rentDate.desc()).first()
 
         # Check if there is any related rent
-        if not associatedRents:
+        if not associated_rent:
             self.rentStatus = False
         else:
-            for rent in associatedRents:
-                # Check if the oldest rent has been returned
-                if not rent.is_returned():
-                    self.rentStatus = True
-                else:
-                    self.rentStatus = False
-    
+            # Check if the latest rent has been returned
+            self.rentStatus = not associated_rent.is_returned()
+
     @classmethod
     def update_rent_statuses(cls):
         dresses = cls.query.all()
 
         for dress in dresses:
             dress.update_rent_status()
+    
+    def __repr__(self):
+        return f"Dress Id - {self.id} Brand - {self.brand}"
 
 
 class User(UserMixin, db.Model):
@@ -78,14 +77,14 @@ class User(UserMixin, db.Model):
     joinedAtDate = db.Column(db.DateTime(), index=True, default=datetime.utcnow)
     isAdmin = db.Column(db.Boolean, default=False)
 
-    def __repr__(self):
-        return f"<{self.username}>"
-
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
     
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+    
+    def __repr__(self):
+        return f"<{self.username}>"
 
 
 class Rent(db.Model):
@@ -123,7 +122,7 @@ class Rent(db.Model):
         # Extract only the date portion from the current date and time
         current_date = current_datetime.date()
         # Check if the current date is greater than or equal to the return date
-        if current_date >= self.returnDate:
+        if current_date > self.returnDate:
             return True
         return False
 
