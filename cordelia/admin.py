@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import current_user
 from cordelia.db import db
-from cordelia.models import Dress
+from cordelia.models import Dress, Rent
 from cordelia.forms import InventoryForm, SearchForm
 from functools import wraps
 
@@ -30,6 +30,8 @@ def inventory():
     # Pass the model_columns list to the SearchForm constructor
     form = SearchForm(model_columns=model_columns)
 
+    Dress.update_rent_statuses()
+
     inventory = Dress.query.all()
 
     if form.validate_on_submit():
@@ -57,6 +59,12 @@ def inventory():
                 return redirect(url_for('admin.inventory'))
             else:
                 flash('Dress not found.', 'danger')
+
+    # After processing the whole request, update the rentStatus for marked dresses and commit the changes
+    for dress in inventory:
+        dress.update_rent_status()
+        
+    db.session.commit()
 
     return render_template('inventory.html', inventory=inventory, form=form)
 

@@ -6,38 +6,38 @@ import click
 from flask.cli import with_appcontext
 
 
-
 # Initialize SQLAlchemy extension
 db = SQLAlchemy()
 
 
-def get_engine():
+def get_engine(app):
     # Get the SQLAlchemy engine for the current app
-    engine = getattr(current_app, '_engine', None)
+    engine = getattr(app, '_engine', None)
     if engine is None:
         # Create a new engine based on the app's database URI
-        engine = create_engine(current_app.config['SQLALCHEMY_DATABASE_URI'])
-        setattr(current_app, '_engine', engine)
+        engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
+        setattr(app, '_engine', engine)
     return engine
 
 
-def get_session():
+def get_session(app):
     # Get the database session for the current app and engine
-    session = getattr(current_app, '_session', None)
+    session = getattr(app, '_session', None)
     if session is None:
         # Create a scoped session based on the engine
-        sessionFactory = scoped_session(sessionmaker(bind=get_engine()))
+        sessionFactory = scoped_session(sessionmaker(bind=get_engine(app)))
         session = sessionFactory()
-        setattr(current_app, '_session', session)
+        setattr(app, '_session', session)
     return session
 
 
 def close_session(e=None):
     # Close the database session
-    session = getattr(current_app, '_session', None)
+    app = current_app._get_current_object()
+    session = getattr(app, '_session', None)
     if session is not None:
         session.close()
-        setattr(current_app, '_session', None)
+        setattr(app, '_session', None)
 
 
 def init_db(app):
@@ -61,12 +61,23 @@ def init_db(app):
         db.session.commit()
 
 
+# Command to initialize the database
 @click.command('init-db')
 @with_appcontext
 def init_db_command():
-    # Command to initialize the database
     init_db(current_app)
     click.echo('Initialized the database.')
+
+
+from cordelia.models import Dress, Rent
+# Event listener to update rentStatus in Dress whenever a new Rent object is created or updated
+@db.event.listens_for(Rent, 'after_insert')
+@db.event.listens_for(Rent, 'after_update')
+@db.event.listens_for(Rent, 'after_delete')
+def update_dress_rent_status(mapper, connection, target):
+    dress = Dress.query.get(target.dressId)
+    if dress:
+        dress.update_rent_status()
 
 
 def init_app(app):

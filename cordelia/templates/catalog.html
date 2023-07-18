@@ -31,26 +31,31 @@
         <p>New Arrivals.</p>
     </div>
   </div>
-  <div class="container justify-content-center">
-    <div class="row">
-      {% for dress in inventory %}
-        <div class="col-md-4 mb-4">
-          <div class="card">
-            <img src="{{ url_for('static', filename='images/dressExample1.jpg') }}" class="card-img-top" alt="...">
-            <div class="card-body">
-              <h6 class="card-title">{{ dress.id }}</h6>
-              <p class="card-text">{{ dress.dressDescription }}</p>
-              <p class="card-text"><small class="text-muted">Rent for: ${{ dress.rentPrice }}</small></p>
-              {% if not dress.rentStatus %}
-              <a class="btn btn-primary btn-lg btn-dark" href="{{ url_for('home.cart', dress_id=dress.id)}}" role="button">Add to cart</a>
-              {% else %}
-                <p>This dress is currently unavailable.</p>
-              {% endif %}
+
+  <div class="container custom-bg">
+    <div class="container justify-content-center">
+      {% for row_index in range(0, inventory|length, 3) %}
+        <div class="row">
+          {% for dress in inventory[row_index:row_index+3] %}
+            <div class="col-md-4 mb-4"> <!-- col-md-4 to make 3 columns on medium-sized screens -->
+              <div class="card">
+                <img src="{{ url_for('static', filename='images/dressExample1.jpg') }}" class="card-img-top" alt="..." style="object-fit: cover;">
+                <div class="card-body" style="height: 180px;">
+                  <h6 class="card-title">{{ dress.id }}</h6>
+                  <p class="card-text">{{ dress.dressDescription }}</p>
+                  <p class="card-text"><small class="text-muted">Rent for: ${{ dress.rentPrice }}</small></p>
+                  {% if not dress.rentStatus %}
+                    <a class="btn btn-primary btn-sm btn-dark" href="{{ url_for('home.cart', dress_id=dress.id)}}" role="button">Add to cart</a>
+                  {% else %}
+                    <p>This dress is currently unavailable.</p>
+                  {% endif %}
+                </div>
+              </div>
             </div>
-          </div>
+          {% endfor %}
         </div>
       {% endfor %}
-    </div>
-  </div>
+    </div>    
+  </div>   
 
 {% endblock %}

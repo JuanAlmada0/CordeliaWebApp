@@ -26,7 +26,7 @@ class Dress(db.Model):
         self.calculate_rents_to_return_investment()
 
     def __repr__(self):
-        return f"Dress ID: {self.id}, Brand: {self.brand}"
+        return f"Dress Id - {self.id} Brand - {self.brand}"
     
     def calculate_rents_to_return_investment(self):
         self.rentsToReturnInvestment = self.dressCost // self.rentPrice
@@ -42,12 +42,28 @@ class Dress(db.Model):
                 self.sellable = False
         except Exception as e:
             print("Error in increment_times_rented: ", e)
-
+    
     def update_rent_status(self):
-        try:
-            self.rentStatus = True
-        except Exception as e:
-            print("Error in update_rent_status: ", e)
+        # Query the database to get the oldest rent associated with this dress
+        associatedRents = Rent.query.filter_by(dressId=self.id).order_by(Rent.rentDate).all()
+
+        # Check if there is any related rent
+        if not associatedRents:
+            self.rentStatus = False
+        else:
+            for rent in associatedRents:
+                # Check if the oldest rent has been returned
+                if not rent.is_returned():
+                    self.rentStatus = True
+                else:
+                    self.rentStatus = False
+    
+    @classmethod
+    def update_rent_statuses(cls):
+        dresses = cls.query.all()
+
+        for dress in dresses:
+            dress.update_rent_status()
 
 
 class User(UserMixin, db.Model):
@@ -94,14 +110,22 @@ class Rent(db.Model):
 
         # Increment timesRented value from the Dress instance.
         self.dress.increment_times_rented()
-        # Update rentStatus from Dress Instance.
-        self.dress.update_rent_status()
         # Calculate return date based on rentDate value.
         if self.rentDate:
-            self.returnDate = self.rentDate + timedelta(days=5)
+            self.returnDate = self.rentDate + timedelta(days=2)
         # Added Tax.
         tax = self.dress.rentPrice * 0.16
         self.paymentTotal = int(self.dress.rentPrice + tax)
+    
+    def is_returned(self):
+        # Get the current date and time
+        current_datetime = datetime.utcnow()
+        # Extract only the date portion from the current date and time
+        current_date = current_datetime.date()
+        # Check if the current date is greater than or equal to the return date
+        if current_date >= self.returnDate:
+            return True
+        return False
 
     def __repr__(self):
-        return f"<Rent id={self.id}, dressId-{self.dressId}, clientId={self.clientId}>"
+        return f"<Rent Id- {self.id}, dressId- {self.dressId}, clientId- {self.clientId}>"

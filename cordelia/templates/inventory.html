@@ -2,159 +2,232 @@
 
 {% block content %}
 
-  <style>
-    .custom-bg {
-        color: #B07D47; 
-    }
-    .btn-smaller {
-        padding: 0.12rem 0.4rem;
-        font-size: 0.8rem;
-    }
-  </style>
+<style>
+  .custom-bg {
+    color: #B07D47;
+  }
 
-  </br>
+  .btn-smaller {
+    padding: 0.1rem 0.3rem;
+    font-size: 0.7rem;
+  }
+  .custom-btn {
+    position: relative;
+  }
+  .arrow-down {
+    border: solid #DCC6B6;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 2px; /* Adjust top and bottom padding to change the height */
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+  }
+  /* Custom CSS for reducing space between text and arrow button */
+  .text-arrow-container {
+    display: flex;
+    align-items: center;
+  }
 
-  <div class="d-flex justify-content-center custom-bg">
-    <h3>Dashboard</h3>
-  </div>
+  .text-arrow-container .text-left {
+    margin-right: 5px; /* Adjust this value to control the space between the text and the arrow */
+  }
+  .custom-form-control {
+    padding: 0.25rem 0.5rem; /* Adjust the padding to make the form fields smaller */
+    font-size: 0.7rem; /* Adjust the font-size to make the text inside the form fields smaller */
+  }
+</style>
 
-  <div class="d-flex justify-content-center">
-    <table class="table table-sm table-dark" style="width: 60rem;">
-      <thead class="custom-bg">
-        <tr>
-            <th colspan="2">
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="text-left text-light" style="font-size: 15px;">Dress Inventory</span>
-                    <form method="POST" action="{{ url_for('admin.inventory') }}" class="form-inline">
-                        {{ form.hidden_tag() }}
-                        <div class="form-group form-control-sm">
-                            {{ form.category(class="form-control form-control-sm mr-2", id="category-input") }}
-                            {{ form.search(class="form-control form-control-sm mr-2", type="search", placeholder="Search") }}
-                            <button type="submit" class="btn btn-outline-light btn-smaller">Filter</button>
-                        </div>
-                    </form>
-                </div>
+</br>
+
+<div class="d-flex justify-content-center custom-bg">
+  <h3>Dashboard</h3>
+</div>
+
+<div class="d-flex justify-content-center" style="background-color: #b8a495dc; padding-top: 20px;">
+  <!-- New vertical and narrow table, taking 2 columns out of 12 -->
+  <div class="col-md-2 d-flex flex-column">
+    <div class="row pl-3"> <!-- Add this div with the 'row' class -->
+      <table class="table table-bordered table-dark flex-1 p-1" style="height: 100%; overflow-y: auto;">
+        <thead>
+          <tr>
+            <th>
+              <span class="text-left text-light" style="font-size: 14px;">Inventory</span>
             </th>
-        </tr>
-      </thead>
-      <tbody class="custom-bg">
-        {% for dress in inventory %}
-        <tr>
-          <td colspan="2">
-            <div class="accordion" id="accordion{{ loop.index }}">
-              <div class="card bg-dark">
-                  <div class="card-header" id="heading{{ loop.index }}">
-                      <h6 class="mb-0">
-                          <div class="row align-items-center">
-                              <div class="col">
-                                <button class="btn btn-sm btn-outline-light" style="color: #DCC6B6; border: 1px solid #DCC6B6;" type="button" data-toggle="collapse" data-target="#collapse{{ loop.index }}" aria-expanded="true" aria-controls="collapse{{ loop.index }}">
-                                  {{ dress }}
-                                </button>                                
-                              </div>
-                              <div class="col-auto">
-                                  {% if dress.sellable %}
-                                  <span class="badge badge-light badge-pill badge-small">Sellable</span>
-                                  {% endif %}
-                              </div>
-                              <div class="col-auto">
-                                  {% if not dress.rentStatus %}
-                                  <span class="badge badge-success badge-pill badge-small">Available</span>
-                                  {% else %}
-                                  <span class="badge badge-info badge-pill badge-small">Rented</span>
-                                  {% endif %}
-                              </div>
-                              {% if not dress.rentStatus %}
-                                <div class="col-auto">
-                                  <form method="POST" action="{{ url_for('admin.inventory') }}" class="form-inline" onsubmit="return confirm('Are you sure you want to delete this dress? This action cannot be undone.');">
-                                    {{ form.hidden_tag() }}
-                                    <input type="hidden" name="dress_id" value="{{ dress.id }}">
-                                    <button type="submit" class="btn btn-danger btn-smaller">Delete</button>
-                                  </form>
-                                </div>
-                              {% else %}
-                                <div class="col-auto">
-                                  <form method="POST" action="{{ url_for('admin.inventory') }}" class="form-inline" onsubmit="return false;">
-                                    {{ form.hidden_tag() }}
-                                    <input type="hidden" name="dress_id" value="{{ dress.id }}">
-                                    <button type="submit" class="btn btn-secondary btn-smaller" disabled>Delete</button>
-                                  </form>
-                                </div>
-                              {% endif %}
-                          </div>
-                      </h6>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <span class="text-left text-light" style="font-size: 12px;">Dress</span>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <span class="text-left text-light" style="font-size: 12px;">User</span>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <span class="text-left text-light" style="font-size: 12px;">Rent</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>  
+
+  <div class="col-md-10 ml-auto"> <!-- Adjust the size as needed -->
+    <div class="d-flex justify-content-center">
+      <table class="table table-sm table-dark" style="width: 100%;"> <!-- Adjust the width as needed -->
+        <thead class="custom-bg">
+          <tr>
+            <th colspan="2">
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="text-left text-light" style="font-size: 14px;">Dress Inventory</span>
+                <form method="POST" action="{{ url_for('admin.inventory') }}" class="form-inline">
+                  {{ form.hidden_tag() }}
+                  <div class="form-group">
+                    {{ form.category(class="form-control form-control-sm custom-form-control mr-2", id="category-input") }}
+                    {{ form.search(class="form-control form-control-sm custom-form-control mr-2", type="search", placeholder="Search") }}
+                    <button type="submit" class="btn btn-outline-light btn-smaller">Filter</button>
                   </div>
+                </form>
               </div>
-            </div>
-            <div>                       
-              <div id="collapse{{ loop.index }}" class="collapse" aria-labelledby="heading{{ loop.index }}" data-parent="#accordion{{ loop.index }}">
-                <div class="card-body">
-                  <table class="table table-striped table-hover table-sm table-dark">
-                    <tbody>
-                      <tr>
-                        <th scope="row">Brand:</th>
-                        <td>{{ dress.brand }}</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">Size:</th>
-                        <td>{{ dress.size }}</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">Color:</th>
-                        <td>{{ dress.color }}</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">Style:</th>
-                        <td>{{ dress.style }}</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">Description:</th>
-                        <td>{{ dress.dressDescription }}</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">Dress Cost:</th>
-                        <td>{{ dress.dressCost }}</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">Market Price:</th>
-                        <td>{{ dress.marketPrice }}</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">Rent Price:</th>
-                        <td>{{ dress.rentPrice }}</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">Rents to return Investment:</th>
-                        <td>{{ dress.rentsToReturnInvestment }}</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">Times Rented:</th>
-                        <td>{{ dress.timesRented }}</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">Sellable:</th>
-                        <td>{{ dress.sellable }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
+            </th>
+          </tr>
+        </thead>
+        <tbody class="custom-bg">
+          {% for dress in inventory %}
+          <tr>
+            <td colspan="2">
+              <div class="accordion" id="accordion{{ loop.index }}">
+                <div class="card bg-dark">
+                  <div class="card-header" id="heading{{ loop.index }}">
+                    <h6 class="mb-0">
+                      <div class="row align-items-center">
+                        <div class="col-md-4 d-flex justify-content-start align-items-center">
+                          <div>
+                            <button class="btn btn-sm" type="button" data-toggle="collapse" data-target="#collapse{{ loop.index }}" aria-expanded="true" aria-controls="collapse{{ loop.index }}">
+                              <span class="arrow-down"></span>
+                            </button>
+                          </div>
+                          <div class="text-arrow-container">
+                            <span class="text-left text-light" style="font-size: 13px; margin-left: 5px;">{{ dress }}</span>
+                          </div>
+                        </div>                                                                       
+                        <div class="col-6 col-md-8 text-right">
+                          <!-- New div for the badges and delete button on the right -->
+                          <div class="row align-items-center justify-content-end">
+                            <div class="col-3 col-md-2">
+                              {% if dress.sellable %}
+                              <span class="badge badge-light badge-pill badge-small">Sellable</span>
+                              {% endif %}
+                            </div>
+                            <div class="col-3 col-md-2 d-flex justify-content-center">
+                              {% if not dress.rentStatus %}
+                              <span class="badge badge-success badge-pill badge-small">Available</span>
+                              {% else %}
+                              <span class="badge badge-info badge-pill badge-small">Rented</span>
+                              {% endif %}
+                            </div>
+                            <div class="col-6 col-md-2">
+                              {% if not dress.rentStatus %}
+                              <form method="POST" action="{{ url_for('admin.inventory') }}" class="form-inline" onsubmit="return confirm('Are you sure you want to delete this dress? This action cannot be undone.');">
+                                {{ form.hidden_tag() }}
+                                <input type="hidden" name="dress_id" value="{{ dress.id }}">
+                                <button type="submit" class="btn btn-danger btn-sm btn-smaller">Delete</button>
+                              </form>
+                              {% else %}
+                              <form method="POST" action="{{ url_for('admin.inventory') }}" class="form-inline" onsubmit="return false;">
+                                {{ form.hidden_tag() }}
+                                <input type="hidden" name="dress_id" value="{{ dress.id }}">
+                                <button type="submit" class="btn btn-secondary btn-sm btn-smaller" disabled>Delete</button>
+                              </form>
+                              {% endif %}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </h6>
+                  </div>
                 </div>
               </div>
-            </div>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-      <tfoot>
-        <tr>
-          <td colspan="2">
-            <div class="d-flex justify-content-start">
-              <button type="submit" class="btn btn-dark btn-smaller">
-                <a href="{{ url_for('admin.update') }}" class="text-light">Update Inventory</a>
-              </button>
-            </div>
-          </td>
-        </tr>
-      </tfoot>
-    </table>
+              <div>
+                <div id="collapse{{ loop.index }}" class="collapse" aria-labelledby="heading{{ loop.index }}" data-parent="#accordion{{ loop.index }}">
+                  <div class="card-body">
+                    <table class="table table-striped table-hover table-sm table-dark">
+                      <tbody style="font-size: 13px;">
+                        <tr>
+                          <th scope="row">Brand:</th>
+                          <td>{{ dress.brand }}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Size:</th>
+                          <td>{{ dress.size }}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Color:</th>
+                          <td>{{ dress.color }}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Style:</th>
+                          <td>{{ dress.style }}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Description:</th>
+                          <td>{{ dress.dressDescription }}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Dress Cost:</th>
+                          <td>{{ dress.dressCost }}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Market Price:</th>
+                          <td>{{ dress.marketPrice }}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Rent Price:</th>
+                          <td>{{ dress.rentPrice }}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Rents to return Investment:</th>
+                          <td>{{ dress.rentsToReturnInvestment }}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Times Rented:</th>
+                          <td>{{ dress.timesRented }}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Sellable:</th>
+                          <td>{{ dress.sellable }}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Rent Status:</th>
+                          <td>{{ dress.rentStatus }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="2">
+              <div class="d-flex justify-content-start">
+                <button type="submit" class="btn btn-outline-light btn-smaller">
+                  <a href="{{ url_for('admin.update') }}" class="text-light">Update Inventory</a>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
   </div>
+</div>
 
 {% endblock %}

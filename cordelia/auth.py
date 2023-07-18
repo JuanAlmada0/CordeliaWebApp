@@ -91,8 +91,8 @@ def login():
             if next_page and is_safe_url(next_page):
                 session.pop('next_page')
                 return redirect(next_page)
-            
-            return redirect(url_for('home.home'))
+            else:
+                return redirect(url_for('home.home'))
            
         flash('Invalid email or password.', 'error')
         return redirect(url_for('auth.login'))

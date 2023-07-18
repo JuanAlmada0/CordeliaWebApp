@@ -34,6 +34,11 @@
         .custom-navbar .navbar-nav .nav-link {
             color: #B07D47; 
         }
+        .content-container {
+            max-width: 80rem;
+            margin: 0 auto; 
+            padding: 0 1rem; 
+        }
     </style>
 
     <nav class="navbar navbar-expand-lg navbar-light custom-navbar">
@@ -100,9 +105,10 @@
 
   {% endblock %}
   
-
+  <div class="content-container">
   {% block content %}
   {% endblock %}
+  </div>
   
   
 
