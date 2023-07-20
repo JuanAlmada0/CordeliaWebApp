@@ -56,7 +56,6 @@ class InventoryForm(FlaskForm):
     size = StringField('Size', validators=[DataRequired()])
     color = StringField('Color', validators=[DataRequired()])
     style = StringField('Style', validators=[DataRequired()])
-    description = StringField('Description', validators=[DataRequired()])
     dressCost = IntegerField('Dress Cost', validators=[DataRequired()])
     marketPrice = IntegerField('Market Price', validators=[DataRequired()])
     rentPrice = IntegerField('Rent Price', validators=[DataRequired()])

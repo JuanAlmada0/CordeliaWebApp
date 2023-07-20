@@ -73,7 +73,7 @@
         <tbody>
           <tr>
             <td>
-              <a href="{{ url_for('admin.inventory') }}" class="text-left text-light" style="font-size: 12px;">Dress     .</a> <span class="badge badge-light">{{ inventory.total }}</span>
+              <a href="{{ url_for('admin.inventory') }}" class="text-left text-light" style="font-size: 12px;">Dress</a>
             </td>
           </tr>
           <tr>
@@ -83,7 +83,7 @@
           </tr>
           <tr>
             <td>
-              <a href="{{ url_for('admin.userInventory') }}" class="text-left text-light" style="font-size: 12px;">User</a>
+              <a href="{{ url_for('admin.userInventory') }}" class="text-left text-light" style="font-size: 12px;">User     .</a> <span class="badge badge-light">{{ inventory.total }}</span>
             </td>
           </tr>
         </tbody>
@@ -101,10 +101,10 @@
       <table class="table table-sm table-dark" style="width: 100%;"> 
         <thead class="custom-bg">
           <tr>
-            <th colspan="2" style="width: 100%; position: relative;">
+            <th colspan="2" style="width: 100%;">
               <div class="d-flex justify-content-between align-items-center">
                 <span class="text-left text-light" style="font-size: 14px;">
-                  <span style="margin-right: 1rem;">Dress</span>
+                  <span style="margin-right: 1rem;">User</span>
                 </span>
                 <div class="pagination-container">
                 {% if inventory.has_prev or inventory.has_next %}
@@ -112,14 +112,14 @@
                     <ul class="pagination justify-content-center">
                       {% if inventory.has_prev %}
                       <li class="page-item">
-                        <a class="badge badge-dark" href="{{ url_for('admin.inventory', page=inventory.prev_num) }}" aria-label="Previous">prev</a>
+                        <a class="badge badge-dark" href="{{ url_for('admin.userInventory', page=inventory.prev_num) }}" aria-label="Previous">prev</a>
                       </li>
                       {% endif %}
                     
                       {% for page_num in inventory.iter_pages(left_edge=1, left_current=1, right_current=1, right_edge=1) %}
                       {% if page_num %}
                       <li class="page-item {% if page_num == inventory.page %}active{% endif %}">
-                        <a class="badge badge-dark" href="{{ url_for('admin.inventory', page=page_num) }}">{{ page_num }}</a>
+                        <a class="badge badge-dark" href="{{ url_for('admin.userInventory', page=page_num) }}">{{ page_num }}</a>
                       </li>
                       {% else %}
                       <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
@@ -128,19 +128,14 @@
                     
                       {% if inventory.has_next %}
                       <li class="page-item">
-                        <a class="badge badge-dark" href="{{ url_for('admin.inventory', page=inventory.next_num) }}" aria-label="Next">next</a>
+                        <a class="badge badge-dark" href="{{ url_for('admin.userInventory', page=inventory.next_num) }}" aria-label="Next">next</a>
                       </li>
                       {% endif %}
                     </ul>
                   </nav>
                   {% endif %}
                 </div>
-                <div class="ml-auto">
-                  <button type="submit" class="btn btn-outline-light btn-smaller mr-2">
-                    <a href="{{ url_for('admin.update') }}" class="text-light">Add dress</a>
-                  </button>
-                </div>
-                <form method="POST" action="{{ url_for('admin.inventory') }}" class="form-inline">
+                <form method="POST" action="{{ url_for('admin.userInventory') }}" class="form-inline">
                   {{ form.hidden_tag() }}
                   <div class="form-group" style="padding-right: 2.5px;">
                     {{ form.category(class="form-control form-control-sm custom-form-control mr-2", id="category-input", style="width: 12em;") }}
@@ -153,7 +148,7 @@
           </tr>
         </thead>        
         <tbody class="custom-bg">
-          {% for dress in inventory.items %}
+          {% for user in inventory.items %}
           <tr>
             <td colspan="2">
               <div class="accordion" id="accordion{{ loop.index }}">
@@ -168,58 +163,42 @@
                               <span class="arrow-down"></span>
                             </button>
                             <div class="text-arrow-container ml-2">
-                              <span class="text-left text-light" style="font-size: 13px;">{{ dress }}</span>
+                              <span class="text-left text-light" style="font-size: 13px;">{{ user }}</span>
                             </div>
                           </div>
                         </div>
                       
                         <!-- Second column, middle part of the card -->
-                        <div class="col-md-5">
+                        <div class="col-md-6">
                           <div class="d-flex justify-content-start">
                             <div class="text-arrow-container">
-                              <span class="text-left text-light" style="font-size: 13px;">Brand | {{ dress.brand }}</span>
+                              <span class="text-left text-light" style="font-size: 13px;">{{ user.email }}</span>
                             </div>
                           </div>
                         </div>
-                      
-                        <!-- Third column, sellable badge -->
-                        <div class="col-md-1 d-flex justify-content-center">
-                          {% if dress.sellable %}
-                          <span class="badge badge-pill badge-dark badge-small" style="font-size: 12px;">Sellable</span>
-                          {% endif %}
-                        </div>
-                      
-                        <!-- Fourth column, availability badge -->
-                        <div class="col-md-1 d-flex justify-content-center">
-                          {% if not dress.rentStatus %}
-                          <span class="text text-light" style="font-size: 12px;">Available</span>
-                          {% else %}
-                          <span class="badge badge-info badge-pill badge-small" style="font-size: 12px;">Rented</span>
-                          {% endif %}
-                        </div>
-                      
+                    
                         <!-- Fifth column, delete button -->
-                        <div class="col-md-1 d-flex justify-content-end">
-                          {% if not dress.rentStatus %}
-                          <form method="POST" action="{{ url_for('admin.inventory') }}" class="form-inline" onsubmit="return confirm('Are you sure you want to delete this dress? This action cannot be undone.');">
+                        <div class="col-md-2 d-flex justify-content-end">
+                          {% if not user.check_status() %}
+                          <form method="POST" action="{{ url_for('admin.userInventory') }}" class="form-inline" onsubmit="return confirm('Are you sure you want to delete this dress? This action cannot be undone.');">
                             {{ form.hidden_tag() }}
-                            <input type="hidden" name="dress_id" value="{{ dress.id }}">
+                            <input type="hidden" name="user_id" value="{{ user.id }}">
                             <!-- Use the Bootstrap close button here -->
                             <button type="submit" class="btn btn-secondary btn-sm btn-smaller text-light" aria-label="Close">
                               <span aria-hidden="true">&times;</span>
                             </button>
                           </form>
                           {% else %}
-                          <form method="POST" action="{{ url_for('admin.inventory') }}" class="form-inline" onsubmit="return false;">
+                          <form method="POST" action="{{ url_for('admin.userInventory') }}" class="form-inline" onsubmit="return false;">
                             {{ form.hidden_tag() }}
-                            <input type="hidden" name="dress_id" value="{{ dress.id }}">
+                            <input type="hidden" name="user_id" value="{{ user.id }}">
                             <!-- Use the Bootstrap close button here -->
                             <button type="submit" class="btn btn-secondary btn-sm btn-smaller text-light" aria-label="Close" disabled>
                               <span aria-hidden="true">&times;</span>
                             </button>
                           </form>
                           {% endif %}
-                        </div>                        
+                        </div> 
                       </div>
                     </h6>
                   </div>
@@ -231,36 +210,24 @@
                     <table class="table table-striped table-hover table-sm table-secondary">
                       <tbody style="font-size: 15px;">
                         <tr>
-                          <th scope="row">Rent for :</th>
-                          <td>{{ dress.rentPrice }}</td>
+                          <th scope="row">Email:</th>
+                          <td>{{ user.email }}</td>
                         </tr>
                         <tr>
-                          <th scope="row">Size:</th>
-                          <td>{{ dress.size }}</td>
+                          <th scope="row">Name:</th>
+                          <td>{{ user.name }}</td>
                         </tr>
                         <tr>
-                          <th scope="row">Color:</th>
-                          <td>{{ dress.color }}</td>
+                          <th scope="row">Last Name:</th>
+                          <td>{{ user.lastName }}</td>
                         </tr>
                         <tr>
-                          <th scope="row">Style:</th>
-                          <td>{{ dress.style }}</td>
+                          <th scope="row">Phone number:</th>
+                          <td>{{ user.phoneNumber }}</td>
                         </tr>
                         <tr>
-                          <th scope="row">Dress Cost:</th>
-                          <td>{{ dress.dressCost }}</td>
-                        </tr>
-                        <tr>
-                          <th scope="row">Market Price:</th>
-                          <td>{{ dress.marketPrice }}</td>
-                        </tr>
-                        <tr>
-                          <th scope="row">Rents to return Investment:</th>
-                          <td>{{ dress.rentsToReturnInvestment }}</td>
-                        </tr>
-                        <tr>
-                          <th scope="row">Times Rented:</th>
-                          <td>{{ dress.timesRented }}</td>
+                          <th scope="row">Account created:</th>
+                          <td>{{ user.joinedAtDate }}</td>
                         </tr>
                       </tbody>
                     </table>

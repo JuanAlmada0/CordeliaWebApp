@@ -35,9 +35,9 @@
             color: #B07D47; 
         }
         .content-container {
-            max-width: 80rem;
-            margin: 0 auto; 
-            padding: 0 1rem; 
+          max-width: 80rem;
+          margin: 0 auto; 
+          height: 100%;
         }
     </style>
 
@@ -57,11 +57,13 @@
           </ul>
           <div class="navbar-nav mx-auto">
             <div class="nav-item">
-              {% if current_user.is_authenticated %}
-                <p class="nav-link mb-0 font-weight-normal">Welcome {{ current_user }} </p>
-              {% else %}
-                <p class="nav-link mb-0 font-weight-normal">Welcome</p>
-              {% endif %}
+                {% block welcome_message %}
+                    {% if current_user.is_authenticated %}
+                        <p class="nav-link mb-0 font-weight-normal">Welcome {{ current_user }} </p>
+                    {% else %}
+                        <p class="nav-link mb-0 font-weight-normal">Welcome</p>
+                    {% endif %}
+                {% endblock %}
             </div>
           </div>
           <ul class="navbar-nav ml-auto">

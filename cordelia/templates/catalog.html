@@ -42,7 +42,6 @@
                 <img src="{{ url_for('static', filename='images/dressExample1.jpg') }}" class="card-img-top" alt="..." style="object-fit: cover;">
                 <div class="card-body" style="height: 180px;">
                   <h6 class="card-title">{{ dress.id }}</h6>
-                  <p class="card-text">{{ dress.dressDescription }}</p>
                   <p class="card-text"><small class="text-muted">Rent for: ${{ dress.rentPrice }}</small></p>
                   {% if not dress.rentStatus %}
                     <a class="btn btn-primary btn-sm btn-dark" href="{{ url_for('home.cart', dress_id=dress.id)}}" role="button">Add to cart</a>
