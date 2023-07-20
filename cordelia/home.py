@@ -5,7 +5,7 @@ from flask import (
 from flask_login import login_required, current_user
 from cordelia.db import db
 from cordelia.models import Dress, Rent
-from cordelia.forms import RentForm
+from cordelia.forms import UserRentForm
 
 
 
@@ -34,7 +34,7 @@ def cart(dress_id):
         flash('Dress not found.', 'danger')
         return redirect(url_for('home.catalog'))
     
-    form = RentForm()
+    form = UserRentForm()
 
     if form.validate_on_submit():
         rent = Rent(

@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, SelectField, DateField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, SelectField, DateField, HiddenField
 from wtforms.validators import DataRequired, Email, EqualTo
 from wtforms.validators import ValidationError
 import phonenumbers
@@ -62,6 +62,13 @@ class InventoryForm(FlaskForm):
     submit = SubmitField('Submit')
 
 
+class RentForm(FlaskForm):
+    userId = IntegerField('User Id', validators=[DataRequired()])
+    dressId = IntegerField('Dress Id', validators=[DataRequired()])
+    rentDate = DateField('Rent Date', validators=[DataRequired()])
+    submit = SubmitField('Submit')
+
+
 class SearchForm(FlaskForm):
     category = SelectField('Category', choices=[], default='Select Category', validators=[DataRequired()])
     search = StringField('Search')
@@ -72,6 +79,15 @@ class SearchForm(FlaskForm):
         self.category.choices = [('Select Category', 'Select Category')] + [(column, column) for column in model_columns]
 
 
-class RentForm(FlaskForm):
-    rentDate = DateField('Rent Date')
+class UserRentForm(FlaskForm):
+    rentDate = DateField('Rent Date', validators=[DataRequired()])
     submit = SubmitField('Check Out')
+
+
+class UpdateForm(FlaskForm):
+    dress_id = HiddenField('Dress ID', validators=[DataRequired()])
+    submit = SubmitField('Maintenance')
+
+class DeleteForm(FlaskForm):
+    dress_id = IntegerField('Dress ID', validators=[DataRequired()])
+    submit = SubmitField('Delete')

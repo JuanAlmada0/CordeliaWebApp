@@ -48,18 +48,18 @@ def is_safe_url(target):
 @authBp.route('/register', methods=['GET', 'POST'])
 def register():
 
-    userForm = RegistrationForm()
+    form = RegistrationForm()
 
-    if userForm.validate_on_submit():
+    if form.validate_on_submit():
         # Create new User
         user = User(
-            username=userForm.username.data, 
-            email=userForm.email.data, 
-            name=userForm.name.data, 
-            lastName=userForm.lastName.data,
-            phoneNumber=userForm.phoneNumber.data
+            username=form.username.data, 
+            email=form.email.data, 
+            name=form.name.data, 
+            lastName=form.lastName.data,
+            phoneNumber=form.phoneNumber.data
         )
-        user.set_password(userForm.password.data)
+        user.set_password(form.password.data)
         
         # Save the user to the database
         db.session.add(user)
@@ -68,23 +68,23 @@ def register():
         flash('Registration successful. You can now log in.', 'success')
         return redirect(url_for('auth.login'))
     
-    return render_template('register.html', userForm=userForm)
+    return render_template('authenticate.html', form=form, title='Registration', action_url=url_for('auth.register'))
 
 
 # Login route
 @authBp.route('/login', methods=['GET', 'POST'])
 def login():
 
-    loginForm = LoginForm()
+    form = LoginForm()
 
     next_page = session.get('next_page')
 
-    if loginForm.validate_on_submit():
-        user = User.query.filter_by(email=loginForm.email.data).first()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
 
-        if user and user.check_password(loginForm.password.data):
+        if user and user.check_password(form.password.data):
             # Log the user in by storing their ID in the user's session
-            login_user(user, remember=loginForm.remember.data)
+            login_user(user, remember=form.remember.data)
 
             flash('Logged in successfully.', 'success')
 
@@ -99,7 +99,7 @@ def login():
 
     session['next_page'] = request.referrer
 
-    return render_template('login.html', loginForm=loginForm)
+    return render_template('authenticate.html', form=form, title='Login', action_url=url_for('auth.login'))
 
 
 # Logout route

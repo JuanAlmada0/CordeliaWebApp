@@ -44,11 +44,6 @@
     display: block;
     height: 20px; 
   }
-  .custom-footer-index::before {
-    content: ""; /* Empty content */
-    display: block;
-    height: 20px; 
-  }
   .pagination-container {
     position: absolute;
     margin: auto;
@@ -62,12 +57,17 @@
 <div class="d-flex justify-content-center" style="background-color: #b8a495dc; padding-top: 10px; padding-bottom: 10px;">
   <div class="col-md-2 d-flex flex-column">
     <div class="row pl-3"> 
-      <table class="table table-bordered table-dark flex-1 p-1" style="height: 100%; overflow-y: auto;">
+      <table class="table table-dark flex-1 p-1">
         <thead>
           <tr>
             <th>
               <span class="text-left text-light" style="font-size: 12px;">Database</span>
             </th>
+            <th>
+              <button type="submit" class="btn btn-outline-light btn-smaller mr-2">
+                <a href="{{ url_for('admin.downloadExcell') }}" class="text-light">Download</a>
+              </button>
+            </th>            
           </tr>
         </thead>
         <tbody>
@@ -87,7 +87,7 @@
             </td>
           </tr>
         </tbody>
-        <tfoot class="custom-footer-index">
+        <tfoot class="custom-footer">
           <tr>
             <td colspan="2"></td>
           </tr>
@@ -119,7 +119,7 @@
                       {% for page_num in inventory.iter_pages(left_edge=1, left_current=1, right_current=1, right_edge=1) %}
                       {% if page_num %}
                       <li class="page-item {% if page_num == inventory.page %}active{% endif %}">
-                        <a class="badge badge-dark" href="{{ url_for('admin.userInventory', page=page_num) }}">{{ page_num }}</a>
+                        <a class="btn btn-outline-light btn-sm btn-smaller" href="{{ url_for('admin.userInventory', page=page_num) }}">{{ page_num }}</a>
                       </li>
                       {% else %}
                       <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
@@ -138,11 +138,11 @@
                 <form method="POST" action="{{ url_for('admin.userInventory') }}" class="form-inline">
                   {{ form.hidden_tag() }}
                   <div class="form-group" style="padding-right: 2.5px;">
-                    {{ form.category(class="form-control form-control-sm custom-form-control mr-2", id="category-input", style="width: 12em;") }}
-                    {{ form.search(class="form-control form-control-sm custom-form-control mr-2", type="search", placeholder="Search") }}
+                    {{ form.category(class="form-control form-control-sm custom-form-control mr-2", id="category-input", style="width: 12em;", style="background-color: #333; color: #fff;") }}
+                    {{ form.search(class="form-control form-control-sm custom-form-control mr-2", type="search", placeholder="Search", style="background-color: #333; color: #fff;") }}
                     <button type="submit" class="btn btn-outline-light btn-smaller">Filter</button>
                   </div>
-                </form>
+                </form> 
               </div>
             </th>
           </tr>
@@ -172,6 +172,9 @@
                         <div class="col-md-6">
                           <div class="d-flex justify-content-start">
                             <div class="text-arrow-container">
+                              <span class="text-left text-light" style="font-size: 13px;">ID : {{ user.id }}</span>
+                            </div>
+                            <div class="text-arrow-container ml-auto">
                               <span class="text-left text-light" style="font-size: 13px;">{{ user.email }}</span>
                             </div>
                           </div>

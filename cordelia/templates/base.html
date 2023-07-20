@@ -36,7 +36,8 @@
         }
         .content-container {
           max-width: 80rem;
-          margin: 0 auto; 
+          margin: 0 auto;
+          margin-bottom: 20px;
           height: 100%;
         }
     </style>
@@ -95,7 +96,7 @@
         <div class="alert alert-info alert-sm alert-dismissible fade-out" role="alert">
           <ul class="messages">
             {% for message in messages %}
-              <li>{{ message }}</li>
+              <li class="mb-0">{{ message }}</li>
             {% endfor %}
           </ul>
           <button type="button" class="close close-sm" data-dismiss="alert" aria-label="Close">

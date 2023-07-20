@@ -19,6 +19,7 @@ class Dress(db.Model):
     timesRented = db.Column(db.Integer, index=True, default=0)
     sellable = db.Column(db.Boolean, index=True, default=False)
     rentStatus = db.Column(db.Boolean, index=True, default=False)
+    maintenanceStatus = db.Column(db.Boolean, index=True, default=False)
 
     def __init__(self, *args, **kwargs):
         super(Dress, self).__init__(*args, **kwargs)
@@ -50,6 +51,9 @@ class Dress(db.Model):
         else:
             self.timesRented = 0
             self.sellable = self.timesRented > self.rentsToReturnInvestment
+    
+    def update_maintenance_status(self):
+        self.maintenanceStatus = not self.maintenanceStatus
 
     def update_rent_status(self):
         # Query the database to get the latest rent associated with this dress

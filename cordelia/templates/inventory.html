@@ -44,11 +44,6 @@
     display: block;
     height: 20px; 
   }
-  .custom-footer-index::before {
-    content: ""; /* Empty content */
-    display: block;
-    height: 20px; 
-  }
   .pagination-container {
     position: absolute;
     margin: auto;
@@ -62,12 +57,17 @@
 <div class="d-flex justify-content-center" style="background-color: #b8a495dc; padding-top: 10px; padding-bottom: 10px;">
   <div class="col-md-2 d-flex flex-column">
     <div class="row pl-3"> 
-      <table class="table table-bordered table-dark flex-1 p-1" style="height: 100%; overflow-y: auto;">
+      <table class="table table-dark flex-1 p-1">
         <thead>
           <tr>
             <th>
               <span class="text-left text-light" style="font-size: 12px;">Database</span>
             </th>
+            <th>
+              <button type="submit" class="btn btn-outline-light btn-smaller mr-2">
+                <a href="{{ url_for('admin.downloadExcell') }}" class="text-light">Download</a>
+              </button>
+            </th>            
           </tr>
         </thead>
         <tbody>
@@ -87,9 +87,10 @@
             </td>
           </tr>
         </tbody>
-        <tfoot class="custom-footer-index">
+        <tfoot class="custom-footer">
           <tr>
-            <td colspan="2"></td>
+            <td colspan="2">
+            </td>
           </tr>
         </tfoot>
       </table>
@@ -119,7 +120,7 @@
                       {% for page_num in inventory.iter_pages(left_edge=1, left_current=1, right_current=1, right_edge=1) %}
                       {% if page_num %}
                       <li class="page-item {% if page_num == inventory.page %}active{% endif %}">
-                        <a class="badge badge-dark" href="{{ url_for('admin.inventory', page=page_num) }}">{{ page_num }}</a>
+                        <a class="btn btn-outline-light btn-sm btn-smaller" href="{{ url_for('admin.inventory', page=page_num) }}">{{ page_num }}</a>
                       </li>
                       {% else %}
                       <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
@@ -143,11 +144,11 @@
                 <form method="POST" action="{{ url_for('admin.inventory') }}" class="form-inline">
                   {{ form.hidden_tag() }}
                   <div class="form-group" style="padding-right: 2.5px;">
-                    {{ form.category(class="form-control form-control-sm custom-form-control mr-2", id="category-input", style="width: 12em;") }}
-                    {{ form.search(class="form-control form-control-sm custom-form-control mr-2", type="search", placeholder="Search") }}
+                    {{ form.category(class="form-control form-control-sm custom-form-control mr-2", id="category-input", style="width: 12em;", style="background-color: #333; color: #fff;") }}
+                    {{ form.search(class="form-control form-control-sm custom-form-control mr-2", type="search", placeholder="Search", style="background-color: #333; color: #fff;") }}
                     <button type="submit" class="btn btn-outline-light btn-smaller">Filter</button>
                   </div>
-                </form>
+                </form> 
               </div>
             </th>
           </tr>
@@ -174,34 +175,55 @@
                         </div>
                       
                         <!-- Second column, middle part of the card -->
-                        <div class="col-md-5">
+                        <div class="col-md-4">
                           <div class="d-flex justify-content-start">
                             <div class="text-arrow-container">
                               <span class="text-left text-light" style="font-size: 13px;">Brand | {{ dress.brand }}</span>
                             </div>
                           </div>
                         </div>
+
+                        <div class="col-md-1 d-flex justify-content-center">
+                          {% if not dress.maintenanceStatus %}
+                            <form method="POST" action="{{ url_for('admin.update_maintenance', dress_id=dress.id) }}" class="form-inline">
+                              {{ maintenance_form.csrf_token }}
+                              {{ maintenance_form.dress_id(value=dress.id) }}
+                              <button type="submit" class="btn btn-secondary btn-sm btn-smaller text-light">
+                                <span class="text text-light" style="font-size: 12px;">Maintenance</span>
+                              </button>
+                            </form>
+                          {% else %}
+                            <form method="POST" action="{{ url_for('admin.update_maintenance', dress_id=dress.id) }}" class="form-inline">
+                              {{ maintenance_form.csrf_token }}
+                              {{ maintenance_form.dress_id(value=dress.id) }}
+                              <button type="submit" class="btn btn-secondary btn-sm btn-smaller text-light">
+                                <span class="badge badge-pill badge-warning badge-small" style="font-size: 12px;">In Maintenance</span>
+                              </button>
+                            </form>
+                          {% endif %}
+                        </div>                        
                       
                         <!-- Third column, sellable badge -->
                         <div class="col-md-1 d-flex justify-content-center">
                           {% if dress.sellable %}
-                          <span class="badge badge-pill badge-dark badge-small" style="font-size: 12px;">Sellable</span>
+                            <span class="badge badge-pill badge-dark badge-small" style="font-size: 12px;">Sellable</span>
+                          {% else %}
+                            <span class="text text-secondary" style="font-size: 12px;">Not Sellable</span>
+                          {% endif %}
+                        </div>
+
+                        <div class="col-md-1 d-flex justify-content-center">
+                          {% if not dress.rentStatus %}
+                            <span class="badge badge-pill badge-light badge-small" style="font-size: 12px;">Available</span>
+                          {% else %}
+                            <span class="badge badge-pill badge-info badge-small" style="font-size: 12px;">Rented</span>
                           {% endif %}
                         </div>
                       
                         <!-- Fourth column, availability badge -->
-                        <div class="col-md-1 d-flex justify-content-center">
-                          {% if not dress.rentStatus %}
-                          <span class="text text-light" style="font-size: 12px;">Available</span>
-                          {% else %}
-                          <span class="badge badge-info badge-pill badge-small" style="font-size: 12px;">Rented</span>
-                          {% endif %}
-                        </div>
-                      
-                        <!-- Fifth column, delete button -->
                         <div class="col-md-1 d-flex justify-content-end">
                           {% if not dress.rentStatus %}
-                          <form method="POST" action="{{ url_for('admin.inventory') }}" class="form-inline" onsubmit="return confirm('Are you sure you want to delete this dress? This action cannot be undone.');">
+                          <form method="POST" action="{{ url_for('admin.delete_dress', dress_id=dress.id) }}" class="form-inline" onsubmit="return confirm('Are you sure you want to delete this dress? This action cannot be undone.');">
                             {{ form.hidden_tag() }}
                             <input type="hidden" name="dress_id" value="{{ dress.id }}">
                             <!-- Use the Bootstrap close button here -->
@@ -210,7 +232,7 @@
                             </button>
                           </form>
                           {% else %}
-                          <form method="POST" action="{{ url_for('admin.inventory') }}" class="form-inline" onsubmit="return false;">
+                          <form method="POST" action="{{ url_for('admin.delete_dress', dress_id=dress.id) }}" class="form-inline" onsubmit="return false;">
                             {{ form.hidden_tag() }}
                             <input type="hidden" name="dress_id" value="{{ dress.id }}">
                             <!-- Use the Bootstrap close button here -->
@@ -219,7 +241,7 @@
                             </button>
                           </form>
                           {% endif %}
-                        </div>                        
+                        </div>                                            
                       </div>
                     </h6>
                   </div>
@@ -261,6 +283,10 @@
                         <tr>
                           <th scope="row">Times Rented:</th>
                           <td>{{ dress.timesRented }}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">In maintenance:</th>
+                          <td>{{ dress.maintenanceStatus }}</td>
                         </tr>
                       </tbody>
                     </table>
