@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="d-flex justify-content-center">
+    <div class="register-container">
+        <div class="d-flex justify-content-center">
+            <h3>{{ title }}</h3>
+        </div>
+        <form method="POST" action="{{ action_url }}">
+            <!-- Add the form_type hidden field here -->
+            <input type="hidden" name="form_type" value="{{ form_type }}">
+            {% if form_type == 'user' %}
+                {% for field in form %}
+                    <div class="form-group">
+                        {% if field.type == 'HiddenField' %}
+                            {{ field() }}
+                        {% elif field.type != 'SubmitField' %}
+                            {{ field.label }}
+                            {{ field(class="form-control", autocomplete="off") }}
+                            {% for error in field.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% elif form_type == 'dress' %}
+                {% for field in form %}
+                    <div class="form-group">
+                        {% if field.type == 'HiddenField' %}
+                            {{ field() }}
+                        {% elif field.type != 'SubmitField' %}
+                            {{ field.label }}
+                            {{ field(class="form-control", autocomplete="off") }}
+                            {% for error in field.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% elif form_type == 'rent' %}
+                {% for field in form %}
+                    <div class="form-group">
+                        {% if field.type == 'HiddenField' %}
+                            {{ field() }}
+                        {% elif field.type != 'SubmitField' %}
+                            {{ field.label }}
+                            {{ field(class="form-control", autocomplete="off") }}
+                            {% for error in field.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <!-- Add a single submit button for the entire form -->
+            <input type="submit" class="btn btn-primary btn-dark" value="Submit">
+        </form>
+    </div>
+</div>
+
+<style>
+    .register-container {
+        width: 25rem;
+        padding: 1rem;
+        border: 1px solid #B07D47;
+        border-radius: 5px;
+        color: #B07D47;
+    }
+
+    .form-group {
+        margin-bottom: 0.5rem;
+    }
+</style>
+
+{% endblock %}

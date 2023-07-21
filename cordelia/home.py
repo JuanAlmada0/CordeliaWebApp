@@ -1,12 +1,8 @@
-from flask import (
-    Blueprint, render_template, redirect, url_for, 
-    flash
-)
+from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import login_required, current_user
 from cordelia.db import db
 from cordelia.models import Dress, Rent
 from cordelia.forms import UserRentForm
-
 
 
 homeBp = Blueprint('home', __name__)
@@ -21,7 +17,8 @@ def home():
 @homeBp.route('/catalog')
 def catalog():
     inventory = Dress.query.all()
-    return render_template('catalog.html', inventory=inventory)
+
+    return render_template('home_views/catalog.html', inventory=inventory)
 
 
 @homeBp.route('/cart/<int:dress_id>', methods=['GET', 'POST'])
@@ -48,11 +45,12 @@ def cart(dress_id):
         flash('Dress added to cart.', 'success')
         return redirect(url_for('home.checkout', rent_id=rent.id))
 
-    return render_template('cart.html', dress=dress, form=form) 
+    return render_template('home_views/cart.html', dress=dress, form=form) 
 
 
 @homeBp.route('/checkout/<int:rent_id>', methods=['GET', 'POST'])
 @login_required
 def checkout(rent_id):
     rent = Rent.query.get(rent_id)
-    return render_template('checkout.html', rent=rent)
+    
+    return render_template('home_views/checkout.html', rent=rent)

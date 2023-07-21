@@ -8,7 +8,6 @@ from cordelia.models import db, User
 from cordelia.forms import RegistrationForm, LoginForm
 
 
-
 # Create auth blueprint
 authBp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -88,11 +87,14 @@ def login():
 
             flash('Logged in successfully.', 'success')
 
-            if next_page and is_safe_url(next_page):
-                session.pop('next_page')
-                return redirect(next_page)
+            if user.isAdmin:
+                return redirect(url_for('admin.inventory'))
             else:
-                return redirect(url_for('home.home'))
+                if next_page and is_safe_url(next_page):
+                    session.pop('next_page')
+                    return redirect(next_page)
+                else:
+                    return redirect(url_for('home.home'))
            
         flash('Invalid email or password.', 'error')
         return redirect(url_for('auth.login'))

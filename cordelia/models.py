@@ -4,7 +4,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 
 
-
 class Dress(db.Model):
     # Dress model representing a dress item in the database
     id = db.Column(db.Integer, primary_key=True)
@@ -81,12 +80,12 @@ class Dress(db.Model):
 class User(UserMixin, db.Model):
     # User model representing a user in the database
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(60), index=True, unique=True)
+    username = db.Column(db.String(60), index=True, unique=True, default=None)
     email = db.Column(db.String(80), index=True, unique=True)
     name = db.Column(db.String(60), index=True)
     lastName = db.Column(db.String(60), index=True)
     phoneNumber = db.Column(db.Integer, index=True, unique=True)
-    password_hash = db.Column(db.String(80))
+    password_hash = db.Column(db.String(80), nullable=True)
     joinedAtDate = db.Column(db.DateTime(), index=True, default=datetime.utcnow)
     isAdmin = db.Column(db.Boolean, default=False)
 
@@ -96,9 +95,10 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
     
+    # Will return True if the latest rent has been returned and False if it's still active.
     def check_status(self):
         # Query the database to get the latest rent associated with this user
-        associated_rent = Rent.query.filter_by(dressId=self.id).order_by(Rent.rentDate.desc()).first()
+        associated_rent = Rent.query.filter_by(clientId=self.id).order_by(Rent.rentDate.desc()).first()
 
         # Check if there is any related rent
         if not associated_rent:

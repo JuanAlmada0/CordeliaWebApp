@@ -4,8 +4,7 @@ from wtforms.validators import DataRequired, Email, EqualTo
 from wtforms.validators import ValidationError
 import phonenumbers
 from phonenumbers.phonenumberutil import NumberParseException
-from cordelia.models import User, Dress
-
+from cordelia.models import User
 
 
 class RegistrationForm(FlaskForm):
@@ -15,7 +14,7 @@ class RegistrationForm(FlaskForm):
     password2 = PasswordField('Re-enter Password', validators=[DataRequired(), EqualTo('password')])
     name = StringField('First name', validators=[DataRequired()])
     lastName = StringField('Last name', validators=[DataRequired()])
-    phoneNumber = StringField('Phone Number')
+    phoneNumber = StringField('Phone Number', validators=[DataRequired()])
     submit = SubmitField('Register')
 
     def validate_phoneNumber(self, field):
@@ -51,7 +50,32 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Login')
 
 
-class InventoryForm(FlaskForm):
+class SearchForm(FlaskForm):
+    category = SelectField('Category', choices=[], default='Select Category', validators=[DataRequired()])
+    search = StringField('Search')
+    submit = SubmitField('Filter')
+    
+    def __init__(self, model_columns, *args, **kwargs):
+        super(SearchForm, self).__init__(*args, **kwargs)
+        self.category.choices = [('Select Category', 'Select Category')] + [(column, column) for column in model_columns]
+
+
+class UserRentForm(FlaskForm):
+    rentDate = DateField('Rent Date', validators=[DataRequired()])
+    submit = SubmitField('Check Out')
+
+
+class MaintenanceForm(FlaskForm):
+    dress_id = HiddenField('Dress ID', validators=[DataRequired()])
+    submit = SubmitField('Maintenance')
+
+
+class DeleteForm(FlaskForm):
+    dress_id = IntegerField('Dress ID', validators=[DataRequired()])
+    submit = SubmitField('Delete')
+
+
+class DressForm(FlaskForm):
     brand = StringField('Brand', validators=[DataRequired()])
     size = StringField('Size', validators=[DataRequired()])
     color = StringField('Color', validators=[DataRequired()])
@@ -69,25 +93,30 @@ class RentForm(FlaskForm):
     submit = SubmitField('Submit')
 
 
-class SearchForm(FlaskForm):
-    category = SelectField('Category', choices=[], default='Select Category', validators=[DataRequired()])
-    search = StringField('Search')
-    submit = SubmitField('Filter')
-    
-    def __init__(self, model_columns, *args, **kwargs):
-        super(SearchForm, self).__init__(*args, **kwargs)
-        self.category.choices = [('Select Category', 'Select Category')] + [(column, column) for column in model_columns]
+class UserForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    name = StringField('First name', validators=[DataRequired()])
+    lastName = StringField('Last name', validators=[DataRequired()])
+    phoneNumber = StringField('Phone Number', validators=[DataRequired()])
+    submit = SubmitField('Register')
 
+    def validate_phoneNumber(self, field):
+        phone_number = field.data
+        try:
+            parsed_number = phonenumbers.parse(phone_number, "MX")
+            if not phonenumbers.is_valid_number(parsed_number):
+                raise ValidationError('Invalid phone number')
 
-class UserRentForm(FlaskForm):
-    rentDate = DateField('Rent Date', validators=[DataRequired()])
-    submit = SubmitField('Check Out')
+            # Store the parsed phone number in the form field
+            field.data = phonenumbers.format_number(parsed_number, phonenumbers.PhoneNumberFormat.E164)
 
+        except NumberParseException:
+            raise ValidationError('Invalid phone number')
 
-class UpdateForm(FlaskForm):
-    dress_id = HiddenField('Dress ID', validators=[DataRequired()])
-    submit = SubmitField('Maintenance')
+    def validate_email(self, field):
+        if User.query.filter_by(email=field.data).first():
+            raise ValidationError('Email already exists.')
 
-class DeleteForm(FlaskForm):
-    dress_id = IntegerField('Dress ID', validators=[DataRequired()])
-    submit = SubmitField('Delete')
+    def validate_phoneNumber_duplicate(self, field):
+        if User.query.filter_by(phoneNumber=field.data).first():
+            raise ValidationError('Phone number already exists.')
