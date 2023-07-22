@@ -2,6 +2,7 @@ from cordelia.db import db
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+import json
 
 
 class Dress(db.Model):
@@ -17,8 +18,10 @@ class Dress(db.Model):
     rentsToReturnInvestment = db.Column(db.Integer, index=True)
     timesRented = db.Column(db.Integer, index=True, default=0)
     sellable = db.Column(db.Boolean, index=True, default=False)
+    dateAdded = db.Column(db.DateTime(), index=True, default=datetime.utcnow)
     rentStatus = db.Column(db.Boolean, index=True, default=False)
     maintenanceStatus = db.Column(db.Boolean, index=True, default=False)
+    maintenanceLog = db.Column(db.String, nullable=True, default=None)
 
     def __init__(self, *args, **kwargs):
         super(Dress, self).__init__(*args, **kwargs)
@@ -53,6 +56,12 @@ class Dress(db.Model):
     
     def update_maintenance_status(self):
         self.maintenanceStatus = not self.maintenanceStatus
+
+    def get_maintenance_log(self):
+        maintenance_log = []
+        if self.maintenanceLog:
+            maintenance_log = json.loads(self.maintenanceLog)
+            return maintenance_log
 
     def update_rent_status(self):
         # Query the database to get the latest rent associated with this dress

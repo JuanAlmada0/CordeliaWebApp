@@ -4,6 +4,8 @@ from cordelia.db import db
 from cordelia.models import Dress, Rent, User
 from cordelia.forms import SearchForm, DressForm, RentForm, UserForm, MaintenanceForm, DeleteForm
 from functools import wraps
+import json
+from datetime import datetime
 
 
 adminBp = Blueprint('admin', __name__, url_prefix='/admin')
@@ -18,6 +20,7 @@ def admin_required(f):
             return redirect(url_for('home.home'))
         return f(*args, **kwargs)
     return decorated_function
+
 
 
 @adminBp.route('/inventory', methods=['GET', 'POST'])
@@ -49,7 +52,7 @@ def inventory():
     db.session.commit()
 
     # Paginate the filtered results
-    inventory = inventory_query.order_by(Dress.rentStatus, Dress.maintenanceStatus.desc()).paginate(page=page, per_page=items_per_page)
+    inventory = inventory_query.order_by(Dress.rentStatus.desc(), Dress.maintenanceStatus.desc()).paginate(page=page, per_page=items_per_page)
 
     # Initialize the delete form
     delete_form = DeleteForm()
@@ -70,17 +73,68 @@ def inventory():
     return render_template('admin_views/inventory.html', inventory=inventory, form=form, maintenance_form=maintenance_form, delete_form=delete_form, pagination=inventory)
 
 
+
 @adminBp.route('/update-dress/<int:dress_id>', methods=['POST'])
 @admin_required
 def update_maintenance(dress_id):
     dress = Dress.query.get(int(dress_id))
+
     if dress and not dress.rentStatus:
+        # Update maintenance status
+        dress.update_maintenance_status()
+        
+        # Get the maintenance data from the form
+        maintenance_date = request.form.get("maintenanceDate")
+        maintenance_cost = request.form.get("maintenanceCost")
+
+        # Generate the current date if not provided
+        if not maintenance_date:
+            maintenance_date = datetime.today().strftime('%Y-%m-%d')
+
+        try:
+            # Convert cost to integer
+            maintenance_cost = int(maintenance_cost)
+        except ValueError:
+            flash('Invalid maintenance cost. Please enter a valid number.', 'danger')
+            return redirect(url_for('admin.inventory'))
+
+        # Get the existing maintenance log data (if any) from the dress
+        existing_maintenance_log = json.loads(dress.maintenanceLog) if dress.maintenanceLog else []
+
+        # Append the new maintenance data to the existing log
+        new_maintenance_data = {
+            "date": maintenance_date,
+            "cost": maintenance_cost
+        }
+        existing_maintenance_log.append(new_maintenance_data)
+
+        # Save the updated maintenance log to the dress
+        dress.maintenanceLog = json.dumps(existing_maintenance_log)
+        db.session.commit()
+
+        flash('Dress maintenance record added successfully.', 'success')
+    else:
+        flash('Dress not available or already rented.', 'danger')
+
+    flash('Maintenance updated successfully!', 'success')
+    return redirect(url_for('admin.inventory'))
+
+
+
+@adminBp.route("/update-maintenance-status/<int:dress_id>", methods=["POST"])
+@admin_required
+def update_maintenance_status(dress_id):
+    dress = Dress.query.get(dress_id)
+
+    if dress:
         dress.update_maintenance_status()
         db.session.commit()
-        flash('Dress status changed.', 'success')
+        flash("Maintenance status updated successfully!", 'success')
     else:
-        flash('Dress not available.', 'danger')
+        flash("Dress not found!", 'error')
+
     return redirect(url_for('admin.inventory'))
+
 
 
 @adminBp.route('/rent-inventory', methods=['GET', 'POST'])
@@ -122,6 +176,7 @@ def rentInventory():
     return render_template('admin_views/rentInventory.html', inventory=inventory, form=form, delete_form=delete_form, pagination=inventory)
 
 
+
 @adminBp.route('/user-inventory', methods=["GET", "POST"])
 @admin_required
 def userInventory():
@@ -158,6 +213,7 @@ def userInventory():
         return redirect(url_for('admin.delete_object', dataBase='User', id=user_id))
 
     return render_template('admin_views/userInventory.html', inventory=inventory, form=form, delete_form=delete_form, pagination=inventory)
+
 
 
 @adminBp.route("/update-db/<string:title>/<string:form_type>", methods=['GET', 'POST'])
@@ -221,6 +277,7 @@ def update(title, form_type):
     return render_template('admin_views/update.html', title=title, form_type=form_type, form=form)
 
 
+
 @adminBp.route('/delete/<string:dataBase>/<int:id>', methods=['POST'])
 @admin_required
 def delete_object(dataBase, id):
@@ -256,7 +313,7 @@ def delete_object(dataBase, id):
                     # Handle the case when the associated dress is not found
                     flash('Associated Dress not found when trying to decrement times_rented.', 'danger')
             except Exception as e:
-                # Handle any unexpected errors that might occur during the process
+                # Handle unexpected errors that might occur during the process
                 flash(f'Error: {str(e)}', 'danger')
                 
             flash('Rent deleted successfully.', 'success')
@@ -274,6 +331,7 @@ def delete_object(dataBase, id):
             return redirect(url_for('admin.userInventory'))
         else:
             flash('User not found, or busy.', 'danger')
+
 
 
 @adminBp.route('/download/excel')

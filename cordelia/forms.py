@@ -1,9 +1,13 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, SelectField, DateField, HiddenField
-from wtforms.validators import DataRequired, Email, EqualTo
+from wtforms import (
+    StringField, PasswordField, SubmitField, BooleanField, IntegerField, 
+    SelectField, DateField, HiddenField
+    )
+from wtforms.validators import DataRequired, Email, EqualTo, NumberRange
 from wtforms.validators import ValidationError
 import phonenumbers
 from phonenumbers.phonenumberutil import NumberParseException
+import json
 from cordelia.models import User
 
 
@@ -67,7 +71,17 @@ class UserRentForm(FlaskForm):
 
 class MaintenanceForm(FlaskForm):
     dress_id = HiddenField('Dress ID', validators=[DataRequired()])
+    maintenanceDate = DateField('Maintenance Date', validators=[DataRequired()])
+    maintenanceCost = IntegerField('Cost', validators=[NumberRange(min=0)])
     submit = SubmitField('Maintenance')
+
+    def validate_data(self, field):
+        try:
+            json_data = json.loads(field.data)
+            if not isinstance(json_data, dict):
+                raise ValueError("Data must be a valid JSON object (dictionary).")
+        except json.JSONDecodeError as e:
+            raise ValueError("Invalid JSON data. Please enter a valid JSON object (dictionary).")
 
 
 class DeleteForm(FlaskForm):

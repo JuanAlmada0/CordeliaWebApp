@@ -92,20 +92,21 @@
 
   {% block header %}
 
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <div class="alert alert-info alert-sm alert-dismissible fade-out" role="alert">
-          <ul class="messages">
-            {% for message in messages %}
-              <li class="mb-0">{{ message }}</li>
-            {% endfor %}
-          </ul>
-          <button type="button" class="close close-sm" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-      {% endif %}
-    {% endwith %}
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div class="alert alert-info alert-sm alert-dismissible fade-out" role="alert">
+        <ul class="messages" style="font-size: 14px; padding: 10px;">
+          {% for message in messages %}
+            <li class="mb-0">{{ message }}</li>
+          {% endfor %}
+        </ul>
+        <button type="button" class="close close-sm" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    {% endif %}
+  {% endwith %}
+
 
   {% endblock %}
   
