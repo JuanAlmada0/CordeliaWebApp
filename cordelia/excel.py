@@ -23,7 +23,7 @@ def excel_download():
             'Dress Cost': [dress.dressCost for dress in dresses],
             'Market Price': [dress.marketPrice for dress in dresses],
             'Rent Price': [dress.rentPrice for dress in dresses],
-            'Rents for Returns': [dress.rentsToReturnInvestment for dress in dresses],
+            'Rents for Returns': [dress.rentsForReturns for dress in dresses],
             'Times Rented': [dress.timesRented for dress in dresses],
             'Sellable': [dress.sellable for dress in dresses],
             'Rent Status': [dress.rentStatus for dress in dresses],

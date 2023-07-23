@@ -2,103 +2,21 @@
 
 {% block content %}
 
-  <style>
-
-    table {
-      background: linear-gradient(135deg, #817467 0%, #3d3d3d 100%);
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-    }
-    .btn-smaller {
-      padding: 0.08rem 0.15rem;
-      font-size: 0.7rem;
-    }
-    .custom-btn {
-      position: relative;
-    }
-    .arrow-down {
-      border: solid #ffffff;
-      border-width: 0 3px 3px 0;
-      display: inline-block;
-      padding: 2px;
-      transform: rotate(45deg);
-      -webkit-transform: rotate(45deg);
-    }
-    /* Custom CSS for reducing space between text and arrow button */
-    .text-arrow-container {
-      display: flex;
-      align-items: center;
-    }
-
-    .text-arrow-container .text-left {
-      margin-right: 5px; 
-    }
-    .custom-form-control {
-      padding: 0.25rem 0.5rem; 
-      font-size: 0.7rem; 
-    }
-    .custom-footer::before {
-      content: ""; /* Empty content */
-      display: block;
-      height: 20px; 
-    }
-    .pagination-container {
-      position: absolute;
-      margin: auto;
-      padding-left: 68px;
-      padding-top: 15px;
-    }
-    .content-container {
-      background-color: #ad967e;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle box shadow for depth */
-      padding: 4px;
-    }
-    /* Define the styles for the neon text */
-    .neon-text {
-      font-size: 11px;
-      animation: neon 1s infinite;
-      display: inline-block;
-      margin-right: 10px;
-    }
-    .green {
-      color: #ffffff; 
-      text-shadow: 0 0 2px #ffffff;
-    }
-    .sand {
-      color: #DCC6B6; 
-      text-shadow: 0 0 2px #B07D47;
-    }
-    .blue {
-      color: #00ffff; 
-      text-shadow: 0 0 2px #00ffff;
-    }
-    .clean-blue {
-      color: #00ffc8;
-      text-shadow: 0 0 2px #00ffc8;
-    }
-    .clean-two {
-      color: #ff9900;
-      text-shadow: 0 0 2px #ff9900;
-    }
-
-  </style>
-
-
   <div class="d-flex justify-content-center" style="background-color: #b8a495dc; padding-top: 10px; padding-bottom: 10px;">
     <div class="col-md-2 d-flex flex-column">
       <div class="row pl-3"> 
         <table class="table table-dark flex-1 p-1">
           <thead>
-            <tr>
-              <th>
-                <span class="text-left text-light" style="font-size: 12px;">Database</span>
-              </th>
-              <th>
-                <button type="submit" class="btn btn-outline-light btn-smaller mr-2 btn-dark">
-                  <a href="{{ url_for('admin.downloadExcell') }}" class="text-light">Download</a>
-                </button>
-              </th>            
-            </tr>
+              <tr>
+                <td>
+                  <span class="text-left neon-text sand" style="font-size: 12.4px;">Database</span>
+                </td>
+                <td>
+                  <button type="submit" class="btn btn-outline-light btn-smaller mr-2 btn-dark">
+                    <a href="{{ url_for('admin.downloadExcell') }}" class="text-light">Download</a>
+                  </button>
+                </td>
+              </tr>            
           </thead>
           <tbody>
             <tr>
@@ -116,6 +34,26 @@
                 <a href="{{ url_for('admin.userInventory') }}" class="text-left text-light" style="font-size: 12px;">User</a>
               </td>
             </tr>
+            <table class="table table-dark flex-1 p-1">
+              <thead>
+                <tr>
+                  <td class="text-left">
+                    <span class="text-left neon-text sand" style="font-size: 12.4px;">Query</span>
+                  </td>                     
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <span class="text-left text-light" style="font-size: 12px;">Costs</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <span class="text-left text-light" style="font-size: 12px;">Accounting</span>
+                  </td>
+                </tr>
+            </table>
           </tbody>
           <tfoot class="custom-footer">
             <tr>
@@ -174,6 +112,12 @@
                   <form method="POST" action="{{ url_for('admin.inventory') }}" class="form-inline">
                     {{ form.hidden_tag() }}
                     <div class="form-group" style="padding-right: 2.5px;">
+                      <style>
+                        /* Target the specific field and set the fixed width */
+                        #category-input {
+                            width: 11em; /* Set the desired width here, for example, 10em */
+                        }
+                      </style>  
                       {{ form.category(class="form-control form-control-sm custom-form-control mr-2", id="category-input", style="width: 12em;", style="background-color: #333; color: #fff;") }}
                       {{ form.search(class="form-control form-control-sm custom-form-control mr-2", type="search", placeholder="Search", style="background-color: #333; color: #fff;") }}
                       <button type="submit" class="btn btn-outline-light btn-smaller btn-dark">Filter</button>
@@ -213,21 +157,34 @@
                             </div>
                           </div>
 
-                          <!-- Third column, middle part of the card -->
+                          <!-- Third column, sellable badge -->
                           <div class="col-md-1 d-flex justify-content-center">
-                            {% if not dress.maintenanceStatus %}
-                                <!-- Button to trigger the maintenance form modal -->
-                                <div type="button" data-toggle="modal" data-target="#maintenanceModal{{ dress.id }}">
-                                    <span class="neon-text blue ml-auto" style="font-size: 11px;">cleaner</span>
-                                </div>
+                            {% if dress.sellable %}
+                              <span class="neon-text sand" style="font-size: 12px;">sellable</span>
                             {% else %}
-                                <!-- Button to update maintenance status -->
-                                <form action="{{ url_for('admin.update_maintenance_status', dress_id=dress.id) }}" method="post">
-                                  {{ form.hidden_tag() }}
-                                  <button type="submit" class="neon-text clean-blue" style="background: none; border: none; padding: 0; font-size: 14px;">
-                                      @
-                                  </button>
-                              </form>                                                            
+                              <span class="text text-dark" style="font-size: 12px;">{{ dress.sellable }}</span>
+                            {% endif %}
+                          </div>
+
+                          <!-- Fourth column, middle part of the card -->
+                          <div class="col-md-1 d-flex justify-content-center">
+                            {% if not dress.maintenanceStatus and not dress.rentStatus %}
+                              <!-- Button to trigger the maintenance form modal -->
+                              <div type="button" data-toggle="modal" data-target="#maintenanceModal{{ dress.id }}">
+                                  <span class="neon-text blue ml-auto" style="font-size: 11px;">clean</span>
+                              </div>
+                            {% elif dress.maintenanceStatus %}
+                              <!-- Button to update maintenance status -->
+                              <form action="{{ url_for('admin.update_maintenance_status', dress_id=dress.id) }}" method="post">
+                                {{ form.hidden_tag() }}
+                                <button type="submit" class="neon-text clean-blue" style="background: none; border: none; padding: 0; font-size: 14px;">
+                                    @
+                                </button>
+                              </form>  
+                            {% elif dress.rentStatus %}
+                              <div type="button" data-toggle="modal" data-target="#maintenanceModal{{ dress.id }}">
+                                    <span class="text-dark ml-auto" style="font-size: 11px;">unavailable</span>
+                              </div>
                             {% endif %}
                           </div>
                           
@@ -264,22 +221,13 @@
                                 </div>
                             </div>
                           </div>
-                        
-                          <!-- Fourth column, sellable badge -->
-                          <div class="col-md-1 d-flex justify-content-center">
-                            {% if dress.sellable %}
-                              <span class="neon-text sand" style="font-size: 12px;">sellable</span>
-                            {% else %}
-                              <span class="text text-dark" style="font-size: 12px;">{{ dress.sellable }}</span>
-                            {% endif %}
-                          </div>
 
                           <div class="col-md-1 d-flex justify-content-center">
                             {% if not dress.rentStatus %}
                               {% if not dress.maintenanceStatus %}
-                                <span class="neon-text sand" style="font-size: 12px;">stock</span>
+                                <span class="neon-text green" style="font-size: 12px;">stock</span>
                               {% else %}
-                                <span class="neon-text clean-blue" style="font-size: 12px;">@cleaning</span>
+                                <span class="neon-text clean-blue" style="font-size: 12px;">@cleaner</span>
                               {% endif %}
                             {% else %}
                               <span class="neon-text clean-two" style="font-size: 12px;">rented</span>
@@ -358,7 +306,7 @@
                                     </tr>
                                     <tr>
                                       <th scope="row">Rents for returns:</th>
-                                      <td>{{ dress.rentsToReturnInvestment }}</td>
+                                      <td>{{ dress.rentsForReturns }}</td>
                                     </tr>
                                     <tr>
                                       <th scope="row">Times Rented:</th>
@@ -374,26 +322,26 @@
                               <!-- Maintenance log column -->
                               <div class="col-4">
                                 <table class="table table-striped table-hover table-sm table-dark">
+                                  {% if dress.maintenanceLog %}
                                   <thead style="font-size: 14px;">
                                     <tr>
-                                      <th>Log Date</th>
-                                      <th>Maintenance Cost</th>
+                                      <th>Cleaner Log</th>
+                                      <th>Cost</th>
                                     </tr>
                                   </thead>
                                   <tbody style="font-size: 13px;">
-                                  {% if dress.maintenanceLog %}
                                     {% for log in dress.get_maintenance_log() %}
                                     <tr>
                                         <td>{{ log.date }}</td>
                                         <td>$ {{ log.cost }}</td>
                                     </tr>
                                     {% endfor %}
-                                  {% endif %}
                                   </tbody>
+                                  {% endif %}
                                 </table>
                               </div>
                               <!-- Image column -->
-                              <div class="col-4 text-center">
+                              <div class="col-4">
                                 <img src="{{ url_for('static', filename='images/cordelia-logo.png') }}" alt="..." class="img-thumbnail" style="max-width: 100%; height: auto;">
                               </div>
                             </td>

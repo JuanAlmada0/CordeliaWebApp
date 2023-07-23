@@ -13,9 +13,9 @@ class Dress(db.Model):
     style = db.Column(db.String(20), index=True, nullable=False)
     brand = db.Column(db.String(20), index=True, nullable=False)
     dressCost = db.Column(db.Integer, index=True, nullable=False)
-    marketPrice = db.Column(db.Integer, index=True, nullable=True)
+    marketPrice = db.Column(db.Integer, index=True, default=None)
     rentPrice = db.Column(db.Integer, index=True, nullable=False)
-    rentsToReturnInvestment = db.Column(db.Integer, index=True)
+    rentsForReturns = db.Column(db.Integer, index=True)
     timesRented = db.Column(db.Integer, index=True, default=0)
     sellable = db.Column(db.Boolean, index=True, default=False)
     dateAdded = db.Column(db.DateTime(), index=True, default=datetime.utcnow)
@@ -25,22 +25,22 @@ class Dress(db.Model):
 
     def __init__(self, *args, **kwargs):
         super(Dress, self).__init__(*args, **kwargs)
-        self.calculate_rents_to_return_investment()
+        self.calculate_rents_for_returns()
     
-    def calculate_rents_to_return_investment(self):
-        self.rentsToReturnInvestment = self.dressCost // self.rentPrice
+    def calculate_rents_for_returns(self):
+        self.rentsForReturns = self.dressCost // self.rentPrice
      # Methods to modify the timesRented value and update sellable flag
     def increment_times_rented(self):
         if self.timesRented is not None:
             self.timesRented += 1
-            self.sellable = self.timesRented > self.rentsToReturnInvestment
+            self.sellable = self.timesRented > self.rentsForReturns
         else:
             self.timesRented = 1
             self.sellable = False
 
     def decrement_times_rented(self):
         self.timesRented -= 1
-        self.sellable = self.timesRented > self.rentsToReturnInvestment
+        self.sellable = self.timesRented > self.rentsForReturns
 
     def update_times_rented(self):
         associatedRents = Rent.query.filter_by(dressId=self.id).all()
@@ -49,10 +49,10 @@ class Dress(db.Model):
             for rent in associatedRents:
                 numOfRents += 1
             self.timesRented = numOfRents
-            self.sellable = self.timesRented > self.rentsToReturnInvestment
+            self.sellable = self.timesRented > self.rentsForReturns
         else:
             self.timesRented = 0
-            self.sellable = self.timesRented > self.rentsToReturnInvestment
+            self.sellable = self.timesRented > self.rentsForReturns
     
     def update_maintenance_status(self):
         self.maintenanceStatus = not self.maintenanceStatus

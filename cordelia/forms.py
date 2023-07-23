@@ -3,7 +3,7 @@ from wtforms import (
     StringField, PasswordField, SubmitField, BooleanField, IntegerField, 
     SelectField, DateField, HiddenField
     )
-from wtforms.validators import DataRequired, Email, EqualTo, NumberRange
+from wtforms.validators import DataRequired, Email, EqualTo, NumberRange, Optional
 from wtforms.validators import ValidationError
 import phonenumbers
 from phonenumbers.phonenumberutil import NumberParseException
@@ -85,7 +85,7 @@ class MaintenanceForm(FlaskForm):
 
 
 class DeleteForm(FlaskForm):
-    dress_id = IntegerField('Dress ID', validators=[DataRequired()])
+    id = IntegerField('ID', validators=[DataRequired()])
     submit = SubmitField('Delete')
 
 
@@ -95,7 +95,7 @@ class DressForm(FlaskForm):
     color = StringField('Color', validators=[DataRequired()])
     style = StringField('Style', validators=[DataRequired()])
     dressCost = IntegerField('Dress Cost', validators=[DataRequired()])
-    marketPrice = IntegerField('Market Price', validators=[DataRequired()])
+    marketPrice = IntegerField('Market Price', validators=[Optional()])
     rentPrice = IntegerField('Rent Price', validators=[DataRequired()])
     submit = SubmitField('Submit')
 

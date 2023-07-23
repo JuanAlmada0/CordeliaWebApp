@@ -71,13 +71,12 @@ def init_db_command():
 
 from cordelia.models import Dress, Rent
 
-# Event listener to update rentStatus in Dress whenever a new Rent object is created or updated
+# Event listener to update rentStatus in Dress whenever a new Rent object is created, updated, or deleted
 @db.event.listens_for(Rent, 'after_insert')
 @db.event.listens_for(Rent, 'after_update')
+@db.event.listens_for(Rent, 'after_delete')
 def update_dress_rent_status_after_insert_or_update(mapper, connection, target):
-    dress = Dress.query.get(target.dressId)
-    if dress:
-        dress.update_rent_status()
+    Dress.update_rent_statuses()
 
 
 def init_app(app):

@@ -27,7 +27,7 @@ def admin_required(f):
 @admin_required
 def inventory():
     model_columns = Dress.__table__.columns.keys()
-
+    
     # Pagination settings
     page = request.args.get('page', 1, type=int)
     items_per_page = 12
@@ -46,10 +46,6 @@ def inventory():
         if category and filterSearch and category in model_columns:
             column = model_columns[category]
             inventory_query = inventory_query.filter(column.ilike(f"%{filterSearch}%"))
-
-    # After processing the search form, update the rentStatus for Dress Database
-    Dress.update_rent_statuses()
-    db.session.commit()
 
     # Paginate the filtered results
     inventory = inventory_query.order_by(Dress.rentStatus.desc(), Dress.maintenanceStatus.desc()).paginate(page=page, per_page=items_per_page)
@@ -71,6 +67,7 @@ def inventory():
         return redirect(url_for('admin.update_maintenance', dress_id=dress_id))
 
     return render_template('admin_views/inventory.html', inventory=inventory, form=form, maintenance_form=maintenance_form, delete_form=delete_form, pagination=inventory)
+
 
 
 
@@ -219,7 +216,7 @@ def userInventory():
 @adminBp.route("/update-db/<string:title>/<string:form_type>", methods=['GET', 'POST'])
 @admin_required
 def update(title, form_type):
-    # Initialize the appropriate form based on form_type
+    # Initialize form based on form_type
     if form_type == 'user':
         form = UserForm()
     elif form_type == 'dress':
@@ -277,7 +274,6 @@ def update(title, form_type):
     return render_template('admin_views/update.html', title=title, form_type=form_type, form=form)
 
 
-
 @adminBp.route('/delete/<string:dataBase>/<int:id>', methods=['POST'])
 @admin_required
 def delete_object(dataBase, id):
@@ -293,7 +289,6 @@ def delete_object(dataBase, id):
             flash('Dress not available.', 'danger')
     
         return redirect(url_for('admin.inventory'))
-
     
     elif dataBase == 'Rent':
         rent = Rent.query.get(int(id))
