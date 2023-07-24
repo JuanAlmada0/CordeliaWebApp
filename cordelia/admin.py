@@ -11,6 +11,7 @@ from datetime import datetime
 adminBp = Blueprint('admin', __name__, url_prefix='/admin')
 
 
+
 # admin_required Wrapper
 def admin_required(f):
     @wraps(f)
@@ -22,33 +23,59 @@ def admin_required(f):
     return decorated_function
 
 
-
-@adminBp.route('/inventory', methods=['GET', 'POST'])
-@admin_required
-def inventory():
-    model_columns = Dress.__table__.columns.keys()
-    
-    # Pagination settings
-    page = request.args.get('page', 1, type=int)
-    items_per_page = 12
-
-    inventory_query = Dress.query
-
-    # Initialize the search form
+# SearchForm handler
+def handle_search_form(query, model_columns, model_class):
     form = SearchForm(model_columns=model_columns)
 
     if form.validate_on_submit():
         category = form.category.data
         filterSearch = form.search.data
-        
-        model_columns = {column: getattr(Dress, column) for column in model_columns}
+
+        model_columns = {column: getattr(model_class, column) for column in model_columns}
 
         if category and filterSearch and category in model_columns:
             column = model_columns[category]
-            inventory_query = inventory_query.filter(column.ilike(f"%{filterSearch}%"))
+            query = query.filter(column.ilike(f"%{filterSearch}%"))
 
-    # Paginate the filtered results
-    inventory = inventory_query.order_by(Dress.rentStatus.desc(), Dress.maintenanceStatus.desc()).paginate(page=page, per_page=items_per_page)
+    return query, form
+
+
+@adminBp.route('/inventory', methods=['GET', 'POST'])
+@admin_required
+def inventory():
+    # Get the list of model columns for the Dress table
+    model_columns = Dress.__table__.columns.keys()
+
+    # Pagination settings
+    page = request.args.get('page', 1, type=int)
+    items_per_page = 12
+
+    # Get the selected column for ordering from the query parameters
+    order_by_column = request.args.get('order_by', default='default')
+
+    Dress.update_rent_statuses()
+    db.session.commit()
+
+    # Get the initial inventory query
+    inventory_query = Dress.query
+
+    # Apply sorting based on the selected column
+    if order_by_column == 'timesRented':
+        inventory_query = inventory_query.order_by(Dress.timesRented.desc())
+    elif order_by_column == 'id':
+        inventory_query = inventory_query.order_by(Dress.id)
+    else :
+        # If 'default', sort by rentStatus and maintenanceStatus in descending order
+        inventory_query = inventory_query.order_by(Dress.rentStatus.desc(), Dress.maintenanceStatus.desc())
+
+    # Handle search form
+    inventory_query, form = handle_search_form(inventory_query, model_columns, Dress)
+
+    # Paginate the filtered results and store it in 'inventory' variable
+    inventory = inventory_query.paginate(page=page, per_page=items_per_page)
+
+    # Separate pagination query from the inventory query to avoid conflicts
+    pagination = inventory_query.paginate(page=page, per_page=items_per_page)
 
     # Initialize the delete form
     delete_form = DeleteForm()
@@ -66,9 +93,8 @@ def inventory():
         dress_id = maintenance_form.dress_id.data
         return redirect(url_for('admin.update_maintenance', dress_id=dress_id))
 
-    return render_template('admin_views/inventory.html', inventory=inventory, form=form, maintenance_form=maintenance_form, delete_form=delete_form, pagination=inventory)
-
-
+    # Pass the inventory and pagination objects to the template for rendering
+    return render_template('admin_views/inventory.html', inventory=inventory, form=form, maintenance_form=maintenance_form, delete_form=delete_form, pagination=pagination, order_by_column=order_by_column)
 
 
 @adminBp.route('/update-dress/<int:dress_id>', methods=['POST'])
@@ -145,19 +171,8 @@ def rentInventory():
 
     inventory_query = Rent.query
 
-    # Initialize the search form
-    form = SearchForm(model_columns=model_columns)
-
-    if form.validate_on_submit():
-        category = form.category.data
-        filterSearch = form.search.data
-
-        # Map category values to column names
-        model_columns = {column: getattr(Rent, column) for column in model_columns}
-
-        if category and filterSearch and category in model_columns:
-            column = model_columns[category]
-            inventory_query = inventory_query.filter(column.ilike(f"%{filterSearch}%"))
+    # Handle search form
+    inventory_query, form = handle_search_form(inventory_query, model_columns, Rent)
 
     # Paginate the filtered results
     inventory = inventory_query.order_by(Rent.rentDate.desc()).paginate(page=page, per_page=items_per_page)
@@ -185,18 +200,8 @@ def userInventory():
 
     inventory_query = User.query
 
-    # Initialize the search form
-    form = SearchForm(model_columns=model_columns)
-
-    if form.validate_on_submit():
-        category = form.category.data
-        filterSearch = form.search.data
-
-        model_columns = {column: getattr(User, column) for column in model_columns}
-
-        if category and filterSearch and category in model_columns:
-            column = model_columns[category]
-            inventory_query = inventory_query.filter(column.ilike(f"%{filterSearch}%"))
+    # Handle search form
+    inventory_query, form = handle_search_form(inventory_query, model_columns, User)
 
     # Paginate the filtered results
     inventory = inventory_query.order_by(User.joinedAtDate.asc()).paginate(page=page, per_page=items_per_page)
@@ -266,12 +271,17 @@ def update(title, form_type):
                 )
                 db.session.add(rent)
                 db.session.commit()
+
+                dress.update_times_rented()
+                db.session.commit()
+
                 flash('Rent added successfully into the database.')
                 return redirect(url_for('admin.rentInventory'))
             else:
                 flash('Dress not available.')
 
     return render_template('admin_views/update.html', title=title, form_type=form_type, form=form)
+
 
 
 @adminBp.route('/delete/<string:dataBase>/<int:id>', methods=['POST'])
@@ -302,7 +312,7 @@ def delete_object(dataBase, id):
                 # Attempt to find the associated dress and decrement times_rented
                 associated_dress = Dress.query.get(dress_id)
                 if associated_dress:
-                    associated_dress.decrement_times_rented()
+                    associated_dress.update_times_rented()
                     db.session.commit()
                 else:
                     # Handle the case when the associated dress is not found
@@ -310,7 +320,7 @@ def delete_object(dataBase, id):
             except Exception as e:
                 # Handle unexpected errors that might occur during the process
                 flash(f'Error: {str(e)}', 'danger')
-                
+
             flash('Rent deleted successfully.', 'success')
             return redirect(url_for('admin.rentInventory'))
         else:

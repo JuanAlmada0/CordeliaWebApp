@@ -178,7 +178,33 @@
         color: #ff9900;
         text-shadow: 0 0 2px #ff9900;
       }
-  
+      /* CSS for Breadcrumb */
+      .breadcrumb {
+        background-color: transparent; /* Set the background to transparent */
+        padding: 0; /* Remove any padding */
+        margin: 0; /* Remove any margin */
+        color: #e6ded9;
+      }
+      /* CSS for Breadcrumb links and slashes */
+      .breadcrumb-link {
+        /* Remove underline */
+        text-decoration: none;
+        /* Set the desired font size, adjust as needed */
+        font-size: 12.4px;
+        font-family: Arial, Helvetica, sans-serif;
+        font-style: italic;
+      }
+
+      /* Set the color and content of the slashes */
+      .breadcrumb-item::before {
+        /* Add the same neon text effect (sand color) as the links */
+        color: #DCC6B6;
+        text-shadow: 0 0 2px #B07D47;
+        /* Set display to inline to make the slashes visible */
+        display: inline;
+        /* Adjust the spacing between the slash and the text */
+        margin-right: 5px;
+      }
     </style>
     {% block content %}
     {% endblock %}
@@ -188,6 +214,8 @@
       {% block content2 %}
       {% endblock %}
   </section>
+
+  </br>
 
   {% block scripts %}
 

@@ -29,30 +29,6 @@ class Dress(db.Model):
     
     def calculate_rents_for_returns(self):
         self.rentsForReturns = self.dressCost // self.rentPrice
-     # Methods to modify the timesRented value and update sellable flag
-    def increment_times_rented(self):
-        if self.timesRented is not None:
-            self.timesRented += 1
-            self.sellable = self.timesRented > self.rentsForReturns
-        else:
-            self.timesRented = 1
-            self.sellable = False
-
-    def decrement_times_rented(self):
-        self.timesRented -= 1
-        self.sellable = self.timesRented > self.rentsForReturns
-
-    def update_times_rented(self):
-        associatedRents = Rent.query.filter_by(dressId=self.id).all()
-        numOfRents = 0
-        if associatedRents:
-            for rent in associatedRents:
-                numOfRents += 1
-            self.timesRented = numOfRents
-            self.sellable = self.timesRented > self.rentsForReturns
-        else:
-            self.timesRented = 0
-            self.sellable = self.timesRented > self.rentsForReturns
     
     def update_maintenance_status(self):
         self.maintenanceStatus = not self.maintenanceStatus
@@ -73,6 +49,18 @@ class Dress(db.Model):
         else:
             # Check if the latest rent has been returned
             self.rentStatus = not associated_rent.is_returned()
+    
+    def update_times_rented(self):
+        associatedRents = Rent.query.filter_by(dressId=self.id).all()
+        numOfRents = 0
+        if associatedRents:
+            for rent in associatedRents:
+                numOfRents += 1
+            self.timesRented = numOfRents
+            self.sellable = self.timesRented > self.rentsForReturns
+        else:
+            self.timesRented = 0
+            self.sellable = self.timesRented > self.rentsForReturns
 
     @classmethod
     def update_rent_statuses(cls):
@@ -117,7 +105,7 @@ class User(UserMixin, db.Model):
             return not associated_rent.is_returned()
     
     def __repr__(self):
-        return f"{self.username}"
+        return f"{self.name}"
 
 
 class Rent(db.Model):
@@ -139,8 +127,9 @@ class Rent(db.Model):
             self.dress = Dress.query.get(self.dressId)
         if self.clientId:
             self.user = User.query.get(self.clientId)
-        # Increment timesRented value from the Dress instance.
-        self.dress.increment_times_rented()
+        # Increment timesRented and rentStatus value from the Dress instance.
+        self.dress.update_times_rented()
+        self.dress.update_rent_status()
         # Calculate return date based on rentDate value.
         if self.rentDate:
             self.returnDate = self.rentDate + timedelta(days=2)
