@@ -1,6 +1,9 @@
 import os
 from flask import Flask
 from flask_wtf.csrf import CSRFProtect
+import secrets
+
+import logging
 
 
 def create_app(test_config=None):
@@ -8,12 +11,13 @@ def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
     
     app.config.from_mapping(
-        SECRET_KEY='dev',
+        SECRET_KEY=secrets.token_hex(32),
         SQLALCHEMY_DATABASE_URI='sqlite:///' + os.path.join(app.instance_path, 'CordeliaDB.db'),
         SQLALCHEMY_TRACK_MODIFICATIONS=True,
         SERVER_NAME='127.0.0.1:5000',
-        PREFERRED_URL_SCHEME='http',
-        WTF_CSRF_ENABLED=True
+        PREFERRED_URL_SCHEME='https',
+        WTF_CSRF_ENABLED=True,
+        FLASK_ENV='development'
     )
     
     csrf = CSRFProtect()
@@ -50,5 +54,21 @@ def create_app(test_config=None):
     
     # Initialize the LoginManager
     auth.init_app(app)
+
+
+    log_dir = os.path.join(app.instance_path, 'logs')
+    os.makedirs(log_dir, exist_ok=True)
+
+    log_file_path = os.path.join(log_dir, 'debug.log')
+
+    logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s - %(levelname)s - %(message)s',
+                    handlers=[
+                        logging.StreamHandler(), 
+                        logging.FileHandler(log_file_path, mode='w')
+                    ])
+
+    logging.debug(f"Flask environment: {app.config['FLASK_ENV']}")
+
 
     return app

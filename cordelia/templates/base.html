@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> 
 </head>
 <body style="background-color: #DCC6B6;">
   <header class="site-header">
@@ -47,36 +48,26 @@
           <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
-          <div class="navbar-nav ml-auto">
-            <div class="nav-item">
-                {% block welcome_message %}
-                    {% if current_user.is_authenticated %}
-                        <p class="nav-item mb-0 font-weight-normal">Welcome {{ current_user.username }} </p>
-                    {% else %}
-                        <p class="nav-item mb-0 font-weight-normal">Welcome</p>
-                    {% endif %}
-                {% endblock %}
-            </div>
-          </div>
-          <ul class="navbar-nav ml-auto">
-            {% if not current_user.is_authenticated %}
+          {% if not current_user.is_authenticated %}
+            <ul class="navbar-nav ml-auto">
               <li class="nav-item">
                   <a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
               </li>
-              {% else %}
-                {% if current_user.isAdmin %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('admin.inventory') }}">Dashboard</a>
-                </li>
-                {% endif %}
+            </ul>
+          {% else %}
+            <li class="navbar-nav">
+                <a class="nav-link" href="{{ url_for('admin.inventory') }}">Dashboard</a>
+            </li>
+            <ul class="navbar-nav ml-auto">
               <li class="nav-item">
                   <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
               </li>
-              {% endif %}
-          </ul>
+            </ul>
+          {% endif %}
+        
       </div>
     </nav>
 
@@ -103,12 +94,16 @@
   <section class="content-container">
     <style>
       table {
-        background: linear-gradient(135deg, #817467 0%, #3f3f3f 100%);
+        background: linear-gradient(135deg, #817467c5 0%, #3f3f3f 100%);
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
       }
       .btn-smaller {
         padding: 0.08rem 0.15rem;
         font-size: 0.7rem;
+        font-style: italic;
+        background-color: #817568;
+        border: none;
+        box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.5)
       }
       .custom-btn {
         position: relative;
@@ -140,10 +135,7 @@
         height: 20px; 
       }
       .pagination-container {
-        position: absolute;
-        margin: auto;
-        padding-left: 68px;
-        padding-top: 15px;
+        position: absolute; top: 5px; left: 50px;
       }
       .content-container {
         border-radius: 8px;
@@ -177,33 +169,6 @@
       .clean-two {
         color: #ff9900;
         text-shadow: 0 0 2px #ff9900;
-      }
-      /* CSS for Breadcrumb */
-      .breadcrumb {
-        background-color: transparent; /* Set the background to transparent */
-        padding: 0; /* Remove any padding */
-        margin: 0; /* Remove any margin */
-        color: #e6ded9;
-      }
-      /* CSS for Breadcrumb links and slashes */
-      .breadcrumb-link {
-        /* Remove underline */
-        text-decoration: none;
-        /* Set the desired font size, adjust as needed */
-        font-size: 12.4px;
-        font-family: Arial, Helvetica, sans-serif;
-        font-style: italic;
-      }
-
-      /* Set the color and content of the slashes */
-      .breadcrumb-item::before {
-        /* Add the same neon text effect (sand color) as the links */
-        color: #DCC6B6;
-        text-shadow: 0 0 2px #B07D47;
-        /* Set display to inline to make the slashes visible */
-        display: inline;
-        /* Adjust the spacing between the slash and the text */
-        margin-right: 5px;
       }
     </style>
     {% block content %}

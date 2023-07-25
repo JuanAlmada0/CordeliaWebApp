@@ -40,8 +40,8 @@ def close_session(e=None):
         setattr(app, '_session', None)
 
 
-def init_db(app):
-    with app.app_context():
+def init_db():
+    with current_app.app_context():
         # Create all the database tables based on the defined models
         db.create_all()
 
@@ -67,16 +67,6 @@ def init_db(app):
 def init_db_command():
     init_db(current_app)
     click.echo('Initialized the database.')
-
-
-from cordelia.models import Dress, Rent
-
-# Event listener to update rentStatus in Dress whenever a new Rent object is created, updated, or deleted
-@db.event.listens_for(Rent, 'after_insert')
-@db.event.listens_for(Rent, 'after_update')
-@db.event.listens_for(Rent, 'after_delete')
-def update_dress_rent_status_after_insert_or_update(mapper, connection, target):
-    Dress.update_rent_statuses()
 
 
 def init_app(app):

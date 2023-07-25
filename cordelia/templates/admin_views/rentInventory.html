@@ -6,27 +6,43 @@
     <div class="col-md-2 d-flex flex-column">
       <div class="row pl-3"> 
         <table class="table table-dark flex-1 p-1">
+
           <thead>
-            <tr>
-              <td class="text-left">
-                <span class="text-left neon-text sand" style="font-size: 12.4px;">Database</span>
-              </td>
-              <td>
-                <button type="submit" class="btn btn-outline-light btn-smaller mr-2 btn-dark">
-                  <a href="{{ url_for('admin.downloadExcell') }}" class="text-light">Download</a>
-                </button>
-              </td>            
-            </tr>
+              <tr>
+                <td>
+                  <span class="text-left neon-text sand" style="font-size: 12.4px;">Database</span>
+                </td>
+
+                <td></td>
+                
+                <td>
+                  <button type="submit" class="btn btn-outline-light btn-smaller mr-2 btn-dark">
+                    <a href="{{ url_for('admin.downloadExcell') }}" class="text-light">
+                        <i class="fas fa-download fa-sm"></i> <!-- Font Awesome download icon, larger size -->
+                    </a>
+                  </button>                
+                </td>
+                
+              </tr>            
           </thead>
           <tbody>
             <tr>
               <td>
                 <a href="{{ url_for('admin.inventory') }}" class="text-left text-light" style="font-size: 12px;">Dress</a>
-              </td>
+              </td>            
             </tr>
             <tr>
               <td>
-                <a href="{{ url_for('admin.rentInventory') }}" class="text-left text-light" style="font-size: 12px;">Rent     .</a> <span class="badge badge-light">{{ inventory.total }}</span>
+                <a href="{{ url_for('admin.rentInventory') }}" class="text-left text-light" style="font-size: 12px;">Rent</a> 
+                <span class="badge badge-light">{{ inventory.total }}</span>
+              </td>
+              <td>
+                
+              </td>
+              <td>
+                <a href="{{ url_for('admin.update', title='Add Rent', form_type='rent') }}" class="btn btn-outline-light btn-smaller mr-2 btn-dark">
+                  add
+                </a>
               </td>
             </tr>
             <tr>
@@ -38,8 +54,8 @@
               <thead>
                 <tr>
                   <td class="text-left">
-                    <span class="text-left neon-text sand" style="font-size: 12.4px;">Query</span>          
-                  </td>
+                    <span class="text-left neon-text sand" style="font-size: 12.4px;">Accounting</span>
+                  </td>                     
                 </tr>
               </thead>
               <tbody>
@@ -50,86 +66,118 @@
                 </tr>
                 <tr>
                   <td>
-                    <span class="text-left text-light" style="font-size: 12px;">Accounting</span>
+                    <span class="text-left text-light" style="font-size: 12px;">Earnings</span>
                   </td>
                 </tr>
             </table>
           </tbody>
           <tfoot class="custom-footer">
             <tr>
-              <td colspan="2"></td>
+              <td colspan="2">
+              </td>
             </tr>
           </tfoot>
         </table>
       </div>
     </div>  
-  
+
     <div class="col-md-10 ml-auto">
       <div class="d-flex justify-content-center">
-        <table class="table table-sm table-dark" style="width: 100%;">
+        <table class="table table-sm table-dark" style="width: 100%;"> 
           <thead>
             <tr>
               <th colspan="2" style="width: 100%; position: relative;">
                 <div class="d-flex justify-content-between align-items-center">
-
                   <span class="text-left text-light" style="font-size: 13px;">
-                    <span style="margin-right: 1rem;">Rents</span>
+                    <span style="margin-right: 1rem;">Rent</span>
                   </span>
-                  
+        
                   <div class="pagination-container">
-                  {% if inventory.has_prev or inventory.has_next %}
+                    {% if inventory.has_prev or inventory.has_next %}
                     <nav aria-label="Inventory pagination">
-                      <ul class="pagination justify-content-center">
+                      <ul class="pagination">
                         {% if inventory.has_prev %}
-                        <li class="page-item">
-                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark" href="{{ url_for('admin.rentInventory', page=inventory.prev_num) }}" aria-label="Previous">prev</a>
+                        <li class="page-item ml-1">
+                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark" href="{{ url_for('admin.rentInventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">prev</a>
                         </li>
                         {% endif %}
-                      
                         {% for page_num in inventory.iter_pages(left_edge=1, left_current=1, right_current=1, right_edge=1) %}
                         {% if page_num %}
-                        <li class="page-item {% if page_num == inventory.page %}active{% endif %}">
-                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark" href="{{ url_for('admin.rentInventory', page=page_num) }}">{{ page_num }}</a>
+                        <li class="page-item ml-1 {% if page_num == inventory.page %}active{% endif %}">
+                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark" href="{{ url_for('admin.rentInventory', page=page_num, order_by=order_by_column) }}">{{ page_num }}</a>
                         </li>
                         {% else %}
-                        <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
+                        <li class="page-item ml-2 disabled"><span class="page-link">&hellip;</span></li>
                         {% endif %}
                         {% endfor %}
-                      
                         {% if inventory.has_next %}
-                        <li class="page-item">
-                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark" href="{{ url_for('admin.rentInventory', page=inventory.next_num) }}" aria-label="Next">next</a>
+                        <li class="page-item ml-2">
+                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark" href="{{ url_for('admin.rentInventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">next</a>
                         </li>
                         {% endif %}
                       </ul>
                     </nav>
                     {% endif %}
                   </div>
-                  <div class="ml-auto" style="padding-bottom: 2px;">
-                    <a href="{{ url_for('admin.update', title='Add Rent', form_type='rent') }}" class="btn btn-outline-light btn-smaller mr-2 btn-dark">
-                        Add Rent
-                    </a>
-                  </div>
+
+                  <style>
+                    .btn.active {
+                      background-color: #817467 !important;
+                      border: none !important;
+                      color: #000 !important; /* Set the text color to dark */
+                    }
+                    /* Style the active link inside buttons */
+                    .btn.active .text-light {
+                      color: #DCC6B6 !important;
+                      text-shadow: 0 0 2px #B07D47;
+                    }
+                    .btn.active:hover {
+                      color: #000 !important; /* Set the text color to dark on hover */
+                    }
+        
+                    /* Remove underline from the links inside buttons */
+                    .btn.custom-link {
+                      text-decoration: none;
+                    }
+                  </style>
+                  
+                  <div class="mx-auto">
+                    <button type="button" class="ml-2 btn {% if order_by_column == 'default' %}active{% endif %} btn-sm btn-smaller">
+                      <a class="text-left text-light custom-link" style="font-size: 12px; font-style: italic;" href="{{ url_for('admin.rentInventory', order_by='default') }}">date</a>
+                    </button>
+                    <button type="button" class="ml-2 btn {% if order_by_column == 'id' %}active{% endif %} btn-sm btn-smaller">
+                      <a class="text-left text-light custom-link" style="font-size: 12px; font-style: italic;" href="{{ url_for('admin.rentInventory', order_by='return_date') }}">returned</a>
+                    </button>
+                    <button type="button" class="ml-2 btn {% if order_by_column == 'times_rented' %}active{% endif %} btn-sm btn-smaller">
+                      <a class="text-left text-light custom-link" style="font-size: 12px; font-style: italic;" href="{{ url_for('admin.rentInventory', order_by='id') }}">rent id</a>
+                    </button>
+                    <button type="button" class="ml-2 btn {% if order_by_column == 'dress_cost' %}active{% endif %} btn-sm btn-smaller">
+                      <a class="text-left text-light custom-link" style="font-size: 12px; font-style: italic;" href="{{ url_for('admin.rentInventory', order_by='dress_id') }}">dress</a>
+                    </button>
+                  </div>  
+
                   <form method="POST" action="{{ url_for('admin.rentInventory') }}" class="form-inline">
                     {{ form.hidden_tag() }}
                     <div class="form-group" style="padding-right: 2.5px;">
                       <style>
                         /* Target the specific field and set the fixed width */
                         #category-input {
-                            width: 11em; /* Set the desired width here, for example, 10em */
+                          width: 11em; /* Set the desired width here, for example, 10em */
                         }
-                      </style>                    
-                      {{ form.category(class="form-control form-control-sm custom-form-control mr-2", id="category-input", style="width: 12em;", style="background-color: #333; color: #fff;") }}
+                      </style>
+                      {{ form.category(class="btn-smaller form-control form-control-sm custom-form-control mr-2", id="category-input", style="width: 12em;", style="background-color: #817568; color: #fff;") }}
                       {{ form.search(class="form-control form-control-sm custom-form-control mr-2", type="search", placeholder="Search", style="background-color: #333; color: #fff;") }}
-                      <button type="submit" class="btn btn-outline-light btn-smaller btn-dark">Filter</button>
+                      <button type="submit" class="btn btn-outline-light btn-smaller btn-dark">filter</button>
                     </div>
-                  </form>                
+                  </form>
+          
                 </div>
               </th>
             </tr>
-          </thead>                                     
+          </thead>                   
+          
           <tbody>
-            {% for rent in inventory.items %}
+          {% for rent in inventory.items %}
             <tr>
               <td colspan="2">
                 <div class="accordion" id="accordion{{ loop.index }}">
@@ -225,39 +273,62 @@
                     </div>
                   </div>
                 </div>
+
                 <div>
                   <div id="collapse{{ loop.index }}" class="collapse" aria-labelledby="heading{{ loop.index }}" data-parent="#accordion{{ loop.index }}">
                     <div class="card-body">
                       <table class="table table-striped table-hover table-sm table-dark">
-                        <tbody style="font-size: 14px;">
+                        <tbody style="font-size: 15px;">
                           <tr>
-                            <th scope="row">Dress Id:</th>
-                            <td>{{ rent.dressId }}</td>
-                          </tr>
-                          <tr>
-                            <th scope="row">User :</th>
-                            <td>{{ rent.user.name }} {{ rent.user.lastName }}</td>
-                          </tr>
-                          <tr>
-                            <th scope="row">Rent date:</th>
-                            <td>{{ rent.rentDate }}</td>
-                          </tr>
-                          <tr>
-                            <th scope="row">Return date:</th>
-                            <td>{{ rent.returnDate }}</td>
-                          </tr>
-                          <tr>
-                            <th scope="row">Rent Total:</th>
-                            <td>{{ rent.paymentTotal }}</td>
+                            <td class="d-flex" style="padding-left: 10px;">
+                              <!-- Main table column -->
+                              <div class="col-4">
+                                <!-- Inner table with the content of the rows -->
+                                <table class="w-100">
+                                  <tbody>
+                                    <tr>
+                                      <th scope="row">Dress :</th>
+                                      <td>{{ rent.dress }}</td>
+                                    </tr>
+                                    <tr>
+                                      <th scope="row">User:</th>
+                                      <td>{{ rent.user }}</td>
+                                    </tr>
+                                    <tr>
+                                      <th scope="row">Rent Date:</th>
+                                      <td>{{ rent.rentDate }}</td>
+                                    </tr>
+                                    <tr>
+                                      <th scope="row">Return Date:</th>
+                                      <td>{{ rent.returnDate }}</td>
+                                    </tr>
+                                    <tr>
+                                      <th scope="row">Rent Price:</th>
+                                      <td>{{ rent.rentPrice }}</td>
+                                    </tr>
+                                    <tr>
+                                      <th scope="row">Rent Total:</th>
+                                      <td>{{ rent.paymentTotal }}</td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </div>
+                              <!-- Maintenance log column -->
+                              <div class="col-4">
+                                <table class="table table-striped table-hover table-sm table-dark">
+
+                                </table>
+                              </div>
+                            </td>
                           </tr>
                         </tbody>
-                      </table>
+                      </table>                                                           
                     </div>
                   </div>
                 </div>
               </td>
             </tr>
-            {% endfor %}
+          {% endfor %}
           </tbody>
           <tfoot class="custom-footer">
             <tr>

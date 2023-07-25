@@ -4,6 +4,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 import json
 
+import logging
+
 
 class Dress(db.Model):
     # Dress model representing a dress item in the database
@@ -30,7 +32,7 @@ class Dress(db.Model):
     def calculate_rents_for_returns(self):
         self.rentsForReturns = self.dressCost // self.rentPrice
     
-    def update_maintenance_status(self):
+    def toggle_maintenance_status(self):
         self.maintenanceStatus = not self.maintenanceStatus
 
     def get_maintenance_log(self):
@@ -38,6 +40,17 @@ class Dress(db.Model):
         if self.maintenanceLog:
             maintenance_log = json.loads(self.maintenanceLog)
             return maintenance_log
+    
+    def toggle_rent_status(self):
+        self.rentStatus = not self.rentStatus
+    
+    def increment_times_rented(self):
+        self.timesRented += 1
+        self.sellable = self.timesRented > self.rentsForReturns
+
+    def decrement_times_rented(self):
+        self.timesRented -= 1
+        self.sellable = self.timesRented > self.rentsForReturns
 
     def update_rent_status(self):
         # Query the database to get the latest rent associated with this dress
@@ -51,13 +64,12 @@ class Dress(db.Model):
             self.rentStatus = not associated_rent.is_returned()
     
     def update_times_rented(self):
-        associatedRents = Rent.query.filter_by(dressId=self.id).all()
-        numOfRents = 0
-        if associatedRents:
-            for rent in associatedRents:
-                numOfRents += 1
-            self.timesRented = numOfRents
-            self.sellable = self.timesRented > self.rentsForReturns
+        associated_rents = Rent.query.filter_by(dressId=self.id).all()
+        if associated_rents:
+            num_of_rents = len(associated_rents)
+            # Update the timesRented and sellable attributes
+            self.timesRented = num_of_rents
+            self.sellable = num_of_rents > self.rentsForReturns
         else:
             self.timesRented = 0
             self.sellable = self.timesRented > self.rentsForReturns
@@ -69,9 +81,11 @@ class Dress(db.Model):
         for dress in dresses:
             dress.update_rent_status()
             dress.update_times_rented()
+            
+        logging.debug("update_rent_statuses method executed.")
     
     def __repr__(self):
-        return f"Dress Id - {self.id}"
+        return f"ID - D-{self.id}"
 
 
 class User(UserMixin, db.Model):
@@ -105,7 +119,7 @@ class User(UserMixin, db.Model):
             return not associated_rent.is_returned()
     
     def __repr__(self):
-        return f"{self.name}"
+        return (f"{self.name} {self.lastName}").title()
 
 
 class Rent(db.Model):
@@ -127,9 +141,11 @@ class Rent(db.Model):
             self.dress = Dress.query.get(self.dressId)
         if self.clientId:
             self.user = User.query.get(self.clientId)
-        # Increment timesRented and rentStatus value from the Dress instance.
-        self.dress.update_times_rented()
-        self.dress.update_rent_status()
+        # update timesRented and rentStatus value from the related Dress object.
+        self.dress.increment_times_rented()
+        logging.debug(f"Dress id:{self.dressId} increment_times_rented() method called by created rent id:{self.id}")
+        self.dress.toggle_rent_status()
+        logging.debug(f"Dress id:{self.dressId} toggle_rent_status() method called by created rent id:{self.id}")
         # Calculate return date based on rentDate value.
         if self.rentDate:
             self.returnDate = self.rentDate + timedelta(days=2)
@@ -148,4 +164,4 @@ class Rent(db.Model):
         return False
 
     def __repr__(self):
-        return f"Rent Id - {self.id}"
+        return f"ID - R-{self.id}"

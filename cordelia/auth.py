@@ -1,7 +1,4 @@
-from flask import (
-    Blueprint, render_template, redirect, url_for, 
-    flash, request, session
-)
+from flask import Blueprint, render_template, redirect, url_for, flash, request, session
 from flask_login import LoginManager, login_user, login_required, logout_user
 from urllib.parse import urlparse, urljoin 
 from cordelia.models import db, User
@@ -40,6 +37,7 @@ def is_safe_url(target):
     """
     ref_url = urlparse(request.host_url)
     test_url = urlparse(urljoin(request.host_url, target))
+    
     return test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc
 
 

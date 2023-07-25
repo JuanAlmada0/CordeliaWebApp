@@ -55,13 +55,13 @@ class LoginForm(FlaskForm):
 
 
 class SearchForm(FlaskForm):
-    category = SelectField('Category', choices=[], default='Select Category', validators=[DataRequired()])
+    category = SelectField('Category', choices=[], default='select category', validators=[DataRequired()])
     search = StringField('Search')
     submit = SubmitField('Filter')
     
     def __init__(self, model_columns, *args, **kwargs):
         super(SearchForm, self).__init__(*args, **kwargs)
-        self.category.choices = [('Select Category', 'Select Category')] + [(column, column) for column in model_columns]
+        self.category.choices = [('select categoy', 'select category')] + [(column, column) for column in model_columns]
 
 
 class UserRentForm(FlaskForm):
@@ -109,9 +109,12 @@ class RentForm(FlaskForm):
 
 class UserForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    password2 = PasswordField('Re-enter Password', validators=[DataRequired(), EqualTo('password')])
     name = StringField('First name', validators=[DataRequired()])
     lastName = StringField('Last name', validators=[DataRequired()])
     phoneNumber = StringField('Phone Number', validators=[DataRequired()])
+    isAdmin = BooleanField('Admin Access')
     submit = SubmitField('Register')
 
     def validate_phoneNumber(self, field):
