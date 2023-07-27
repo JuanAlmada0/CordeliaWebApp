@@ -47,6 +47,15 @@
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
       </button>
+      <li class="navbar-nav">
+        <a class="nav-link" href="{{ url_for('home.home') }}">Home</a>
+      </li>
+      {% if current_user.is_authenticated %}
+      <li class="navbar-nav">
+        <a class="nav-link" href="{{ url_for('admin.inventory') }}">Dashboard</a>
+      </li>
+      {% endif %}
+
       <div class="collapse navbar-collapse" id="navbarNav">
           {% if not current_user.is_authenticated %}
             <ul class="navbar-nav ml-auto">
@@ -58,9 +67,6 @@
               </li>
             </ul>
           {% else %}
-            <li class="navbar-nav">
-                <a class="nav-link" href="{{ url_for('admin.inventory') }}">Dashboard</a>
-            </li>
             <ul class="navbar-nav ml-auto">
               <li class="nav-item">
                   <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
@@ -94,14 +100,13 @@
   <section class="content-container">
     <style>
       table {
-        background: linear-gradient(135deg, #817467c5 0%, #3f3f3f 100%);
+        background: linear-gradient(135deg, #8b7d71 0%, #464444de 100%);
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
       }
       .btn-smaller {
         padding: 0.08rem 0.15rem;
         font-size: 0.7rem;
-        font-style: italic;
-        background-color: #817568;
+        background-color: #b8a495dc;
         border: none;
         box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.5)
       }
@@ -121,13 +126,45 @@
         display: flex;
         align-items: center;
       }
-  
       .text-arrow-container .text-left {
         margin-right: 5px; 
       }
       .custom-form-control {
         padding: 0.25rem 0.5rem; 
         font-size: 0.7rem; 
+      }
+      /* Custom CSS for breadcrumb */
+      .breadcrumb.file-cabinet {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0;
+        padding: 0;
+        background: none; /* Remove the background color */
+        box-shadow: none; /* Remove the box-shadow */
+      }
+      /* Custom CSS for breadcrumb items (links) */
+      .breadcrumb-item {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 11.5px;
+        text-transform: uppercase;
+        padding: 3px 6px;
+        color: #b8a495;
+        border: none; /* Remove the border */
+        margin-right: 8px; /* Add some space between items */
+        text-decoration: none;
+        background: none; /* Remove the background color */
+        box-shadow: none;
+      }
+      .breadcrumb-item:hover {
+          color: black; /* Change the link color to black on hover */
+      }
+      /* Custom CSS for active breadcrumb item (current page) */
+      .breadcrumb-item.active {
+        color: #fff;
+        background: none;
+      /*  background-color: #817568;  */
+        border: none; /* Remove the border */
       }
       .custom-footer::before {
         content: ""; 
@@ -198,6 +235,27 @@
       }
     });
   </script>
+  <script>
+    // Function to show the confirmation dialog
+    function confirmAction() {
+      // Show the confirmation dialog
+      var result = confirm('Are you sure you want to update rent statuses?');
+  
+      if (result) {
+        // If the user confirms, submit the form with an additional parameter "confirm" set to true
+        var form = document.getElementById('update-rent-statuses-form');
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'confirm';
+        input.value = 'true';
+        form.appendChild(input);
+        form.submit();
+      } else {
+        alert('Action canceled.');
+        return false;
+      }
+    }
+  </script>  
   
   {% endblock %}
 </body>

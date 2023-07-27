@@ -15,7 +15,7 @@ adminBp = Blueprint('admin', __name__, url_prefix='/admin')
 
 
 
-# admin_required Wrapper
+# (admin_required) wrapper
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -26,16 +26,6 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-
-@adminBp.route('/update-rent-statuses', methods=['POST'])
-@login_required
-def update_rent_statuses_endpoint():
-    Dress.update_rent_statuses()
-    db.session.commit()
-    flash('Rent statuses updated successfully.', 'success')
-
-    logging.debug("update_rent_statuses() method called from dashboard")
-    return redirect(url_for('admin.inventory'))
 
 
 # SearchForm handler
@@ -55,9 +45,11 @@ def handle_search_form(query, model_columns, model_class):
     return query, form
 
 
+
 @adminBp.route('/inventory', methods=['GET', 'POST'])
-# @login_required
+#@login_required
 def inventory():
+    model = 'Dress'
     # Get the list of model columns for the Dress table
     model_columns = Dress.__table__.columns.keys()
 
@@ -88,13 +80,12 @@ def inventory():
     # Paginate the filtered results and store it in 'inventory' variable
     inventory = inventory_query.paginate(page=page, per_page=items_per_page)
 
-    # Separate pagination query from the inventory query to avoid conflicts
+    # Separate pagination query from the inventory query for pagination template
     pagination = inventory_query.paginate(page=page, per_page=items_per_page)
 
-    # Initialize the delete form
+    # Initialize delete and maintenance forms
     delete_form = DeleteForm()
 
-    # Initialize the maintenance form
     maintenance_form = MaintenanceForm()
 
     # Handle form submissions for the delete form
@@ -107,10 +98,26 @@ def inventory():
         dress_id = maintenance_form.dress_id.data
         return redirect(url_for('admin.update_maintenance', dress_id=dress_id))
 
-    # Pass the inventory and pagination objects to the template for rendering
-    return render_template('admin_views/inventory.html', inventory=inventory, form=form, maintenance_form=maintenance_form, delete_form=delete_form, pagination=pagination, order_by_column=order_by_column)
+    return render_template('admin_views/inventory.html', inventory=inventory, form=form, maintenance_form=maintenance_form, delete_form=delete_form, pagination=pagination, order_by_column=order_by_column, model=model)
 
 
+
+@adminBp.route('/update-rent-statuses', methods=['POST'])
+@admin_required
+def update_rent_statuses_endpoint():
+    
+    confirm = request.form.get('confirm', False)
+
+    if confirm:
+        Dress.update_rent_statuses()
+        db.session.commit()
+        flash('Rent statuses updated successfully.', 'success')
+
+    logging.debug("update_rent_statuses() method called from dashboard")
+    return redirect(url_for('admin.inventory'))
+
+
+# Handles modal for maintenance form on the dress inventory dashboard
 @adminBp.route('/update-dress/<int:dress_id>', methods=['POST'])
 @admin_required
 def update_maintenance(dress_id):
@@ -122,6 +129,7 @@ def update_maintenance(dress_id):
         
         # Get the maintenance data from the form
         maintenance_date = request.form.get("maintenanceDate")
+        maintenance_type = request.form.get("maintenanceType")
         maintenance_cost = request.form.get("maintenanceCost")
 
         # Generate the current date if not provided
@@ -141,6 +149,7 @@ def update_maintenance(dress_id):
         # Append the new maintenance data to the existing log
         new_maintenance_data = {
             "date": maintenance_date,
+            "type": maintenance_type,
             "cost": maintenance_cost
         }
         existing_maintenance_log.append(new_maintenance_data)
@@ -175,65 +184,57 @@ def update_maintenance_status(dress_id):
 
 
 @adminBp.route('/rent-inventory', methods=['GET', 'POST'])
-# @login_required
+@login_required
 def rentInventory():
+    model = 'Rent'
+
     model_columns = Rent.__table__.columns.keys()
 
-    # Pagination settings
     page = request.args.get('page', 1, type=int)
     items_per_page = 12
 
-    # Get the selected column for ordering from the query parameters
     order_by_column = request.args.get('order_by', default='default')
 
     inventory_query = Rent.query
 
-    # Apply sorting based on the selected column
-    if order_by_column == 'return_date':
-        inventory_query = inventory_query.order_by(Rent.returnDate.desc())
-    elif order_by_column == 'id':
+    if order_by_column == 'id':
         inventory_query = inventory_query.order_by(Rent.id)
+    elif order_by_column == 'user_id':
+        inventory_query = inventory_query.order_by(Rent.clientId.desc())
     elif order_by_column == 'dress_id':
         inventory_query = inventory_query.order_by(Rent.dressId.desc())
     else :
-        # If 'default', sort by rentStatus and maintenanceStatus in descending order
         inventory_query = inventory_query.order_by(Rent.rentDate.desc())
 
-    # Handle search form
     inventory_query, form = handle_search_form(inventory_query, model_columns, Rent)
 
-    # Paginate the filtered results and store it in 'inventory' variable
     inventory = inventory_query.paginate(page=page, per_page=items_per_page)
 
-    # Separate pagination query from the inventory query to avoid conflicts
     pagination = inventory_query.paginate(page=page, per_page=items_per_page)
 
-    # Initialize the delete form
     delete_form = DeleteForm()
 
-    # Handles the DELETE button for inventory.
     if delete_form.validate_on_submit():
         rent_id = delete_form.rent_id.data
         return redirect(url_for('admin.delete_object', dataBase='Rent', id=rent_id))
 
-    return render_template('admin_views/rentInventory.html', inventory=inventory, form=form, delete_form=delete_form, pagination=pagination, order_by_column=order_by_column)
+    return render_template('admin_views/rentInventory.html', inventory=inventory, form=form, delete_form=delete_form, pagination=pagination, order_by_column=order_by_column, model=model)
 
 
 @adminBp.route('/user-inventory', methods=["GET", "POST"])
-# @login_required
+@login_required
 def userInventory():
+    model = 'User'
+
     model_columns = User.__table__.columns.keys()
 
-    # Pagination settings
     page = request.args.get('page', 1, type=int)
     items_per_page = 12
 
-    # Get the selected column for ordering from the query parameters
     order_by_column = request.args.get('order_by', default='default')
 
     inventory_query = User.query
 
-    # Apply sorting based on the selected column
     if order_by_column == 'name':
         inventory_query = inventory_query.order_by(User.name)
     elif order_by_column == 'last_name':
@@ -241,27 +242,21 @@ def userInventory():
     elif order_by_column == 'date':
         inventory_query = inventory_query.order_by(User.joinedAtDate.desc())
     else :
-        # If 'default', sort by rentStatus and maintenanceStatus in descending order
         inventory_query = inventory_query.order_by(User.id)
 
-    # Handle search form
     inventory_query, form = handle_search_form(inventory_query, model_columns, User)
 
-    # Paginate the filtered results and store it in 'inventory' variable
     inventory = inventory_query.paginate(page=page, per_page=items_per_page)
 
-    # Separate pagination query from the inventory query to avoid conflicts
     pagination = inventory_query.paginate(page=page, per_page=items_per_page)
 
-    # Initialize the delete form
     delete_form = DeleteForm()
 
-    # Handles the DELETE button for inventory.
     if delete_form.validate_on_submit():
         user_id = delete_form.user_id.data
         return redirect(url_for('admin.delete_object', dataBase='User', id=user_id))
 
-    return render_template('admin_views/userInventory.html', inventory=inventory, form=form, delete_form=delete_form, pagination=pagination, order_by_column=order_by_column)
+    return render_template('admin_views/userInventory.html', inventory=inventory, form=form, delete_form=delete_form, pagination=pagination, order_by_column=order_by_column, model=model)
 
 
 
@@ -287,18 +282,16 @@ def update(title, form_type):
                     name=form.name.data,
                     lastName=form.lastName.data,
                     phoneNumber=form.phoneNumber.data,
-                    password=form.password.data,
-                    isAdmin=form.admin.data
                 )
-                user.set_password()
+
                 db.session.add(user)
                 db.session.commit()
-                flash('User added successfully into the database.')
-                logging.debug("User Added on dashboard")
+                flash(f'{user} added successfully into the database.')
+                logging.debug(f"{user} Added on dashboard")
+                
                 return redirect(url_for('admin.userInventory'))
             else:
-                flash('This page requires admin access', 'warning')
-                return redirect(url_for('admin.userInventory'))
+                redirect(url_for('admin.userInventory'))
         
         elif form_type == 'dress':
             dress = Dress(
@@ -310,26 +303,72 @@ def update(title, form_type):
                 marketPrice=form.marketPrice.data,
                 rentPrice=form.rentPrice.data,
             )
+
             db.session.add(dress)
             db.session.commit()
-            flash('Dress added successfully into the database.')
-            logging.debug("Dress Added on dashboard")
+            flash(f'{dress} added successfully into the database.')
+            logging.debug(f"{dress} Added on dashboard")
+
             return redirect(url_for('admin.inventory'))
         
         elif form_type == 'rent':
             dress_id = form.dressId.data
+            user_id = form.userId.data
+
             dress = Dress.query.get(dress_id)
+            user = User.query.get(user_id)
+
             if not dress.rentStatus and not dress.maintenanceStatus:
                 rent = Rent(
                     dressId=form.dressId.data,
                     clientId=form.userId.data,
                     rentDate=form.rentDate.data
                 )
+                
                 db.session.add(rent)
-                db.session.commit()
+                
+                # Get id from un-committed rent
+                provisional_id = Rent.query.order_by(Rent.id.desc()).first()
+                logging.debug(f'Rent {provisional_id} added but not yet committed')
 
-                flash('Rent added successfully into the database.')
-                logging.debug("Rent Added on dashboard")
+                # Convert the provisional ID to a regular integer
+                rent_id = provisional_id.id if provisional_id else None
+
+                # Increment timesRented for dress object
+                dress.increment_times_rented()
+                logging.debug(f"{dress} increment_times_rented() method called by created rent {provisional_id}")
+
+                # Update rentStatus for dress object
+                current_date = datetime.utcnow().date()
+                if rent.returnDate >= current_date:
+                    dress.toggle_rent_status()
+                    logging.debug(f"{dress} toggle_rent_status() method called by created rent {provisional_id}")
+
+                # Add rent log to the dress object
+                dress_log = {
+                    "date": form.rentDate.data.strftime('%Y-%m-%d'),
+                    "id": rent_id,
+                    "user_id": [user.id, user.lastName, user.name]
+                }
+                dress.update_rent_log(dress_log)
+                logging.debug(f"{dress} rent log updated by rent {provisional_id}")
+
+                # Add rent log to the user object
+                user_log = {
+                    "date": form.rentDate.data.strftime('%Y-%m-%d'),
+                    "id": rent_id,
+                    "dress_id": dress.id
+                }
+
+                user.update_rent_log(user_log)
+                logging.debug(f"{user} rent log updated by rent {provisional_id}")
+
+                # Commit rent object
+                db.session.commit()
+                logging.debug(f"{rent} committed")
+                flash(f'{rent} added successfully into the database.')
+                logging.debug(f"{rent} Added on dashboard")
+
                 return redirect(url_for('admin.rentInventory'))
             else:
                 flash('Dress not available.')
@@ -358,17 +397,14 @@ def delete_object(dataBase, id):
     elif dataBase == 'Rent':
         rent = Rent.query.get(int(id))
 
-        if rent and rent.is_rented():
+        if rent and rent.is_returned():
             # Store dress ID before deleting rent object
             dress_id = rent.dressId
             db.session.delete(rent)
-
             # Attempt to find the associated dress and decrement times_rented
             associated_dress = Dress.query.get(dress_id)
             if associated_dress:
-                associated_dress.toggle_rent_status()
                 associated_dress.decrement_times_rented()
-                logging.debug(f"'toggle_rent_status()' method called for Associated Dress. After {rent} deletion.")
                 logging.debug(f"'decrement_rent_status()' method called for Associated Dress. After {rent} deletion.")
             else:
                 # Handle the case when the associated dress is not found
@@ -384,14 +420,14 @@ def delete_object(dataBase, id):
     elif dataBase == 'User':
         user = User.query.get(int(id))
 
-        if user and not user.check_status():
+        if user and not user.check_status() and not user.isAdmin:
             db.session.delete(user)
             db.session.commit()
             flash('User deleted successfully.', 'success')
             logging.debug("User deleted from dashboard")
             return redirect(url_for('admin.userInventory'))
         else:
-            flash('User not found, or busy.', 'danger')
+            flash("Can't delete this user.", 'danger')
 
 
 

@@ -22,14 +22,13 @@ class Dress(db.Model):
     sellable = db.Column(db.Boolean, index=True, default=False)
     dateAdded = db.Column(db.DateTime(), index=True, default=datetime.utcnow)
     rentStatus = db.Column(db.Boolean, index=True, default=False)
+    rentLog = db.Column(db.JSON, nullable=True, default=[])
     maintenanceStatus = db.Column(db.Boolean, index=True, default=False)
-    maintenanceLog = db.Column(db.String, nullable=True, default=None)
+    maintenanceLog = db.Column(db.JSON, nullable=True, default=[])
 
     def __init__(self, *args, **kwargs):
         super(Dress, self).__init__(*args, **kwargs)
-        self.calculate_rents_for_returns()
-    
-    def calculate_rents_for_returns(self):
+
         self.rentsForReturns = self.dressCost // self.rentPrice
     
     def toggle_maintenance_status(self):
@@ -43,6 +42,19 @@ class Dress(db.Model):
     
     def toggle_rent_status(self):
         self.rentStatus = not self.rentStatus
+    
+    def update_rent_log(self, log):
+        existing_rent_log = json.loads(self.rentLog) if self.rentLog else []
+        # Append the new rent data to the existing log
+        existing_rent_log.append(log)
+        # Save the updated rent log to the dress
+        self.rentLog = json.dumps(existing_rent_log)
+    
+    def get_rent_log(self):
+        log = []
+        if self.rentLog:
+            log = json.loads(self.rentLog)
+            return log
     
     def increment_times_rented(self):
         self.timesRented += 1
@@ -80,25 +92,26 @@ class Dress(db.Model):
 
         for dress in dresses:
             dress.update_rent_status()
-            dress.update_times_rented()
+            dress.update_times_rented()      
             
         logging.debug("update_rent_statuses method executed.")
     
     def __repr__(self):
-        return f"ID - D-{self.id}"
+        return f"Dress D-0{self.id}"
 
 
 class User(UserMixin, db.Model):
     # User model representing a user in the database
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(60), index=True, unique=True, default=None)
-    email = db.Column(db.String(80), index=True, unique=True)
+    username = db.Column(db.String(60), index=True, unique=True, nullable=True)
+    email = db.Column(db.String(80), index=True, unique=True, nullable=True)
     name = db.Column(db.String(60), index=True)
     lastName = db.Column(db.String(60), index=True)
-    phoneNumber = db.Column(db.Integer, index=True, unique=True)
+    phoneNumber = db.Column(db.Integer, index=True, unique=True, nullable=True)
     password_hash = db.Column(db.String(80), nullable=True)
     joinedAtDate = db.Column(db.DateTime(), index=True, default=datetime.utcnow)
     isAdmin = db.Column(db.Boolean, default=False)
+    rentLog = db.Column(db.JSON, nullable=True, default=[])
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -106,11 +119,10 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
     
-    # Will return True if the latest rent has been returned and False if it's still active.
     def check_status(self):
+        # Will return True if the latest rent has been returned and False if it's still active.
         # Query the database to get the latest rent associated with this user
         associated_rent = Rent.query.filter_by(clientId=self.id).order_by(Rent.rentDate.desc()).first()
-
         # Check if there is any related rent
         if not associated_rent:
             return False
@@ -118,8 +130,19 @@ class User(UserMixin, db.Model):
             # Check if the latest rent has been returned
             return not associated_rent.is_returned()
     
+    def update_rent_log(self, log):
+        existing_rent_log = json.loads(self.rentLog) if self.rentLog else []
+        existing_rent_log.append(log)
+        self.rentLog = json.dumps(existing_rent_log)
+    
+    def get_rent_log(self):
+        log = []
+        if self.rentLog:
+            log = json.loads(self.rentLog)
+            return log
+    
     def __repr__(self):
-        return (f"{self.name} {self.lastName}").title()
+        return f"User U-0{self.id}"
 
 
 class Rent(db.Model):
@@ -141,18 +164,14 @@ class Rent(db.Model):
             self.dress = Dress.query.get(self.dressId)
         if self.clientId:
             self.user = User.query.get(self.clientId)
-        # update timesRented and rentStatus value from the related Dress object.
-        self.dress.increment_times_rented()
-        logging.debug(f"Dress id:{self.dressId} increment_times_rented() method called by created rent id:{self.id}")
-        self.dress.toggle_rent_status()
-        logging.debug(f"Dress id:{self.dressId} toggle_rent_status() method called by created rent id:{self.id}")
+
         # Calculate return date based on rentDate value.
         if self.rentDate:
             self.returnDate = self.rentDate + timedelta(days=2)
         # Added Tax.
         tax = self.dress.rentPrice * 0.16
-        self.paymentTotal = int(self.dress.rentPrice + tax)
-    
+        self.paymentTotal = int(self.dress.rentPrice + tax) 
+
     def is_returned(self):
         # Get the current date and time
         current_datetime = datetime.utcnow()
@@ -162,6 +181,7 @@ class Rent(db.Model):
         if current_date > self.returnDate:
             return True
         return False
+    
 
     def __repr__(self):
-        return f"ID - R-{self.id}"
+        return f"Rent R-0{self.id}"

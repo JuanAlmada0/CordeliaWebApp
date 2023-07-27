@@ -55,13 +55,13 @@ class LoginForm(FlaskForm):
 
 
 class SearchForm(FlaskForm):
-    category = SelectField('Category', choices=[], default='select category', validators=[DataRequired()])
+    category = SelectField('Category', choices=[], default='Select', validators=[DataRequired()])
     search = StringField('Search')
     submit = SubmitField('Filter')
     
     def __init__(self, model_columns, *args, **kwargs):
         super(SearchForm, self).__init__(*args, **kwargs)
-        self.category.choices = [('select categoy', 'select category')] + [(column, column) for column in model_columns]
+        self.category.choices = [('Select', 'Select')] + [(column, column) for column in model_columns]
 
 
 class UserRentForm(FlaskForm):
@@ -72,17 +72,9 @@ class UserRentForm(FlaskForm):
 class MaintenanceForm(FlaskForm):
     dress_id = HiddenField('Dress ID', validators=[DataRequired()])
     maintenanceDate = DateField('Maintenance Date', validators=[DataRequired()])
+    maintenanceType = StringField('Maintenance Type', validators=[DataRequired()])
     maintenanceCost = IntegerField('Cost', validators=[NumberRange(min=0)])
     submit = SubmitField('Maintenance')
-
-    def validate_data(self, field):
-        try:
-            json_data = json.loads(field.data)
-            if not isinstance(json_data, dict):
-                raise ValueError("Data must be a valid JSON object (dictionary).")
-        except json.JSONDecodeError as e:
-            raise ValueError("Invalid JSON data. Please enter a valid JSON object (dictionary).")
-
 
 class DeleteForm(FlaskForm):
     id = IntegerField('ID', validators=[DataRequired()])
@@ -109,12 +101,9 @@ class RentForm(FlaskForm):
 
 class UserForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    password2 = PasswordField('Re-enter Password', validators=[DataRequired(), EqualTo('password')])
     name = StringField('First name', validators=[DataRequired()])
     lastName = StringField('Last name', validators=[DataRequired()])
     phoneNumber = StringField('Phone Number', validators=[DataRequired()])
-    isAdmin = BooleanField('Admin Access')
     submit = SubmitField('Register')
 
     def validate_phoneNumber(self, field):

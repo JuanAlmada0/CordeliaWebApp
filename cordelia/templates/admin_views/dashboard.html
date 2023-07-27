@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+  @font-face {
+    font-family: 'Typewriter';
+    src: url(data:application/x-font-ttf;charset=utf-8;base64) format('truetype');
+  }
+  .typewriter-button {
+      font-family: 'Typewriter', monospace;
+      cursor: pointer;
+    }
+</style>
+
+<div class="d-flex justify-content-center" style="background-color: #b8a495dc; padding-top: 10px; padding-bottom: 10px;">
+  <div class="col-md-2 d-flex flex-column">
+    <div class="row pl-3"> 
+      <table class="table table-secondary flex-1 p-1">
+
+        <thead>
+            <tr>
+              <td>
+                <span class="text-left neon-text sand typewriter-button" style="font-size: 13px; font-family: 'Courier New', Courier, monospace">Database</span>
+              </td>
+
+              <td></td>
+              
+              <td>
+                <button type="submit" class="btn btn-outline-light btn-smaller ml-auto btn-dark">
+                  <a href="{{ url_for('admin.downloadExcell') }}" class="text-light">
+                      <i class="fas fa-download fa-sm"></i> <!-- Font Awesome download icon, larger size -->
+                  </a>
+                </button>                
+              </td>
+              
+            </tr>            
+        </thead>
+        <tbody>
+            <tr>
+              <td>
+                <a href="{{ url_for('admin.inventory') }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Dress</a>
+                <span class="badge badge-light">{{ inventory.total if model == 'Dress'}}</span>
+              </td>
+              {% if model == "Dress" %}
+                <td>
+                  <form id="update-rent-statuses-form" method="POST" action="{{ url_for('admin.update_rent_statuses_endpoint') }}" onsubmit="return confirmAction();">
+                    {{ form.hidden_tag() }}
+                    <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Refresh">
+                      <i class="fas fa-sync-alt"></i> <!-- Font Awesome refresh icon -->
+                    </button>
+                  </form>
+                </td>
+                <td>
+                  <a href="{{ url_for('admin.update', title='Add Dress', form_type='dress') }}" class="btn btn-outline-light btn-smaller mr-2 btn-dark">
+                    <i class="fas fa-plus"></i> <!-- Font Awesome "plus" icon -->
+                  </a>
+                </td>
+              {% else %}
+                <td></td>
+                <td></td>
+              {% endif %}
+            </tr>
+            <tr>
+                <td>
+                  <a href="{{ url_for('admin.rentInventory') }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Rent</a> 
+                  <span class="badge badge-light">{{ inventory.total if model == 'Rent' }}</span>
+                </td>
+              {% if model == "Rent" %}
+                <td></td>
+                <td>
+                  <a href="{{ url_for('admin.update', title='Add Rent', form_type='rent') }}" class="btn btn-outline-light btn-smaller mr-2 btn-dark">
+                    <i class="fas fa-plus"></i> <!-- Font Awesome "plus" icon -->
+                  </a>
+                </td>
+              {% else %}
+                <td></td>
+                <td></td>
+              {% endif %}            
+            </tr>
+            <tr>
+                <td>
+                  <a href="{{ url_for('admin.userInventory') }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">User</a>
+                  <span class="badge badge-light">{{ inventory.total if model == 'User' }}</span>
+                </td>
+              {% if model == "User" %} 
+                <td> </td>
+                <td>
+                  <a href="{{ url_for('admin.update', title='Add User', form_type='user') }}" class="btn btn-outline-light btn-smaller mr-2 btn-dark">
+                    <i class="fas fa-plus"></i> <!-- Font Awesome "plus" icon -->
+                  </a>
+                </td>
+              {% else %}
+                <td></td>
+                <td></td>
+              {% endif %}
+            </tr>
+            <table class="table table-secondary flex-1 p-1">
+              <thead>
+                <tr>
+                  <td class="text-left">
+                    <span class="text-left neon-text sand typewriter-button" style="font-size: 13px; font-family: 'Courier New', Courier, monospace">Accounting</span>
+                  </td>                     
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <span class="text-left text-light sand typewriter-button" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Costs</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <span class="text-left text-light typewriter-button" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Earnings</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      </table>
+    </div>
+  </div>
+  
+  <div class="col-md-10 ml-auto">
+    <div class="d-flex justify-content-center">
+      <table class="table table-secondary table-sm" style="width: 100%; height: auto;"> 
+        <thead>
+          <tr>
+            <th colspan="2" style="width: 100%; position: relative;">
+              <div class="d-flex justify-content-between align-items-center">
+                
+                <span class="text-left text-light" style="font-size: 14px;">
+                  <span style="margin-right: 1rem; font-family: 'Courier New', Courier, monospace">{{ model }}</span>
+                </span>
+      
+                <div class="pagination-container">
+                  {% if inventory.has_prev or inventory.has_next %}
+                  <nav aria-label="Inventory pagination">
+                    <ul class="pagination">
+                      {% if inventory.has_prev %}
+                      <li class="page-item ml-1">
+                        <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.inventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">prev</a>
+                      </li>
+                      {% endif %}
+                      {% for page_num in inventory.iter_pages(left_edge=1, left_current=1, right_current=1, right_edge=1) %}
+                      {% if page_num %}
+                      <li class="page-item ml-1 {% if page_num == inventory.page %}active{% endif %}">
+                        <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.inventory', page=page_num, order_by=order_by_column) }}">{{ page_num }}</a>
+                      </li>
+                      {% else %}
+                      <li class="page-item ml-2 disabled"><span class="page-link">&hellip;</span></li>
+                      {% endif %}
+                      {% endfor %}
+                      {% if inventory.has_next %}
+                      <li class="page-item ml-2">
+                        <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.inventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">next</a>
+                      </li>
+                      {% endif %}
+                    </ul>
+                  </nav>
+                  {% endif %}
+                </div>
+
+                <style>
+                  .btn.active {
+                    background-color: #817467 !important;
+                    border: none !important;
+                    color: #000 !important; /* Set the text color to dark */
+                  }
+                  /* Style the active link inside buttons */
+                  .btn.active .text-light {
+                    color: #DCC6B6 !important;
+                    text-shadow: 0 0 2px #B07D47;
+                  }
+                  .btn.active:hover {
+                    color: #000 !important; /* Set the text color to dark on hover */
+                  }
+      
+                  /* Remove underline from the links inside buttons */
+                  .btn.custom-link {
+                    text-decoration: none;
+                  }
+                </style>
+
+                
+                  {% if model == 'Dress' %}
+                  <div class="mx-auto breadcrumb file-cabinet">
+                    <a class="breadcrumb-item {% if order_by_column == 'default' %}active{% endif %}" href="{{ url_for('admin.inventory', order_by='default') }}">Status</a>
+                    <a class="breadcrumb-item {% if order_by_column == 'id' %}active{% endif %}" href="{{ url_for('admin.inventory', order_by='id') }}">Added</a>
+                    <a class="breadcrumb-item {% if order_by_column == 'times_rented' %}active{% endif %}" href="{{ url_for('admin.inventory', order_by='times_rented') }}">Popular</a>
+                    <a class="breadcrumb-item {% if order_by_column == 'dress_cost' %}active{% endif %}" href="{{ url_for('admin.inventory', order_by='dress_cost') }}">Cost</a>
+                  </div>
+                  <form method="POST" action="{{ url_for('admin.inventory') }}" class="form-inline">
+                    {{ form.hidden_tag() }}
+                    <div class="form-group" style="padding-right: 2.5px;">
+                      <style>
+                        /* Target the specific field and set the fixed width */
+                        #category-input {
+                          width: 11em; /* Set the desired width here, for example, 10em */
+                        }
+                      </style>
+                      {{ form.category(class="form-control form-control-sm custom-form-control mr-2", id="category-input", style="width: 10em;", style="background-color: #b8a495dc; color: #fff; font-family: 'Courier New', Courier, monospace") }}
+                      {{ form.search(class="form-control form-control-sm custom-form-control mr-2", type="search", placeholder="Search", style="font-family: 'Courier New', Courier, monospace; width: 10em;") }}
+                      <button type="submit" class="btn btn-outline-light btn-smaller btn-dark" style="font-family: 'Courier New', Courier, monospace">Filter</button>
+                    </div>
+                  </form>
+                  {% elif model == 'Rent' %}
+                  <div class="mx-auto breadcrumb file-cabinet">
+                    <a class="breadcrumb-item {% if order_by_column == 'default' %}active{% endif %}" href="{{ url_for('admin.rentInventory', order_by='default') }}">date</a>
+                    <a class="breadcrumb-item {% if order_by_column == 'id' %}active{% endif %}" href="{{ url_for('admin.rentInventory', order_by='id') }}">rent id</a>
+                    <a class="breadcrumb-item {% if order_by_column == 'user_id' %}active{% endif %}" href="{{ url_for('admin.rentInventory', order_by='user_id') }}">user id</a>
+                    <a class="breadcrumb-item {% if order_by_column == 'dress_id' %}active{% endif %}" href="{{ url_for('admin.rentInventory', order_by='dress_id') }}">dress id</a>
+                  </div>
+                  <form method="POST" action="{{ url_for('admin.rentInventory') }}" class="form-inline">
+                    {{ form.hidden_tag() }}
+                    <div class="form-group" style="padding-right: 2.5px;">
+                      <style>
+                        /* Target the specific field and set the fixed width */
+                        #category-input {
+                          width: 11em; /* Set the desired width here, for example, 10em */
+                        }
+                      </style>
+                      {{ form.category(class="form-control form-control-sm custom-form-control mr-2", id="category-input", style="width: 10em;", style="background-color: #b8a495dc; color: #fff; font-family: 'Courier New', Courier, monospace") }}
+                      {{ form.search(class="form-control form-control-sm custom-form-control mr-2", type="search", placeholder="Search", style="font-family: 'Courier New', Courier, monospace; width: 10em;") }}
+                      <button type="submit" class="btn btn-outline-light btn-smaller btn-dark" style="font-family: 'Courier New', Courier, monospace">Filter</button>
+                    </div>
+                  </form>
+                  {% elif model == 'User' %}
+                  <div class="mx-auto breadcrumb file-cabinet">
+                    <a class="breadcrumb-item {% if order_by_column == 'default' %}active{% endif %}" href="{{ url_for('admin.userInventory', order_by='default') }}">id</a>
+                    <a class="breadcrumb-item {% if order_by_column == 'date' %}active{% endif %}" href="{{ url_for('admin.userInventory', order_by='date') }}">joined</a>
+                    <a class="breadcrumb-item {% if order_by_column == 'name' %}active{% endif %}" href="{{ url_for('admin.userInventory', order_by='name') }}">first name</a>
+                    <a class="breadcrumb-item {% if order_by_column == 'last_name' %}active{% endif %}" href="{{ url_for('admin.userInventory', order_by='last_name') }}">last name</a>
+                  </div>
+                  <form method="POST" action="{{ url_for('admin.userInventory') }}" class="form-inline">
+                    {{ form.hidden_tag() }}
+                    <div class="form-group" style="padding-right: 2px;">
+                      <style>
+                        /* Target the specific field and set the fixed width */
+                        #category-input {
+                          width: 10em; 
+                        }
+                      </style>
+                      {{ form.category(class="form-control form-control-sm custom-form-control mr-2", id="category-input", style="width: 10em;", style="background-color: #b8a495dc; color: #fff; font-family: 'Courier New', Courier, monospace") }}
+                      {{ form.search(class="form-control form-control-sm custom-form-control mr-2", type="search", placeholder="search", style="font-family: 'Courier New', Courier, monospace; width: 10em;") }}
+                      <button type="submit" class="btn btn-outline-light btn-smaller btn-dark" style="font-family: 'Courier New', Courier, monospace">Filter</button>
+                    </div>
+                  </form>
+                {% endif %}
+              </div>
+            </th>
+          </tr>
+        </thead> 
+
+  {% block inventory_table_body %}{% endblock %}
+
+{% endblock %}

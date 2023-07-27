@@ -1,180 +1,11 @@
-{% extends "base.html" %}
+{% extends "admin_views/dashboard.html" %}
 
-{% block content %}
 
-  <div class="d-flex justify-content-center" style="background-color: #b8a495dc; padding-top: 10px; padding-bottom: 10px;">
-    <div class="col-md-2 d-flex flex-column">
-      <div class="row pl-3"> 
-        <table class="table table-dark flex-1 p-1">
-
-          <thead>
-              <tr>
-                <td>
-                  <span class="text-left neon-text sand" style="font-size: 12.4px;">Database</span>
-                </td>
-
-                <td></td>
-                
-                <td>
-                  <button type="submit" class="btn btn-outline-light btn-smaller mr-2 btn-dark">
-                    <a href="{{ url_for('admin.downloadExcell') }}" class="text-light">
-                        <i class="fas fa-download fa-sm"></i> <!-- Font Awesome download icon, larger size -->
-                    </a>
-                  </button>                
-                </td>
-                
-              </tr>            
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <a href="{{ url_for('admin.inventory') }}" class="text-left text-light" style="font-size: 12px;">Dress</a>
-              </td>            
-            </tr>
-            <tr>
-              <td>
-                <a href="{{ url_for('admin.rentInventory') }}" class="text-left text-light" style="font-size: 12px;">Rent</a> 
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <a href="{{ url_for('admin.userInventory') }}" class="text-left text-light" style="font-size: 12px;">User</a>
-                <span class="badge badge-light">{{ inventory.total }}</span>
-              </td>
-              <td>
-
-              </td>
-              <td>
-                <a href="{{ url_for('admin.update', title='Add User', form_type='user') }}" class="btn btn-outline-light btn-smaller mr-2 btn-dark">
-                  add
-                </a>
-              </td>
-            </tr>
-            <table class="table table-dark flex-1 p-1">
-              <thead>
-                <tr>
-                  <td class="text-left">
-                    <span class="text-left neon-text sand" style="font-size: 12.4px;">Accounting</span>
-                  </td>                     
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <span class="text-left text-light" style="font-size: 12px;">Costs</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <span class="text-left text-light" style="font-size: 12px;">Earnings</span>
-                  </td>
-                </tr>
-            </table>
-          </tbody>
-          <tfoot class="custom-footer">
-            <tr>
-              <td colspan="2">
-              </td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-    </div>  
-
-    <div class="col-md-10 ml-auto">
-      <div class="d-flex justify-content-center">
-        <table class="table table-sm table-dark" style="width: 100%;"> 
-          <thead>
-            <tr>
-              <th colspan="2" style="width: 100%; position: relative;">
-                <div class="d-flex justify-content-between align-items-center">
-                  <span class="text-left text-light" style="font-size: 13px;">
-                    <span style="margin-right: 1rem;">User</span>
-                  </span>
-        
-                  <div class="pagination-container">
-                    {% if inventory.has_prev or inventory.has_next %}
-                    <nav aria-label="Inventory pagination">
-                      <ul class="pagination">
-                        {% if inventory.has_prev %}
-                        <li class="page-item ml-1">
-                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark" href="{{ url_for('admin.userInventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">prev</a>
-                        </li>
-                        {% endif %}
-                        {% for page_num in inventory.iter_pages(left_edge=1, left_current=1, right_current=1, right_edge=1) %}
-                        {% if page_num %}
-                        <li class="page-item ml-1 {% if page_num == inventory.page %}active{% endif %}">
-                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark" href="{{ url_for('admin.userInventory', page=page_num, order_by=order_by_column) }}">{{ page_num }}</a>
-                        </li>
-                        {% else %}
-                        <li class="page-item ml-2 disabled"><span class="page-link">&hellip;</span></li>
-                        {% endif %}
-                        {% endfor %}
-                        {% if inventory.has_next %}
-                        <li class="page-item ml-2">
-                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark" href="{{ url_for('admin.userInventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">next</a>
-                        </li>
-                        {% endif %}
-                      </ul>
-                    </nav>
-                    {% endif %}
-                  </div>
-
-                  <style>
-                    .btn.active {
-                      background-color: #817467 !important;
-                      border: none !important;
-                      color: #000 !important; /* Set the text color to dark */
-                    }
-                    /* Style the active link inside buttons */
-                    .btn.active .text-light {
-                      color: #DCC6B6 !important;
-                      text-shadow: 0 0 2px #B07D47;
-                    }
-                    .btn.active:hover {
-                      color: #000 !important; /* Set the text color to dark on hover */
-                    }
-        
-                    /* Remove underline from the links inside buttons */
-                    .btn.custom-link {
-                      text-decoration: none;
-                    }
-                  </style>
-                  
-                  <div class="mx-auto">
-                    <button type="button" class="ml-2 btn {% if order_by_column == 'default' %}active{% endif %} btn-sm btn-smaller">
-                      <a class="text-left text-light custom-link" style="font-size: 12px; font-style: italic;" href="{{ url_for('admin.userInventory', order_by='default') }}">user id</a>
-                    </button>
-                    <button type="button" class="ml-2 btn {% if order_by_column == 'id' %}active{% endif %} btn-sm btn-smaller">
-                      <a class="text-left text-light custom-link" style="font-size: 12px; font-style: italic;" href="{{ url_for('admin.userInventory', order_by='date') }}">joined</a>
-                    </button>
-                    <button type="button" class="ml-2 btn {% if order_by_column == 'times_rented' %}active{% endif %} btn-sm btn-smaller">
-                      <a class="text-left text-light custom-link" style="font-size: 12px; font-style: italic;" href="{{ url_for('admin.userInventory', order_by='name') }}">first name</a>
-                    </button>
-                    <button type="button" class="ml-2 btn {% if order_by_column == 'dress_cost' %}active{% endif %} btn-sm btn-smaller">
-                      <a class="text-left text-light custom-link" style="font-size: 12px; font-style: italic;" href="{{ url_for('admin.userInventory', order_by='last_name') }}">last name</a>
-                    </button>
-                  </div>  
-
-                  <form method="POST" action="{{ url_for('admin.userInventory') }}" class="form-inline">
-                    {{ form.hidden_tag() }}
-                    <div class="form-group" style="padding-right: 2.5px;">
-                      <style>
-                        /* Target the specific field and set the fixed width */
-                        #category-input {
-                          width: 11em; /* Set the desired width here, for example, 10em */
-                        }
-                      </style>
-                      {{ form.category(class="btn-smaller form-control form-control-sm custom-form-control mr-2", id="category-input", style="width: 12em;", style="background-color: #817568; color: #fff;") }}
-                      {{ form.search(class="form-control form-control-sm custom-form-control mr-2", type="search", placeholder="Search", style="background-color: #333; color: #fff;") }}
-                      <button type="submit" class="btn btn-outline-light btn-smaller btn-dark">filter</button>
-                    </div>
-                  </form>
+  {% block inventory_table_head %}
           
-                </div>
-              </th>
-            </tr>
-          </thead>                   
+          {% endblock %}
+
+          {% block inventory_table_body %}
           
           <tbody>
           {% for user in inventory.items %}
@@ -192,7 +23,7 @@
                                 <span class="arrow-down"></span>
                               </button>
                               <div class="text-arrow-container ml-2">
-                                <span class="text-left text-light" style="font-size: 13px;">{{ user }}</span>
+                                <span class="text-left text-light typewriter-button" style="font-size: 13px;">{{ user }}</span>
                               </div>
                             </div>
                           </div>
@@ -201,10 +32,10 @@
                           <div class="col-md-6">
                             <div class="d-flex justify-content-start">
                               <div class="text-arrow-container">
-                                <span class="text-left text-light" style="font-size: 13px;">ID : {{ user.id }}</span>
+                                <span class="text-left text-light typewriter-button" style="font-size: 13px;">ID : {{ user.id }}</span>
                               </div>
                               <div class="text-arrow-container ml-auto">
-                                <span class="text-left text-light" style="font-size: 13px;">{{ user.email }}</span>
+                                <span class="text-left text-light typewriter-button" style="font-size: 13px;">{{ user.email }}</span>
                               </div>
                             </div>
                           </div>
@@ -242,8 +73,8 @@
                 <div>
                   <div id="collapse{{ loop.index }}" class="collapse" aria-labelledby="heading{{ loop.index }}" data-parent="#accordion{{ loop.index }}">
                     <div class="card-body">
-                      <table class="table table-striped table-hover table-sm table-dark">
-                        <tbody style="font-size: 15px;">
+                      <table class="table table-striped table-hover table-sm table-dark typewriter-button">
+                        <tbody style="font-size: 13px;">
                           <tr>
                             <td class="d-flex" style="padding-left: 10px;">
                               <!-- Main table column -->
@@ -277,7 +108,24 @@
                               <!-- Maintenance log column -->
                               <div class="col-4">
                                 <table class="table table-striped table-hover table-sm table-dark">
-
+                                  {% if user.rentLog %}
+                                  <thead style="font-size: 13px;">
+                                    <tr>
+                                      <th>Rent Log</th>
+                                      <th>Rent ID</th>
+                                      <th>Dress ID</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody style="font-size: 12px;">
+                                    {% for log in user.get_rent_log() %}
+                                    <tr>
+                                        <td>{{ log.date }}</td>
+                                        <td>{{ log.id }}</td>
+                                        <td>{{ log.dress_id }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                  </tbody>
+                                  {% endif %}
                                 </table>
                               </div>
                             </td>

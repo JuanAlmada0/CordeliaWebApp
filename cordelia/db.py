@@ -40,8 +40,8 @@ def close_session(e=None):
         setattr(app, '_session', None)
 
 
-def init_db():
-    with current_app.app_context():
+def init_db(app):
+    with app.app_context():
         # Create all the database tables based on the defined models
         db.create_all()
 

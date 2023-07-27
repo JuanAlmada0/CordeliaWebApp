@@ -1,186 +1,14 @@
-{% extends "base.html" %}
+{% extends "admin_views/dashboard.html" %}
 
-{% block content %}
 
-  <div class="d-flex justify-content-center" style="background-color: #b8a495dc; padding-top: 10px; padding-bottom: 10px;">
-    <div class="col-md-2 d-flex flex-column">
-      <div class="row pl-3"> 
-        <table class="table table-dark flex-1 p-1">
 
-          <thead>
-              <tr>
-                <td>
-                  <span class="text-left neon-text sand" style="font-size: 12.4px;">Database</span>
-                </td>
+  {% block inventory_table_head %}
 
-                <td></td>
-                
-                <td>
-                  <button type="submit" class="btn btn-outline-light btn-smaller mr-2 btn-dark">
-                    <a href="{{ url_for('admin.downloadExcell') }}" class="text-light">
-                        <i class="fas fa-download fa-sm"></i> <!-- Font Awesome download icon, larger size -->
-                    </a>
-                  </button>                
-                </td>
-                
-              </tr>            
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <a href="{{ url_for('admin.inventory') }}" class="text-left text-light" style="font-size: 12px;">Dress</a> 
-                <span class="badge badge-light">{{ inventory.total }}</span>
-              </td>
-              <td>
-                <form action="{{ url_for('admin.update_rent_statuses_endpoint') }}" method="post">
-                  {{ form.hidden_tag() }}
-                  <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Refresh">
-                      <i class="fas fa-sync-alt"></i> <!-- Font Awesome refresh icon -->
-                  </button>
-                </form>
-              </td>
-              <td>
-                <a href="{{ url_for('admin.update', title='Add Dress', form_type='dress') }}" class="btn btn-outline-light btn-smaller mr-2 btn-dark">
-                  add
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <a href="{{ url_for('admin.rentInventory') }}" class="text-left text-light" style="font-size: 12px;">Rent</a>
-              </td>            
-            </tr>
-            <tr>
-              <td>
-                <a href="{{ url_for('admin.userInventory') }}" class="text-left text-light" style="font-size: 12px;">User</a>
-              </td>
-            </tr>
-            <table class="table table-dark flex-1 p-1">
-              <thead>
-                <tr>
-                  <td class="text-left">
-                    <span class="text-left neon-text sand" style="font-size: 12.4px;">Accounting</span>
-                  </td>                     
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <span class="text-left text-light" style="font-size: 12px;">Costs</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <span class="text-left text-light" style="font-size: 12px;">Earnings</span>
-                  </td>
-                </tr>
-            </table>
-          </tbody>
-          <tfoot class="custom-footer">
-            <tr>
-              <td colspan="2">
-              </td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-    </div>  
+          {% endblock %}
 
-    <div class="col-md-10 ml-auto">
-      <div class="d-flex justify-content-center">
-        <table class="table table-sm table-dark" style="width: 100%;"> 
-          <thead>
-            <tr>
-              <th colspan="2" style="width: 100%; position: relative;">
-                <div class="d-flex justify-content-between align-items-center">
-                  <span class="text-left text-light" style="font-size: 13px;">
-                    <span style="margin-right: 1rem;">Dress</span>
-                  </span>
-        
-                  <div class="pagination-container">
-                    {% if inventory.has_prev or inventory.has_next %}
-                    <nav aria-label="Inventory pagination">
-                      <ul class="pagination">
-                        {% if inventory.has_prev %}
-                        <li class="page-item ml-1">
-                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark" href="{{ url_for('admin.inventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">prev</a>
-                        </li>
-                        {% endif %}
-                        {% for page_num in inventory.iter_pages(left_edge=1, left_current=1, right_current=1, right_edge=1) %}
-                        {% if page_num %}
-                        <li class="page-item ml-1 {% if page_num == inventory.page %}active{% endif %}">
-                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark" href="{{ url_for('admin.inventory', page=page_num, order_by=order_by_column) }}">{{ page_num }}</a>
-                        </li>
-                        {% else %}
-                        <li class="page-item ml-2 disabled"><span class="page-link">&hellip;</span></li>
-                        {% endif %}
-                        {% endfor %}
-                        {% if inventory.has_next %}
-                        <li class="page-item ml-2">
-                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark" href="{{ url_for('admin.inventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">next</a>
-                        </li>
-                        {% endif %}
-                      </ul>
-                    </nav>
-                    {% endif %}
-                  </div>
 
-                  <style>
-                    .btn.active {
-                      background-color: #817467 !important;
-                      border: none !important;
-                      color: #000 !important; /* Set the text color to dark */
-                    }
-                    /* Style the active link inside buttons */
-                    .btn.active .text-light {
-                      color: #DCC6B6 !important;
-                      text-shadow: 0 0 2px #B07D47;
-                    }
-                    .btn.active:hover {
-                      color: #000 !important; /* Set the text color to dark on hover */
-                    }
-        
-                    /* Remove underline from the links inside buttons */
-                    .btn.custom-link {
-                      text-decoration: none;
-                    }
-                  </style>
-                  
-                  <div class="mx-auto">
-                    <button type="button" class="ml-2 btn {% if order_by_column == 'default' %}active{% endif %} btn-sm btn-smaller">
-                      <a class="text-left text-light custom-link" style="font-size: 12px; font-style: italic;" href="{{ url_for('admin.inventory', order_by='default') }}">status</a>
-                    </button>
-                    <button type="button" class="ml-2 btn {% if order_by_column == 'id' %}active{% endif %} btn-sm btn-smaller">
-                      <a class="text-left text-light custom-link" style="font-size: 12px; font-style: italic;" href="{{ url_for('admin.inventory', order_by='id') }}">added</a>
-                    </button>
-                    <button type="button" class="ml-2 btn {% if order_by_column == 'times_rented' %}active{% endif %} btn-sm btn-smaller">
-                      <a class="text-left text-light custom-link" style="font-size: 12px; font-style: italic;" href="{{ url_for('admin.inventory', order_by='times_rented') }}">popular</a>
-                    </button>
-                    <button type="button" class="ml-2 btn {% if order_by_column == 'dress_cost' %}active{% endif %} btn-sm btn-smaller">
-                      <a class="text-left text-light custom-link" style="font-size: 12px; font-style: italic;" href="{{ url_for('admin.inventory', order_by='dress_cost') }}">cost</a>
-                    </button>
-                  </div>  
+          {% block inventory_table_body %}
 
-                  <form method="POST" action="{{ url_for('admin.inventory') }}" class="form-inline">
-                    {{ form.hidden_tag() }}
-                    <div class="form-group" style="padding-right: 2.5px;">
-                      <style>
-                        /* Target the specific field and set the fixed width */
-                        #category-input {
-                          width: 11em; /* Set the desired width here, for example, 10em */
-                        }
-                      </style>
-                      {{ form.category(class="btn-smaller form-control form-control-sm custom-form-control mr-2", id="category-input", style="width: 12em;", style="background-color: #817568; color: #fff;") }}
-                      {{ form.search(class="form-control form-control-sm custom-form-control mr-2", type="search", placeholder="Search", style="background-color: #333; color: #fff;") }}
-                      <button type="submit" class="btn btn-outline-light btn-smaller btn-dark">filter</button>
-                    </div>
-                  </form>
-          
-                </div>
-              </th>
-            </tr>
-          </thead>                   
-          
           <tbody>
           {% for dress in inventory.items %}
             <tr>
@@ -197,7 +25,7 @@
                                 <span class="arrow-down"></span>
                               </button>
                               <div class="text-arrow-container ml-2">
-                                <span class="text-left text-light" style="font-size: 13px;">{{ dress }}</span>
+                                <span class="text-left text-light typewriter-button" style="font-size: 13px;">{{ dress }}</span>
                               </div>
                             </div>
                           </div>
@@ -206,7 +34,7 @@
                           <div class="col-md-4">
                             <div class="d-flex justify-content-start">
                               <div class="text-arrow-container">
-                                <span class="text-left text-light" style="font-size: 13px;">Brand  |  {{ dress.brand }}</span>
+                                <span class="text-left text-light typewriter-button" style="font-size: 13px;">Brand  |  {{ dress.brand }}</span>
                               </div>
                             </div>
                           </div>
@@ -214,7 +42,7 @@
                           <!-- Third column, sellable badge -->
                           <div class="col-md-1 d-flex justify-content-center">
                             {% if dress.sellable %}
-                              <span class="neon-text sand" style="font-size: 12px;">sellable</span>
+                              <span class="neon-text sand typewriter-button" style="font-size: 12px;">sellable</span>
                             {% else %}
                               <span class="text text-dark" style="font-size: 12px;">{{ dress.sellable }}</span>
                             {% endif %}
@@ -225,19 +53,19 @@
                             {% if not dress.maintenanceStatus and not dress.rentStatus %}
                               <!-- Button to trigger the maintenance form modal -->
                               <div type="button" data-toggle="modal" data-target="#maintenanceModal{{ dress.id }}">
-                                  <span class="neon-text blue ml-auto" style="font-size: 11px;">clean</span>
+                                  <span class="neon-text blue ml-auto typewriter-button" style="font-size: 11px;">clean</span>
                               </div>
                             {% elif dress.maintenanceStatus %}
                               <!-- Button to update maintenance status -->
                               <form action="{{ url_for('admin.update_maintenance_status', dress_id=dress.id) }}" method="post">
                                 {{ form.hidden_tag() }}
-                                <button type="submit" class="neon-text clean-blue" style="background: none; border: none; padding: 0; font-size: 14px;">
+                                <button type="submit" class="neon-text clean-blue typewriter-button" style="background: none; border: none; padding: 0; font-size: 14px;">
                                     @
                                 </button>
                               </form>  
                             {% elif dress.rentStatus %}
                               <div type="button" data-toggle="modal" data-target="#maintenanceModal{{ dress.id }}">
-                                    <span class="text-dark ml-auto" style="font-size: 11px;">unavailable</span>
+                                    <span class="text-dark ml-auto typewriter-button" style="font-size: 11px;">unavailable</span>
                               </div>
                             {% endif %}
                           </div>
@@ -252,26 +80,32 @@
                                         </button>
                                     </div>
                                     <div class="modal-body">
-                                        <!-- Maintenance form -->
-                                        <form method="POST" action="{{ url_for('admin.update_maintenance', dress_id=dress.id) }}" class="form-inline">
-                                            {{ maintenance_form.hidden_tag() }}
-                                            {{ maintenance_form.dress_id(value=dress.id) }}
-                        
-                                            <div class="form-group">
-                                                {{ maintenance_form.maintenanceDate.label }}
-                                                {{ maintenance_form.maintenanceDate(class="form-control") }}
-                                            </div>
-                        
-                                            <div class="form-group">
-                                                {{ maintenance_form.maintenanceCost.label }}
-                                                {{ maintenance_form.maintenanceCost(class="form-control", type="number") }}
-                                            </div>
-                        
-                                            <div class="form-group">
-                                                <button type="submit" class="btn btn-primary btn-dark" value="Submit">Submit</button>
-                                            </div>
-                                        </form>
-                                    </div>
+                                      <!-- Maintenance form -->
+                                      <form method="POST" action="{{ url_for('admin.update_maintenance', dress_id=dress.id) }}" class="form-inline">
+                                          {{ maintenance_form.hidden_tag() }}
+                                          {{ maintenance_form.dress_id(value=dress.id) }}
+                                  
+                                          <div class="form-group">
+                                              <label for="{{ maintenance_form.maintenanceDate.id }}">{{ maintenance_form.maintenanceDate.label }}</label>
+                                              {{ maintenance_form.maintenanceDate(class="form-control", autocomplete="off") }}
+                                          </div>
+                                  
+                                          <div class="form-group">
+                                              <label for="{{ maintenance_form.maintenanceType.id }}">{{ maintenance_form.maintenanceType.label }}</label>
+                                              {{ maintenance_form.maintenanceType(class="form-control", autocomplete="off") }}
+                                          </div>
+                                  
+                                          <div class="form-group">
+                                              <label for="{{ maintenance_form.maintenanceCost.id }}">{{ maintenance_form.maintenanceCost.label }}</label>
+                                              {{ maintenance_form.maintenanceCost(class="form-control", autocomplete="off", type="number") }}
+                                          </div>
+                                  
+                                          <div class="form-group">
+                                              <button type="submit" class="btn btn-primary btn-dark" value="Submit">Submit</button>
+                                          </div>
+                                      </form>
+                                  </div>
+                                  
                                 </div>
                             </div>
                           </div>
@@ -279,12 +113,12 @@
                           <div class="col-md-1 d-flex justify-content-center">
                             {% if not dress.rentStatus %}
                               {% if not dress.maintenanceStatus %}
-                                <span class="neon-text green" style="font-size: 12px;">stock</span>
+                                <span class="neon-text green typewriter-button" style="font-size: 12px;">stock</span>
                               {% else %}
-                                <span class="neon-text clean-blue" style="font-size: 12px;">@cleaner</span>
+                                <span class="neon-text clean-blue typewriter-button" style="font-size: 12px;">@cleaner</span>
                               {% endif %}
                             {% else %}
-                              <span class="neon-text clean-two" style="font-size: 12px;">rented</span>
+                              <span class="neon-text clean-two typewriter-button" style="font-size: 12px;">rented</span>
                             {% endif %}
                           </div>
                         
@@ -296,7 +130,7 @@
                               <input type="hidden" name="dataBase" value="Dress">
                               <input type="hidden" name="id" value="{{ dress.id }}">
                               <!-- Bootstrap close button -->
-                              <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Close">
+                              <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light typewriter-button" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                               </button>
                             </form>
@@ -306,7 +140,7 @@
                               <input type="hidden" name="dataBase" value="Dress">
                               <input type="hidden" name="id" value="{{ dress.id }}">
                               <!-- Bootstrap close button -->
-                              <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Close" disabled>
+                              <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light typewriter-button" aria-label="Close" disabled>
                                 <span aria-hidden="true">&times;</span>
                               </button>
                             </form>
@@ -322,13 +156,13 @@
                   <div id="collapse{{ loop.index }}" class="collapse" aria-labelledby="heading{{ loop.index }}" data-parent="#accordion{{ loop.index }}">
                     <div class="card-body">
                       <table class="table table-striped table-hover table-sm table-dark">
-                        <tbody style="font-size: 15px;">
+                        <tbody style="font-size: 13px;">
                           <tr>
                             <td class="d-flex" style="padding-left: 10px;">
                               <!-- Main table column -->
                               <div class="col-4">
                                 <!-- Inner table with the content of the rows -->
-                                <table class="w-100">
+                                <table class="w-100 typewriter-button">
                                   <tbody>
                                     <tr>
                                       <th scope="row">Date Added:</th>
@@ -374,19 +208,41 @@
                                 </table>
                               </div>
                               <!-- Maintenance log column -->
-                              <div class="col-4">
-                                <table class="table table-striped table-hover table-sm table-dark">
+                              <div class="col-5">
+                                <table class="table table-striped table-hover table-sm table-dark typewriter-button">
+                                  {% if dress.rentLog %}
+                                  <thead style="font-size: 13px;">
+                                    <tr>
+                                      <th>Rent Log</th>
+                                      <th>Rent ID</th>
+                                      <th>User ID</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody style="font-size: 12px;">
+                                    {% for log in dress.get_rent_log() %}
+                                    <tr>
+                                        <td>{{ log.date }}</td>
+                                        <td>{{ log.id }}</td>
+                                        <td>{{ log.user_id }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                  </tbody>
+                                  {% endif %}
+                                </table>
+                                <table class="table table-striped table-hover table-sm table-dark typewriter-button">
                                   {% if dress.maintenanceLog %}
-                                  <thead style="font-size: 14px;">
+                                  <thead style="font-size: 13px;">
                                     <tr>
                                       <th>Cleaner Log</th>
+                                      <th>Type</th>
                                       <th>Cost</th>
                                     </tr>
                                   </thead>
-                                  <tbody style="font-size: 13px;">
+                                  <tbody style="font-size: 12px;">
                                     {% for log in dress.get_maintenance_log() %}
                                     <tr>
                                         <td>{{ log.date }}</td>
+                                        <td>{{ log.type }}</td>
                                         <td>$ {{ log.cost }}</td>
                                     </tr>
                                     {% endfor %}
@@ -395,7 +251,7 @@
                                 </table>
                               </div>
                               <!-- Image column -->
-                              <div class="col-4">
+                              <div class="col-3">
                                 <img src="{{ url_for('static', filename='images/cordelia-logo.png') }}" alt="..." class="img-thumbnail" style="max-width: 100%; height: auto;">
                               </div>
                             </td>

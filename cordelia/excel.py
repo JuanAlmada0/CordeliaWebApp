@@ -28,7 +28,8 @@ def excel_download():
             'Sellable': [dress.sellable for dress in dresses],
             'Rent Status': [dress.rentStatus for dress in dresses],
             'Maintenance Status': [dress.maintenanceStatus for dress in dresses],
-            'Maintenance Log': [json.loads(dress.maintenanceLog) if dress.maintenanceLog else None for dress in dresses]
+            'Maintenance Log': [json.loads(dress.rentLog) if dress.rentLog else None for dress in dresses],
+            'Rent Log': [json.loads(dress.rentLog) if dress.rentLog else None for dress in dresses]
         }
 
         df_dress = pd.DataFrame(dress_data)
@@ -43,7 +44,8 @@ def excel_download():
             'Last Name': [user.lastName for user in users],
             'Phone Number': [str(user.phoneNumber) for user in users],
             'Joined At Date': [user.joinedAtDate.strftime('%Y-%m-%d') for user in users],
-            'Is Admin': [user.isAdmin for user in users]
+            'Is Admin': [user.isAdmin for user in users],
+            'Rent Log': [json.loads(user.rentLog) if user.rentLog else None for user in users]
         }
 
         df_user = pd.DataFrame(user_data)
