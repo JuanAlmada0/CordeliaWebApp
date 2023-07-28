@@ -23,9 +23,9 @@ def init_app(app):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-
-# Set the login view
+# Set the login view & message
 login_manager.login_view = 'auth.login'
+login_manager.login_message = 'You must log in to view this page'
 
 
 def is_safe_url(target):
@@ -71,10 +71,10 @@ def register():
 # Login route
 @authBp.route('/login', methods=['GET', 'POST'])
 def login():
-
     form = LoginForm()
 
-    next_page = session.get('next_page')
+    # Get the 'next' query parameter from the URL
+    next_page = request.args.get('next')
 
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
@@ -85,14 +85,14 @@ def login():
 
             flash('Logged in successfully.', 'success')
 
-            if user.isAdmin:
-                return redirect(url_for('admin.inventory'))
+            # Retrieve the stored URL from the session
+            next_page = session.get('next_page')
+            
+            if next_page and is_safe_url(next_page):
+                session.pop('next_page')
+                return redirect(next_page)
             else:
-                if next_page and is_safe_url(next_page):
-                    session.pop('next_page')
-                    return redirect(next_page)
-                else:
-                    return redirect(url_for('home.home'))
+                return redirect(url_for('home.home'))
            
         flash('Invalid email or password.', 'error')
         return redirect(url_for('auth.login'))

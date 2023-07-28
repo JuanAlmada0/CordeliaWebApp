@@ -10,8 +10,8 @@
         <div class="d-flex justify-content-end">
             {% if form_type == 'rent' %}
                 <a class="btn btn-primary btn-dark" href="{{ url_for('admin.rentInventory') }}">Back</a>
-            {% elif form_type == 'user' %}
-                <a class="btn btn-primary btn-dark" href="{{ url_for('admin.userInventory') }}">Back</a>
+            {% elif form_type == 'customer' %}
+                <a class="btn btn-primary btn-dark" href="{{ url_for('admin.customerInventory') }}">Back</a>
             {% else %}
                 <a class="btn btn-primary btn-dark" href="{{ url_for('admin.inventory') }}">Back</a>
             {% endif %}
@@ -22,7 +22,7 @@
         <form method="POST" action="{{ action_url }}">
             <!-- Add the form_type hidden field here -->
             <input type="hidden" name="form_type" value="{{ form_type }}">
-            {% if form_type == 'user' %}
+            {% if form_type == 'customer' %}
                 {% for field in form %}
                     <div class="form-group">
                         {% if field.type == 'HiddenField' %}

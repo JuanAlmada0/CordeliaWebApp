@@ -3,13 +3,13 @@ import pandas as pd
 import json
 import os
 from datetime import datetime
-from cordelia.models import Dress, Rent, User
+from cordelia.models import Dress, Rent, Customer
 
 
 def excel_download():
     
     dresses = Dress.query.all()
-    users = User.query.all()
+    customers = Customer.query.all()
     rents = Rent.query.all()
 
     if dresses:
@@ -34,21 +34,19 @@ def excel_download():
 
         df_dress = pd.DataFrame(dress_data)
         
-    if users:
+    if customers:
 
-        user_data = {
-            'User Id': [user.id if user.id else None for user in users],
-            'Username': [user.username if user.username else None for user in users],
-            'Email': [user.email for user in users],
-            'Name': [user.name for user in users],
-            'Last Name': [user.lastName for user in users],
-            'Phone Number': [str(user.phoneNumber) for user in users],
-            'Joined At Date': [user.joinedAtDate.strftime('%Y-%m-%d') for user in users],
-            'Is Admin': [user.isAdmin for user in users],
-            'Rent Log': [json.loads(user.rentLog) if user.rentLog else None for user in users]
+        customer_data = {
+            'User Id': [customer.id if customer.id else None for customer in customers],
+            'Email': [customer.email for customer in customers],
+            'Name': [customer.name for customer in customers],
+            'Last Name': [customer.lastName for customer in customers],
+            'Phone Number': [str(customer.phoneNumber) for customer in customers],
+            'Date Added': [customer.dateAdded.strftime('%Y-%m-%d') for customer in customers],
+            'Rent Log': [json.loads(customer.rentLog) if customer.rentLog else None for customer in customers]
         }
 
-        df_user = pd.DataFrame(user_data)
+        df_customer = pd.DataFrame(customer_data)
 
     if rents:
 
@@ -58,7 +56,8 @@ def excel_download():
             'User Id': [rent.clientId for rent in rents],
             'Rent Date': [rent.rentDate.strftime('%Y-%m-%d') for rent in rents],
             'Return Date': [rent.returnDate.strftime('%Y-%m-%d') if rent.returnDate else '' for rent in rents],
-            'Payment Total': [rent.paymentTotal for rent in rents]
+            'Payment Total': [rent.paymentTotal for rent in rents],
+            'Rent Log': [json.loads(rent.rentLog) if rent.rentLog else None for rent in rents]
         }
 
         df_rent = pd.DataFrame(rent_data)
@@ -75,8 +74,8 @@ def excel_download():
     with pd.ExcelWriter(file_path, engine='xlsxwriter') as excel_writer:
         if dresses:
             df_dress.to_excel(excel_writer, sheet_name='Dresses', index=False)
-        if users:
-            df_user.to_excel(excel_writer, sheet_name='Users', index=False)
+        if customers:
+            df_customer.to_excel(excel_writer, sheet_name='Customers', index=False)
         if rents:
             df_rent.to_excel(excel_writer, sheet_name='Rents', index=False)
 

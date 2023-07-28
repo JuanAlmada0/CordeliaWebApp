@@ -21,7 +21,7 @@
         <thead>
             <tr>
               <td>
-                <span class="text-left neon-text sand typewriter-button" style="font-size: 13px; font-family: 'Courier New', Courier, monospace">Database</span>
+                <span class="text-left neon-text sand" style="color: #DCC6B6; font-size: 13px; font-family: 'Courier New', Courier, monospace">Database</span>
               </td>
 
               <td></td>
@@ -44,7 +44,7 @@
               </td>
               {% if model == "Dress" %}
                 <td>
-                  <form id="update-rent-statuses-form" method="POST" action="{{ url_for('admin.update_rent_statuses_endpoint') }}" onsubmit="return confirmAction();">
+                  <form id="update-rent-statuses-form" method="POST" action="{{ url_for('admin.update_rent_statuses_endpoint') }}" onsubmit="return confirmAction('Are you sure you want to update?');">
                     {{ form.hidden_tag() }}
                     <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Refresh">
                       <i class="fas fa-sync-alt"></i> <!-- Font Awesome refresh icon -->
@@ -80,13 +80,13 @@
             </tr>
             <tr>
                 <td>
-                  <a href="{{ url_for('admin.userInventory') }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">User</a>
-                  <span class="badge badge-light">{{ inventory.total if model == 'User' }}</span>
+                  <a href="{{ url_for('admin.customerInventory') }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Customer</a>
+                  <span class="badge badge-light">{{ inventory.total if model == 'Customer' }}</span>
                 </td>
-              {% if model == "User" %} 
+              {% if model == "Customer" %} 
                 <td> </td>
                 <td>
-                  <a href="{{ url_for('admin.update', title='Add User', form_type='user') }}" class="btn btn-outline-light btn-smaller mr-2 btn-dark">
+                  <a href="{{ url_for('admin.update', title='Add Customer', form_type='customer') }}" class="btn btn-outline-light btn-smaller mr-2 btn-dark">
                     <i class="fas fa-plus"></i> <!-- Font Awesome "plus" icon -->
                   </a>
                 </td>
@@ -99,19 +99,19 @@
               <thead>
                 <tr>
                   <td class="text-left">
-                    <span class="text-left neon-text sand typewriter-button" style="font-size: 13px; font-family: 'Courier New', Courier, monospace">Accounting</span>
+                    <span class="text-left neon-text sand" style="color: #DCC6B6; font-size: 13px; font-family: 'Courier New', Courier, monospace">Accounting</span>
                   </td>                     
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td>
-                    <span class="text-left text-light sand typewriter-button" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Costs</span>
+                    <span class="text-left text-light sand" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Costs</span>
                   </td>
                 </tr>
                 <tr>
                   <td>
-                    <span class="text-left text-light typewriter-button" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Earnings</span>
+                    <span class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Earnings</span>
                   </td>
                 </tr>
               </tbody>
@@ -184,10 +184,10 @@
                 
                   {% if model == 'Dress' %}
                   <div class="mx-auto breadcrumb file-cabinet">
-                    <a class="breadcrumb-item {% if order_by_column == 'default' %}active{% endif %}" href="{{ url_for('admin.inventory', order_by='default') }}">Status</a>
-                    <a class="breadcrumb-item {% if order_by_column == 'id' %}active{% endif %}" href="{{ url_for('admin.inventory', order_by='id') }}">Added</a>
-                    <a class="breadcrumb-item {% if order_by_column == 'times_rented' %}active{% endif %}" href="{{ url_for('admin.inventory', order_by='times_rented') }}">Popular</a>
-                    <a class="breadcrumb-item {% if order_by_column == 'dress_cost' %}active{% endif %}" href="{{ url_for('admin.inventory', order_by='dress_cost') }}">Cost</a>
+                    <a class="breadcrumb-item {% if order_by_column == 'default' %}active{% endif %}" href="{{ url_for('admin.inventory', order_by='default') }}">status</a>
+                    <a class="breadcrumb-item {% if order_by_column == 'id' %}active{% endif %}" href="{{ url_for('admin.inventory', order_by='id') }}">added</a>
+                    <a class="breadcrumb-item {% if order_by_column == 'times_rented' %}active{% endif %}" href="{{ url_for('admin.inventory', order_by='times_rented') }}">popular</a>
+                    <a class="breadcrumb-item {% if order_by_column == 'dress_cost' %}active{% endif %}" href="{{ url_for('admin.inventory', order_by='dress_cost') }}">cost</a>
                   </div>
                   <form method="POST" action="{{ url_for('admin.inventory') }}" class="form-inline">
                     {{ form.hidden_tag() }}
@@ -205,10 +205,10 @@
                   </form>
                   {% elif model == 'Rent' %}
                   <div class="mx-auto breadcrumb file-cabinet">
-                    <a class="breadcrumb-item {% if order_by_column == 'default' %}active{% endif %}" href="{{ url_for('admin.rentInventory', order_by='default') }}">date</a>
+                    <a class="breadcrumb-item {% if order_by_column == 'default' %}active{% endif %}" href="{{ url_for('admin.rentInventory', order_by='default') }}">status</a>
                     <a class="breadcrumb-item {% if order_by_column == 'id' %}active{% endif %}" href="{{ url_for('admin.rentInventory', order_by='id') }}">rent id</a>
-                    <a class="breadcrumb-item {% if order_by_column == 'user_id' %}active{% endif %}" href="{{ url_for('admin.rentInventory', order_by='user_id') }}">user id</a>
-                    <a class="breadcrumb-item {% if order_by_column == 'dress_id' %}active{% endif %}" href="{{ url_for('admin.rentInventory', order_by='dress_id') }}">dress id</a>
+                    <a class="breadcrumb-item {% if order_by_column == 'dress_id' %}active{% endif %}" href="{{ url_for('admin.rentInventory', order_by='dress_id') }}">dress</a>
+                    <a class="breadcrumb-item {% if order_by_column == 'user_lastName' %}active{% endif %}" href="{{ url_for('admin.rentInventory', order_by='user_lastName') }}">user</a>
                   </div>
                   <form method="POST" action="{{ url_for('admin.rentInventory') }}" class="form-inline">
                     {{ form.hidden_tag() }}
@@ -224,14 +224,14 @@
                       <button type="submit" class="btn btn-outline-light btn-smaller btn-dark" style="font-family: 'Courier New', Courier, monospace">Filter</button>
                     </div>
                   </form>
-                  {% elif model == 'User' %}
+                  {% elif model == 'Customer' %}
                   <div class="mx-auto breadcrumb file-cabinet">
-                    <a class="breadcrumb-item {% if order_by_column == 'default' %}active{% endif %}" href="{{ url_for('admin.userInventory', order_by='default') }}">id</a>
-                    <a class="breadcrumb-item {% if order_by_column == 'date' %}active{% endif %}" href="{{ url_for('admin.userInventory', order_by='date') }}">joined</a>
-                    <a class="breadcrumb-item {% if order_by_column == 'name' %}active{% endif %}" href="{{ url_for('admin.userInventory', order_by='name') }}">first name</a>
-                    <a class="breadcrumb-item {% if order_by_column == 'last_name' %}active{% endif %}" href="{{ url_for('admin.userInventory', order_by='last_name') }}">last name</a>
+                    <a class="breadcrumb-item {% if order_by_column == 'default' %}active{% endif %}" href="{{ url_for('admin.customerInventory', order_by='default') }}">status</a>
+                    <a class="breadcrumb-item {% if order_by_column == 'date' %}active{% endif %}" href="{{ url_for('admin.customerInventory', order_by='date') }}">joined</a>
+                    <a class="breadcrumb-item {% if order_by_column == 'id' %}active{% endif %}" href="{{ url_for('admin.customerInventory', order_by='id') }}">id</a>
+                    <a class="breadcrumb-item {% if order_by_column == 'last_name' %}active{% endif %}" href="{{ url_for('admin.customerInventory', order_by='last_name') }}">last name</a>
                   </div>
-                  <form method="POST" action="{{ url_for('admin.userInventory') }}" class="form-inline">
+                  <form method="POST" action="{{ url_for('admin.customerInventory') }}" class="form-inline">
                     {{ form.hidden_tag() }}
                     <div class="form-group" style="padding-right: 2px;">
                       <style>

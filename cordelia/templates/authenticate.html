@@ -10,7 +10,7 @@
       <div class="d-flex justify-content-center">
         <h3>{{ title }}</h3>
       </div>
-      <form method="POST" action="{{ action_url }}">
+      <form method="post" action="{{ action_url }}?next={{ next_page }}" class="login-form">    
         {% for field in form %}
           <div class="form-group">
             {% if field.type != 'SubmitField' %}

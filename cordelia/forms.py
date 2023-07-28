@@ -55,7 +55,7 @@ class LoginForm(FlaskForm):
 
 
 class SearchForm(FlaskForm):
-    category = SelectField('Category', choices=[], default='Select', validators=[DataRequired()])
+    category = SelectField('Category', choices=[], default=('Select','Select'), validators=[DataRequired()])
     search = StringField('Search')
     submit = SubmitField('Filter')
     
@@ -64,17 +64,13 @@ class SearchForm(FlaskForm):
         self.category.choices = [('Select', 'Select')] + [(column, column) for column in model_columns]
 
 
-class UserRentForm(FlaskForm):
-    rentDate = DateField('Rent Date', validators=[DataRequired()])
-    submit = SubmitField('Check Out')
-
-
 class MaintenanceForm(FlaskForm):
     dress_id = HiddenField('Dress ID', validators=[DataRequired()])
-    maintenanceDate = DateField('Maintenance Date', validators=[DataRequired()])
-    maintenanceType = StringField('Maintenance Type', validators=[DataRequired()])
-    maintenanceCost = IntegerField('Cost', validators=[NumberRange(min=0)])
+    maintenanceDate = DateField('Maintenance Date')
+    maintenanceType = SelectField('Category', choices=[('None', None),('Dry-Cleaning','Dry-Cleaning'), ('Tailor', 'Tailor')])
+    maintenanceCost = IntegerField('Cost')
     submit = SubmitField('Maintenance')
+
 
 class DeleteForm(FlaskForm):
     id = IntegerField('ID', validators=[DataRequired()])
@@ -93,13 +89,13 @@ class DressForm(FlaskForm):
 
 
 class RentForm(FlaskForm):
-    userId = IntegerField('User Id', validators=[DataRequired()])
+    customerId = IntegerField('Customer Id', validators=[DataRequired()])
     dressId = IntegerField('Dress Id', validators=[DataRequired()])
     rentDate = DateField('Rent Date', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
 
-class UserForm(FlaskForm):
+class CustomerForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     name = StringField('First name', validators=[DataRequired()])
     lastName = StringField('Last name', validators=[DataRequired()])
@@ -126,3 +122,7 @@ class UserForm(FlaskForm):
     def validate_phoneNumber_duplicate(self, field):
         if User.query.filter_by(phoneNumber=field.data).first():
             raise ValidationError('Phone number already exists.')
+
+class UserRentForm(FlaskForm):
+    rentDate = DateField('Rent Date', validators=[DataRequired()])
+    submit = SubmitField('Check Out')

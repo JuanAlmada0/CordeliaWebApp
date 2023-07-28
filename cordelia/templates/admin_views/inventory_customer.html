@@ -8,7 +8,7 @@
           {% block inventory_table_body %}
           
           <tbody>
-          {% for user in inventory.items %}
+          {% for customer in inventory.items %}
             <tr>
               <td colspan="2">
                 <div class="accordion" id="accordion{{ loop.index }}">
@@ -22,41 +22,77 @@
                               <button class="btn btn-sm" type="button" data-toggle="collapse" data-target="#collapse{{ loop.index }}" aria-expanded="true" aria-controls="collapse{{ loop.index }}">
                                 <span class="arrow-down"></span>
                               </button>
+                              {% if not customer.check_status() %}
                               <div class="text-arrow-container ml-2">
-                                <span class="text-left text-light typewriter-button" style="font-size: 13px;">{{ user }}</span>
+                                <span class="text-left text-light typewriter-button" style="font-size: 13px;">{{ customer }}</span>
                               </div>
+                              {% else %}
+                              <div class="text-arrow-container ml-2">
+                                <span class="neon-text clean-two typewriter-button" style="font-size: 13px;">{{ customer }}</span>
+                              </div>
+                              {% endif %}
                             </div>
                           </div>
-                        
+
                           <!-- Second column, middle part of the card -->
-                          <div class="col-md-6">
-                            <div class="d-flex justify-content-start">
-                              <div class="text-arrow-container">
-                                <span class="text-left text-light typewriter-button" style="font-size: 13px;">ID : {{ user.id }}</span>
-                              </div>
-                              <div class="text-arrow-container ml-auto">
-                                <span class="text-left text-light typewriter-button" style="font-size: 13px;">{{ user.email }}</span>
+                          {% if not customer.check_status() %}
+                            <div class="col-md-3">
+                              <div class="d-flex justify-content-start">
+                                <div class="text-arrow-container">
+                                  <span class="text-left text-light typewriter-button" style="font-size: 12px;">{{ customer.email }}</span>
+                                </div>
                               </div>
                             </div>
+                            <div class="col-md-3">
+                              <div class="d-flex justify-content-start">
+                                <div class="text-arrow-container">
+                                  <span class="text-left text-light typewriter-button" style="font-size: 12px;">{{ customer.lastName }}, {{ customer.name }}</span>
+                                </div>
+                              </div>
+                            </div>
+                          {% else %}
+                            <div class="col-md-3">
+                              <div class="d-flex justify-content-start">
+                                <div class="text-arrow-container">
+                                  <span class="neon-text green typewriter-button" style="font-size: 12.5px;">{{ customer.email }}</span>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="d-flex justify-content-start">
+                                <div class="text-arrow-container">
+                                  <span class="neon-text green typewriter-button" style="font-size: 12.5px;">{{ customer.lastName }}, {{ customer.name }}</span>                              </div>
+                              </div>
+                            </div>
+                          {% endif %}       
+
+                          <!-- Third column -->
+                          <div class="col-md-1 d-flex justify-content-end">
+                            {% if not customer.check_status() %}
+                              <span class="neon-text sand typewriter-button" style="font-size: 12px;">inactive</span>
+                            {% else %}
+                              <span class="neon-text clean-two typewriter-button" style="font-size: 12px;">active</span>
+                            {% endif %}
                           </div>
+
                         
                           <!-- Fifth column, delete button -->
-                          <div class="col-md-2 d-flex justify-content-end">
-                            {% if not user.check_status() %}
-                            <form method="POST" action="{{ url_for('admin.delete_object', dataBase='User', id=user.id) }}" class="form-inline" onsubmit="return confirm('Are you sure you want to delete this dress? This action cannot be undone.');">
+                          <div class="col-md-1 d-flex justify-content-end">
+                            {% if not customer.check_status() %}
+                            <form method="POST" action="{{ url_for('admin.delete_object', dataBase='Customer', id=customer.id) }}" class="form-inline" onsubmit="return confirm('Are you sure you want to delete this customer? This action cannot be undone.');">
                               {{ delete_form.hidden_tag() }}
-                              <input type="hidden" name="dataBase" value="User">
-                              <input type="hidden" name="id" value="{{ user.id }}">
+                              <input type="hidden" name="dataBase" value="Customer">
+                              <input type="hidden" name="id" value="{{ customer.id }}">
                               <!-- Use the Bootstrap close button here -->
                               <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                               </button>
                             </form>
-                            {% elif user.isAdmin or user.check_status() %}
-                            <form method="POST" action="{{ url_for('admin.delete_object', dataBase='User', id=user.id) }}" class="form-inline" onsubmit="return false;">
+                            {% else %}
+                            <form method="POST" action="{{ url_for('admin.delete_object', dataBase='Customer', id=customer.id) }}" class="form-inline" onsubmit="return false;">
                               {{ delete_form.hidden_tag() }}
-                              <input type="hidden" name="dataBase" value="User">
-                              <input type="hidden" name="id" value="{{ user.id }}">
+                              <input type="hidden" name="dataBase" value="Customer">
+                              <input type="hidden" name="id" value="{{ customer.id }}">
                               <!-- Use the Bootstrap close button here -->
                               <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Close" disabled>
                                 <span aria-hidden="true">&times;</span>
@@ -73,7 +109,7 @@
                 <div>
                   <div id="collapse{{ loop.index }}" class="collapse" aria-labelledby="heading{{ loop.index }}" data-parent="#accordion{{ loop.index }}">
                     <div class="card-body">
-                      <table class="table table-striped table-hover table-sm table-dark typewriter-button">
+                      <table class="table table-striped table-hover table-sm table-dark" style="font-family: 'Courier New', Courier, monospace;">
                         <tbody style="font-size: 13px;">
                           <tr>
                             <td class="d-flex" style="padding-left: 10px;">
@@ -84,31 +120,31 @@
                                   <tbody>
                                     <tr>
                                       <th scope="row">Email:</th>
-                                      <td>{{ user.email }}</td>
+                                      <td>{{ customer.email }}</td>
                                     </tr>
                                     <tr>
                                       <th scope="row">Name:</th>
-                                      <td>{{ user.name }}</td>
+                                      <td>{{ customer.name }}</td>
                                     </tr>
                                     <tr>
                                       <th scope="row">Last Name:</th>
-                                      <td>{{ user.lastName }}</td>
+                                      <td>{{ customer.lastName }}</td>
                                     </tr>
                                     <tr>
-                                      <th scope="row">Phone number:</th>
-                                      <td>{{ user.phoneNumber }}</td>
+                                      <th scope="row">Phone Number:</th>
+                                      <td>{{ customer.phoneNumber }}</td>
                                     </tr>
                                     <tr>
-                                      <th scope="row">Account created:</th>
-                                      <td>{{ user.joinedAtDate }}</td>
+                                      <th scope="row">Date Added:</th>
+                                      <td>{{ customer.dateAdded }}</td>
                                     </tr>
                                   </tbody>
                                 </table>
                               </div>
                               <!-- Maintenance log column -->
                               <div class="col-4">
-                                <table class="table table-striped table-hover table-sm table-dark">
-                                  {% if user.rentLog %}
+                                <table class="table table-striped table-hover table-sm table-dark" style="font-family: 'Courier New', Courier, monospace;">
+                                  {% if customer.rentLog %}
                                   <thead style="font-size: 13px;">
                                     <tr>
                                       <th>Rent Log</th>
@@ -117,7 +153,7 @@
                                     </tr>
                                   </thead>
                                   <tbody style="font-size: 12px;">
-                                    {% for log in user.get_rent_log() %}
+                                    {% for log in customer.get_rent_log() %}
                                     <tr>
                                         <td>{{ log.date }}</td>
                                         <td>{{ log.id }}</td>
