@@ -255,7 +255,7 @@
                                   {% if dress.maintenanceLog %}
                                   <thead style="font-size: 13px;">
                                     <tr>
-                                      <th>Cleaner Log</th>
+                                      <th>Maintenance</th>
                                       <th>Type</th>
                                       <th>Cost</th>
                                     </tr>
@@ -273,8 +273,14 @@
                                 </table>
                               </div>
                               <!-- Image column -->
-                              <div class="col-3" style="vertical-align: middle;">
-                                <img src="{{ url_for('static', filename='images/cordelia-logo.png') }}" alt="..." class="img-thumbnail" style="max-width: 100%; height: auto;">                            
+                              <div class="col-2 ml-auto">
+                                <div class="image-container">
+                                  {% if dress.imageData %}
+                                  <img src="data:image/jpeg;base64,{{ dress.imageData }}" alt="Dress Image" class="img-thumbnail dress-image">
+                                  {% else %}
+                                  <img src="{{ url_for('static', filename='images/cordelia-logo.png') }}" alt="Default Image" class="img-thumbnail dress-image">
+                                  {% endif %}
+                                </div>
                               </div>
                             </td>
                           </tr>

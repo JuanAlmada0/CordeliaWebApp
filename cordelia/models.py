@@ -2,7 +2,6 @@ from cordelia.db import db
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from sqlalchemy.ext.hybrid import hybrid_property
 import json
 
 import logging
@@ -26,6 +25,7 @@ class Dress(db.Model):
     rentLog = db.Column(db.JSON, nullable=True, default=[])
     maintenanceStatus = db.Column(db.Boolean, index=True, default=False)
     maintenanceLog = db.Column(db.JSON, nullable=True, default=[])
+    imageData = db.Column(db.String(255), nullable=True, default=None)
 
     def __init__(self, *args, **kwargs):
         super(Dress, self).__init__(*args, **kwargs)
@@ -196,7 +196,7 @@ class Rent(db.Model):
         # Extract only the date portion from the current date and time
         current_date = current_datetime.date()
         # Check if the current date is greater than or equal to the return date
-        return current_date >= self.returnDate
+        return current_date > self.returnDate
     
     def update_rent_log(self, log):
         existing_rent_log = json.loads(self.rentLog) if self.rentLog else []

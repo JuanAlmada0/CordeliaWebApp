@@ -7,6 +7,7 @@ from cordelia.forms import SearchForm, DressForm, RentForm, CustomerForm, Mainte
 from functools import wraps
 import json
 from datetime import datetime
+from base64 import b64encode
 
 import logging
 
@@ -45,7 +46,7 @@ def handle_search_form(query, model_columns, model_class):
 
 
 @adminBp.route('/inventory', methods=['GET', 'POST'])
-@login_required
+#@login_required
 def inventory():
     model = 'Dress'
     # Get the list of model columns for the Dress table
@@ -88,7 +89,7 @@ def inventory():
 
     # Handle form submissions for the delete form
     if delete_form.validate_on_submit():
-        dress_id = delete_form.dress_id.data
+        dress_id = delete_form.id.data
         return redirect(url_for('admin.delete_object', dataBase='Dress', id=dress_id))
 
     # Handle form submissions for the maintenance form
@@ -214,7 +215,7 @@ def rentInventory():
     delete_form = DeleteForm()
 
     if delete_form.validate_on_submit():
-        rent_id = delete_form.rent_id.data
+        rent_id = delete_form.id.data
         return redirect(url_for('admin.delete_object', dataBase='Rent', id=rent_id))
 
     return render_template('admin_views/inventory_rent.html', inventory=inventory, form=form, delete_form=delete_form, pagination=pagination, order_by_column=order_by_column, model=model)
@@ -253,7 +254,7 @@ def customerInventory():
     delete_form = DeleteForm()
 
     if delete_form.validate_on_submit():
-        customer_id = delete_form.customer_id.data
+        customer_id = delete_form.id.data
         return redirect(url_for('admin.delete_object', dataBase='Customer', id=customer_id))
 
     return render_template('admin_views/inventory_customer.html', inventory=inventory, form=form, delete_form=delete_form, pagination=pagination, order_by_column=order_by_column, model=model)
@@ -274,6 +275,7 @@ def update(title, form_type):
         return redirect(url_for('admin.inventory'))
 
     if form.validate_on_submit():
+
         if form_type == 'customer':
             customer = Customer(
                 email=form.email.data,
@@ -281,14 +283,27 @@ def update(title, form_type):
                 lastName=form.lastName.data,
                 phoneNumber=form.phoneNumber.data,
             )
+
             db.session.add(customer)
             db.session.commit()
             flash(f'{customer} added successfully into the database.')
-            logging.debug(f"{customer} Added on dashboard")
+            logging.debug(f"{customer} Added from dashboard")
             
             return redirect(url_for('admin.customerInventory'))
-        
-        elif form_type == 'dress':
+
+        if form_type == 'dress':
+            # Get the image data from the request
+            image_data = request.files.get('image')
+            logging.debug(f'image_data from request: {image_data}')
+
+            if image_data:
+                # If the image_data is a file object, read it as bytes and convert to base64
+                image_bytes = image_data.read()
+                image_base64 = b64encode(image_bytes).decode('utf-8')
+            else:
+                # If the image_data is None, set image_base64 to None
+                image_base64 = None
+
             dress = Dress(
                 brand=form.brand.data,
                 size=form.size.data,
@@ -297,13 +312,14 @@ def update(title, form_type):
                 dressCost=form.dressCost.data,
                 marketPrice=form.marketPrice.data,
                 rentPrice=form.rentPrice.data,
+                imageData=image_base64  # Store the image data in the database as base64 string or None
             )
 
             db.session.add(dress)
             db.session.commit()
             flash(f'{dress} added successfully into the database.')
-            logging.debug(f"{dress} Added on dashboard")
-
+            logging.debug(f"{dress} Added from dashboard")
+            
             return redirect(url_for('admin.inventory'))
         
         elif form_type == 'rent':
@@ -370,7 +386,7 @@ def update(title, form_type):
                 db.session.commit()
                 logging.debug(f"{rent} committed")
                 flash(f'{rent} added successfully into the database.')
-                logging.debug(f"{rent} Added on dashboard")
+                logging.debug(f"{rent} Added from dashboard")
 
                 return redirect(url_for('admin.rentInventory'))
             else:
@@ -435,8 +451,17 @@ def delete_object(dataBase, id):
 
 @adminBp.route('/download/excel')
 @login_required
-def downloadExcell():
+def downloadExcel():
 
     from cordelia.excel import excel_download
 
     return excel_download()
+
+
+@adminBp.route('/upload/excel')
+@login_required
+def uploadExcel():
+
+    from cordelia.excel import excel_upload
+
+    return excel_upload()

@@ -1,9 +1,11 @@
-from flask import current_app, send_file
+from flask import current_app, send_file, request, jsonify
 import pandas as pd
 import json
 import os
 from datetime import datetime
 from cordelia.models import Dress, Rent, Customer
+from cordelia.db import db
+
 
 
 def excel_download():
@@ -21,6 +23,7 @@ def excel_download():
             'Style': [dress.style for dress in dresses],
             'Brand': [dress.brand for dress in dresses],
             'Dress Cost': [dress.dressCost for dress in dresses],
+            'Date Added': [dress.dateAdded.strftime('%Y-%m-%d') for dress in dresses],
             'Market Price': [dress.marketPrice for dress in dresses],
             'Rent Price': [dress.rentPrice for dress in dresses],
             'Rents for Returns': [dress.rentsForReturns for dress in dresses],
@@ -37,7 +40,7 @@ def excel_download():
     if customers:
 
         customer_data = {
-            'User Id': [customer.id if customer.id else None for customer in customers],
+            'Customer Id': [customer.id if customer.id else None for customer in customers],
             'Email': [customer.email for customer in customers],
             'Name': [customer.name for customer in customers],
             'Last Name': [customer.lastName for customer in customers],
@@ -53,7 +56,7 @@ def excel_download():
         rent_data = {
             'Rent Id': [rent.id for rent in rents],
             'Dress Id': [rent.dressId for rent in rents],
-            'User Id': [rent.clientId for rent in rents],
+            'Customer Id': [rent.clientId for rent in rents],
             'Rent Date': [rent.rentDate.strftime('%Y-%m-%d') for rent in rents],
             'Return Date': [rent.returnDate.strftime('%Y-%m-%d') if rent.returnDate else '' for rent in rents],
             'Payment Total': [rent.paymentTotal for rent in rents],
@@ -85,3 +88,59 @@ def excel_download():
         as_attachment=True,
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
+
+
+
+def excel_upload():
+
+    # Check if the file is present in the request
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part in the request'}), 400
+
+    file = request.files['file']
+
+    # Check if a file is selected and it has a supported extension
+    if file.filename == '' or not file.filename.endswith('.xlsx'):
+        return jsonify({'error': 'Please select a valid XLSX file'}), 400
+    
+    try:
+        df_dress = pd.read_excel(file, sheet_name='Dresses')
+        df_rents = pd.read_excel(file, sheet_name='Rents')
+        df_customers = pd.read_excel(file, sheet_name='Customers')
+        # Convert column names to lowercase to ensure case-insensitivity
+        df_dress.columns = df_dress.columns.str.lower()
+        df_rents.columns = df_rents.columns.str.lower()
+        df_customers.columns = df_customers.columns.str.lower()
+
+        if df_dress:
+            for index, row in df_dress.iterrows():
+                dress_id = row['dress id'] 
+                dress = Dress.query.get(dress_id)
+
+                if dress:
+                    dress.size = row['size']
+                    dress.color = row['color']
+                    dress.style = row['style']
+                    dress.brand = row['brand']
+                    dress.dressCost = row['dress cost']
+                    dress.marketPrice = row['market price'] if row['market price'] else None
+                    dress.rentPrice = row['rent price']
+                else:
+                    dress = Dress(
+                        id = dress_id,
+                        size = row['size'],
+                        color = row['color'],
+                        style = row['style'],
+                        brand = row['brand'],
+                        dressCost = row['dress cost'],
+                        marketPrice = row['market price'] if row['market price'] else None,
+                        rentPrice = row['rent price'],
+                    )
+                    db.session.add(dress)
+        # Commit the changes to the database
+        db.session.commit()
+
+        return jsonify({'message': 'Database updated successfully'}), 200
+
+    except Exception as e:
+        return jsonify({'error': 'Failed to update database. Error: ' + str(e)}), 500

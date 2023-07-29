@@ -11,31 +11,36 @@
       font-family: 'Typewriter', monospace;
       cursor: pointer;
     }
+
+  .disabled-label {
+    pointer-events: none;
+    opacity: 0.6;
+  }
+
 </style>
 
 <div class="d-flex justify-content-center" style="background-color: #b8a495dc; padding-top: 10px; padding-bottom: 10px;">
   <div class="col-md-2 d-flex flex-column">
     <div class="row pl-3"> 
       <table class="table table-secondary flex-1 p-1">
-
         <thead>
-            <tr>
+          <tr>
               <td>
-                <span class="text-left neon-text sand" style="color: #DCC6B6; font-size: 13px; font-family: 'Courier New', Courier, monospace">Database</span>
+                  <span class="text-left neon-text sand" style="color: #DCC6B6; font-size: 13px; font-family: 'Courier New', Courier, monospace">Database</span>
               </td>
-
+              
               <td></td>
-              
+
               <td>
-                <button type="submit" class="btn btn-outline-light btn-smaller ml-auto btn-dark">
-                  <a href="{{ url_for('admin.downloadExcell') }}" class="text-light">
-                      <i class="fas fa-download fa-sm"></i> <!-- Font Awesome download icon, larger size -->
-                  </a>
-                </button>                
+                  <form action="{{ url_for('admin.downloadExcel') }}" method="get" onsubmit="return confirmAction('confirm download?');">
+                      <button type="submit" class="btn btn-outline-light btn-smaller ml-auto btn-dark">
+                          <i class="fas fa-download fa-sm"></i> <!-- Font Awesome download icon, larger size -->
+                      </button>
+                  </form>
               </td>
-              
-            </tr>            
+          </tr>
         </thead>
+      
         <tbody>
             <tr>
               <td>
@@ -44,7 +49,7 @@
               </td>
               {% if model == "Dress" %}
                 <td>
-                  <form id="update-rent-statuses-form" method="POST" action="{{ url_for('admin.update_rent_statuses_endpoint') }}" onsubmit="return confirmAction('Are you sure you want to update?');">
+                  <form id="update-rent-statuses-form" method="POST" action="{{ url_for('admin.update_rent_statuses_endpoint') }}" onsubmit="return confirmAction('Update Dress database??');">
                     {{ form.hidden_tag() }}
                     <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Refresh">
                       <i class="fas fa-sync-alt"></i> <!-- Font Awesome refresh icon -->
@@ -83,8 +88,8 @@
                   <a href="{{ url_for('admin.customerInventory') }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Customer</a>
                   <span class="badge badge-light">{{ inventory.total if model == 'Customer' }}</span>
                 </td>
-              {% if model == "Customer" %} 
-                <td> </td>
+              {% if model == "Customer" %}
+                <td></td>
                 <td>
                   <a href="{{ url_for('admin.update', title='Add Customer', form_type='customer') }}" class="btn btn-outline-light btn-smaller mr-2 btn-dark">
                     <i class="fas fa-plus"></i> <!-- Font Awesome "plus" icon -->

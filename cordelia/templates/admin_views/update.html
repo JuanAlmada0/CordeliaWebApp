@@ -19,7 +19,7 @@
         <div class="d-flex justify-content-center">
             <h3>{{ title }}</h3>
         </div>
-        <form method="POST" action="{{ action_url }}">
+        <form method="POST" action="{{ action_url }}" enctype="multipart/form-data">
             <!-- Add the form_type hidden field here -->
             <input type="hidden" name="form_type" value="{{ form_type }}">
             {% if form_type == 'customer' %}
@@ -41,6 +41,12 @@
                     <div class="form-group">
                         {% if field.type == 'HiddenField' %}
                             {{ field() }}
+                        {% elif field.type == 'FileField' %}
+                            <label for="{{ field.id }}">{{ field.label }}</label>
+                            {{ field(class="form-control-file", id=field.id) }}
+                            {% for error in field.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
                         {% elif field.type != 'SubmitField' %}
                             {{ field.label }}
                             {{ field(class="form-control", autocomplete="off") }}

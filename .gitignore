@@ -41,3 +41,5 @@ build/
 *~
 
 cordelia/static/images
+
+cordelia/templates/admin_views/buttons_upload_excel.html

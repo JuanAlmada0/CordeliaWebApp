@@ -1,13 +1,12 @@
 from flask_wtf import FlaskForm
 from wtforms import (
     StringField, PasswordField, SubmitField, BooleanField, IntegerField, 
-    SelectField, DateField, HiddenField
+    SelectField, DateField, HiddenField, FileField
     )
-from wtforms.validators import DataRequired, Email, EqualTo, NumberRange, Optional
-from wtforms.validators import ValidationError
+from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Optional
+from flask_wtf.file import FileAllowed
 import phonenumbers
 from phonenumbers.phonenumberutil import NumberParseException
-import json
 from cordelia.models import User
 
 
@@ -85,6 +84,7 @@ class DressForm(FlaskForm):
     dressCost = IntegerField('Dress Cost', validators=[DataRequired()])
     marketPrice = IntegerField('Market Price', validators=[Optional()])
     rentPrice = IntegerField('Rent Price', validators=[DataRequired()])
+    image = FileField('Image', validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif', 'webp'])])
     submit = SubmitField('Submit')
 
 
