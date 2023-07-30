@@ -63,7 +63,7 @@
                   <a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
+                <a class="nav-link" href="{{ url_for('auth.login', next=url_for('home.home')) }}">Login</a>
               </li>
             </ul>
           {% else %}
@@ -221,16 +221,17 @@
         color: hsl(315, 100%, 60%);
       }
       .dress-image {
-        border: 3px solid #b8a495dc;
-        height: 220px;
+        height: 200px;
         max-width: 100%;
-        box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
       }
       .image-container {
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100%;
+        height: 220px;
+        width: 160px;
+        background-color: #7e7168dc;
+        box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
       }
     </style>
     {% block content %}

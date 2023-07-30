@@ -46,7 +46,7 @@ def handle_search_form(query, model_columns, model_class):
 
 
 @adminBp.route('/inventory', methods=['GET', 'POST'])
-#@login_required
+@login_required
 def inventory():
     model = 'Dress'
     # Get the list of model columns for the Dress table
@@ -346,14 +346,12 @@ def update(title, form_type):
                 rent_id = provisional_id.id if provisional_id else None
 
                 # Increment timesRented for dress object
-                dress.increment_times_rented()
-                logging.debug(f"{dress} increment_times_rented() method called by created rent {provisional_id}")
+                dress.update_times_rented()
+                logging.debug(f"{dress} update_times_rented() method called by created rent {provisional_id}")
 
                 # Update rentStatus for dress object
-                current_date = datetime.utcnow().date()
-                if rent.returnDate >= current_date:
-                    dress.toggle_rent_status()
-                    logging.debug(f"{dress} toggle_rent_status() method called by created rent {provisional_id}")
+                dress.update_rent_status()
+                logging.debug(f"{dress} update_rent_status() method called by created rent {provisional_id}")
 
                 # Add rent log to the dress object
                 dress_log = {
@@ -423,11 +421,13 @@ def delete_object(dataBase, id):
             # Attempt to find the associated dress and decrement times_rented
             associated_dress = Dress.query.get(dress_id)
             if associated_dress:
-                associated_dress.decrement_times_rented()
-                logging.debug(f"'decrement_rent_status()' method called for Associated Dress. After {rent} deletion.")
+                associated_dress.update_times_rented()
+                associated_dress.update_rent_status()
+                logging.debug(f"update_rent_status() method called for {associated_dress}. After {rent} deletion.")
+                logging.debug(f"update_times_rented() method called for {associated_dress}. After {rent} deletion.")
             else:
                 # Handle the case when the associated dress is not found
-                flash('Associated Dress not found when trying to decrement times_rented.', 'danger')
+                flash(f'{associated_dress} not found when trying to decrement times_rented.', 'danger')
 
             db.session.commit()
             flash(f'{rent} deleted successfully.', 'success')

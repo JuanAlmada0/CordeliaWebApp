@@ -40,7 +40,11 @@
             <p class="lead">Patch notes</p>
             <hr class="my-4">
             <p></p>
-            <a class="btn btn-primary btn-lg btn-dark " href="{{ url_for('admin.inventory')}}" role="button">Start</a>
+            {% if current_user.is_authenticated %}
+            <a class="btn btn-primary btn-lg btn-dark " href="{{ url_for('admin.inventory') }}" role="button">Start</a>
+            {% else %}
+            <a class="btn btn-primary btn-lg btn-dark " href="{{ url_for('auth.login', next=url_for('admin.inventory')) }}" role="button">Start</a>
+            {% endif %}
         </div>
     </div>
 

@@ -9,6 +9,8 @@ import logging
 
 class Dress(db.Model):
     # Dress model representing a dress item in the database
+    __tablename__ = 'dress'
+
     id = db.Column(db.Integer, primary_key=True)
     size = db.Column(db.String(20), index=True, nullable=False)
     color = db.Column(db.String(20), index=True, nullable=False)
@@ -27,6 +29,9 @@ class Dress(db.Model):
     maintenanceLog = db.Column(db.JSON, nullable=True, default=[])
     imageData = db.Column(db.String(255), nullable=True, default=None)
 
+    # Many-to-many relationship with Customer through Rent model
+    customers = db.relationship('Customer', secondary='rent', back_populates='dresses', viewonly=True)
+
     def __init__(self, *args, **kwargs):
         super(Dress, self).__init__(*args, **kwargs)
 
@@ -38,56 +43,47 @@ class Dress(db.Model):
     def get_maintenance_log(self):
         log = []
         if self.maintenanceLog:
-            # Parse the JSON data stored in 'maintenanceLog' into a Python list of dictionaries
+            # Parse the JSON data stored in 'maintenanceLog' into a Python object
             log = json.loads(self.maintenanceLog)
             # Sort the list of maintenance log dictionaries by the 'date' key in descending order
             log.sort(key=lambda x: x['date'], reverse=True)
             return log
     
-    def update_rent_log(self, log):
-        existing_rent_log = json.loads(self.rentLog) if self.rentLog else []
-        existing_rent_log.append(log)
-        # Save the updated rent log to the dress
-        self.rentLog = json.dumps(existing_rent_log)
-
     def get_rent_log(self):
         log = []
         if self.rentLog:
             log = json.loads(self.rentLog)
             log.sort(key=lambda x: x['date'], reverse=True)
             return log
-    
-    def parse_date(self, date_str):
-        return datetime.strptime(date_str, "%Y-%m-%d").date()
+        
+    def update_rent_log(self, log):
+        existing_rent_log = json.loads(self.rentLog) if self.rentLog else []
+        # Append the new rent data to the existing log
+        existing_rent_log.append(log)
+        # Save the updated rent log to the dress
+        self.rentLog = json.dumps(existing_rent_log)
     
     def get_last_maintenance(self):
         if self.maintenanceLog:
             log = json.loads(self.maintenanceLog)
             latest_maintenance_str = max(log, key=lambda x: x['date'])['date']
-            # Call the 'parse_date' method to convert the 'latest_maintenance_str' into a date object
-            return self.parse_date(latest_maintenance_str)
+            # Convert the 'latest_maintenance_str' into a date object
+            parsed_date = datetime.strptime(latest_maintenance_str, "%Y-%m-%d").date()
+            return parsed_date
 
     def get_last_rent(self):
-        if self.rentLog:
-            log = json.loads(self.rentLog)
-            latest_rent_str = max(log, key=lambda x: x['date'])['date']
-            return self.parse_date(latest_rent_str)
+        if self.rents:
+            # Sort the rents by date in descending order to get the latest rent
+            sorted_rents = sorted(self.rents, key=lambda rent: rent.rentDate, reverse=True)
+            latest_rent = sorted_rents[0]
 
-    def increment_times_rented(self):
-        self.timesRented += 1
-        self.sellable = self.timesRented > self.rentsForReturns
-
-    def decrement_times_rented(self):
-        self.timesRented -= 1
-        self.sellable = self.timesRented > self.rentsForReturns
-    
-    def toggle_rent_status(self):
-        self.rentStatus = not self.rentStatus
+            return latest_rent.rentDate 
+        else:
+            return None
 
     def update_times_rented(self):
-        associated_rents = Rent.query.filter_by(dressId=self.id).all()
-        if associated_rents:
-            num_of_rents = len(associated_rents)
+        if self.rents:
+            num_of_rents = len(self.rents)
             # Update the timesRented and sellable attributes
             self.timesRented = num_of_rents
             self.sellable = num_of_rents > self.rentsForReturns
@@ -96,13 +92,14 @@ class Dress(db.Model):
             self.sellable = self.timesRented > self.rentsForReturns
 
     def update_rent_status(self):
-        # Latest rent associated with this dress
-        associated_rent = Rent.query.filter_by(dressId=self.id).order_by(Rent.rentDate.desc()).first()
-        if not associated_rent:
-            self.rentStatus = False
-        else:
+        if self.rents:
+            sorted_rents = sorted(self.rents, key=lambda rent: rent.rentDate, reverse=True)
+            latest_rent = sorted_rents[0]
+
             # Check if the latest rent has been returned
-            self.rentStatus = not associated_rent.is_returned()
+            self.rentStatus = not latest_rent.is_returned()
+        else:
+            self.rentStatus = False
 
     @classmethod
     def update_rent_statuses(cls):
@@ -121,6 +118,8 @@ class Dress(db.Model):
 
 class Customer(db.Model):
     # User model representing a user in the database
+    __tablename__ = 'customer'
+
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(80), index=True, unique=True, nullable=True)
     name = db.Column(db.String(60), index=True)
@@ -128,19 +127,23 @@ class Customer(db.Model):
     phoneNumber = db.Column(db.Integer, index=True, unique=True, nullable=True)
     dateAdded = db.Column(db.DateTime(), index=True, default=datetime.utcnow)
     rentLog = db.Column(db.JSON, nullable=True, default=[])
+
+    # Many-to-many relationship with Dress through Rent model
+    dresses = db.relationship('Dress', secondary='rent', back_populates='customers', viewonly=True)
     
     def check_status(self):
-        associated_rent = Rent.query.filter_by(clientId=self.id).order_by(Rent.rentDate.desc()).first()
-        # Check if there is any related rent
-        if not associated_rent:
-            return False
+        if self.rents:
+            sorted_rents = sorted(self.rents, key=lambda rent: rent.rentDate, reverse=True)
+            latest_rent = sorted_rents[0]
+
+            return not latest_rent.is_returned()
         else:
-            # Check if the latest rent has been returned
-            return not associated_rent.is_returned()
+            return False
     
     def update_rent_log(self, log):
         existing_rent_log = json.loads(self.rentLog) if self.rentLog else []
         existing_rent_log.append(log)
+
         self.rentLog = json.dumps(existing_rent_log)
     
     def get_rent_log(self):
@@ -150,13 +153,6 @@ class Customer(db.Model):
             log.sort(key=lambda x: x['date'], reverse=True)
             return log
     
-    def get_last_rent(self):
-        if self.rentLog:
-            log = json.loads(self.rentLog)
-            latest_rent_str = max(log, key=lambda x: x['date'])['date']
-            latest_rent = datetime.strptime(latest_rent_str, "%Y-%m-%d").date()
-            return latest_rent
-    
     def __repr__(self):
         return f"Customer C-0{self.id}"
 
@@ -164,6 +160,8 @@ class Customer(db.Model):
 
 class Rent(db.Model):
     # Rent model representing a dress rental transaction in the database
+    __tablename__ = 'rent'
+
     id = db.Column(db.Integer, primary_key=True)
     dressId = db.Column(db.Integer, db.ForeignKey('dress.id'))
     clientId = db.Column(db.Integer, db.ForeignKey('customer.id'))
@@ -172,17 +170,18 @@ class Rent(db.Model):
     paymentTotal = db.Column(db.Integer, index=True)
     rentLog = db.Column(db.JSON, nullable=True, default=[])
 
-    dress = db.relationship('Dress', backref='rents')     # One Dress to Many Rents relationship
-    customer = db.relationship('Customer', backref='rents')     # One User to Many Rents relationship
+    # Many Dress and Many customer to One Rent relationship for Rent through dressId and clientId
+
+    dress = db.relationship('Dress', backref='rents')     # One Dress to Many Rents relationship for Dress
+    customer = db.relationship('Customer', backref='rents')     # One User to Many Rents relationship for Customer
 
     def __init__(self, *args, **kwargs):
         super(Rent, self).__init__(*args, **kwargs)
-
         if self.dressId:
             self.dress = Dress.query.get(self.dressId)
         if self.clientId:
             self.customer = Customer.query.get(self.clientId)
-            
+
         # Calculate return date based on rentDate value.
         if self.rentDate:
             self.returnDate = self.rentDate + timedelta(days=2)
@@ -191,11 +190,10 @@ class Rent(db.Model):
         self.paymentTotal = int(self.dress.rentPrice + tax)
 
     def is_returned(self):
-        # Get the current date and time
         current_datetime = datetime.utcnow()
         # Extract only the date portion from the current date and time
         current_date = current_datetime.date()
-        # Check if the current date is greater than or equal to the return date
+        # Return True if current date is greater than or equal to the return date
         return current_date > self.returnDate
     
     def update_rent_log(self, log):
@@ -212,7 +210,6 @@ class Rent(db.Model):
     def __repr__(self):
         return f"Rent R-0{self.id}"
     
-
 
 class User(UserMixin, db.Model):
     # User model representing a user in the database

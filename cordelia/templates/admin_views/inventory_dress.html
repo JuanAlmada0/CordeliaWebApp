@@ -233,14 +233,14 @@
                               <div class="col-5">
                                 <table class="table table-striped table-hover table-sm table-dark" style="font-family: 'Courier New', Courier, monospace;">
                                   {% if dress.rentLog %}
-                                  <thead style="font-size: 13px;">
+                                  <thead style="font-size: 12px;">
                                     <tr>
                                       <th>Rent Log</th>
                                       <th>Rent ID</th>
                                       <th>Customer ID</th>
                                     </tr>
                                   </thead>
-                                  <tbody style="font-size: 12px;">
+                                  <tbody style="font-size: 11px;">
                                     {% for log in dress.get_rent_log() %}
                                     <tr>
                                         <td>{{ log.date }}</td>
@@ -253,14 +253,14 @@
                                 </table>
                                 <table class="table table-striped table-hover table-sm table-dark typewriter-button">
                                   {% if dress.maintenanceLog %}
-                                  <thead style="font-size: 13px;">
+                                  <thead style="font-size: 12px;">
                                     <tr>
                                       <th>Maintenance</th>
                                       <th>Type</th>
                                       <th>Cost</th>
                                     </tr>
                                   </thead>
-                                  <tbody style="font-size: 12px;">
+                                  <tbody style="font-size: 11px;">
                                     {% for log in dress.get_maintenance_log() %}
                                     <tr>
                                         <td>{{ log.date }}</td>
@@ -273,7 +273,7 @@
                                 </table>
                               </div>
                               <!-- Image column -->
-                              <div class="col-2 ml-auto">
+                              <div class="col-2 mx-auto">
                                 <div class="image-container">
                                   {% if dress.imageData %}
                                   <img src="data:image/jpeg;base64,{{ dress.imageData }}" alt="Dress Image" class="img-thumbnail dress-image">
