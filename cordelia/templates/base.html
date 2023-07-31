@@ -47,9 +47,6 @@
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
       </button>
-      <li class="navbar-nav">
-        <a class="nav-link" href="{{ url_for('home.home') }}">Home</a>
-      </li>
       {% if current_user.is_authenticated %}
       <li class="navbar-nav">
         <a class="nav-link" href="{{ url_for('admin.inventory') }}">Dashboard</a>
@@ -230,7 +227,7 @@
         align-items: center;
         height: 220px;
         width: 160px;
-        background-color: #7e7168dc;
+        background-color: #b8a495dc;
         box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
       }
     </style>

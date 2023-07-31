@@ -147,17 +147,17 @@
                                   {% if customer.rentLog %}
                                   <thead style="font-size: 13px;">
                                     <tr>
-                                      <th>Rent Log</th>
-                                      <th>Rent ID</th>
-                                      <th>Dress ID</th>
+                                      <th>Log</th>
+                                      <th>Rent</th>
+                                      <th>Dress</th>
                                     </tr>
                                   </thead>
                                   <tbody style="font-size: 12px;">
                                     {% for log in customer.get_rent_log() %}
                                     <tr>
                                         <td>{{ log.date }}</td>
-                                        <td>{{ log.id }}</td>
-                                        <td>{{ log.dress_id }}</td>
+                                        <td>R-0{{ log.id }}, {{ log.total }}</td>
+                                        <td>{{ log.dress_info['id'] }}, {{ log.dress_info['brand'] }}, {{ log.dress_info['style'] }}</td>
                                     </tr>
                                     {% endfor %}
                                   </tbody>

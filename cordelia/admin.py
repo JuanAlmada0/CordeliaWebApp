@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, session
+from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import current_user
 from cordelia.auth import login_required
 from cordelia.db import db
@@ -15,15 +15,14 @@ import logging
 adminBp = Blueprint('admin', __name__, url_prefix='/admin')
 
 
-# (admin_required) wrapper
+# Wrapper @admin_required
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.isAdmin:
             flash('This page requires Admin Access', 'message')
-            # Store the current URL in the session
-            session['next_page'] = request.url
-            return redirect(url_for('auth.login'))
+            next_page = request.args.get('next')
+            return redirect(url_for('auth.login', next=next_page))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -46,7 +45,7 @@ def handle_search_form(query, model_columns, model_class):
 
 
 @adminBp.route('/inventory', methods=['GET', 'POST'])
-@login_required
+#@login_required
 def inventory():
     model = 'Dress'
     # Get the list of model columns for the Dress table
@@ -68,7 +67,7 @@ def inventory():
     elif order_by_column == 'id':
         inventory_query = inventory_query.order_by(Dress.id)
     elif order_by_column == 'dress_cost':
-        inventory_query = inventory_query.order_by(Dress.dressCost.desc())
+        inventory_query = inventory_query.order_by(Dress.cost.desc())
     else :
         # If 'default', sort by rentStatus and maintenanceStatus in descending order
         inventory_query = inventory_query.order_by(Dress.rentStatus.desc(), Dress.maintenanceStatus.desc())
@@ -181,9 +180,8 @@ def update_maintenance_status(dress_id):
     return redirect(url_for('admin.inventory'))
 
 
-
 @adminBp.route('/rent-inventory', methods=['GET', 'POST'])
-@login_required
+#@login_required
 def rentInventory():
     model = 'Rent'
 
@@ -204,7 +202,8 @@ def rentInventory():
     elif order_by_column == 'dress_id':
         inventory_query = inventory_query.order_by(Rent.dressId.desc())
     else :
-        inventory_query = inventory_query.order_by(Rent.rentDate.desc())
+        # Order by rent date and status
+        inventory_query = inventory_query.order_by(Rent.rentDate.desc(),Rent.is_returned(Rent).desc())
 
     inventory_query, form = handle_search_form(inventory_query, model_columns, Rent)
 
@@ -222,7 +221,7 @@ def rentInventory():
 
 
 @adminBp.route('/customer-inventory', methods=["GET", "POST"])
-@login_required
+#@login_required
 def customerInventory():
     model = 'Customer'
 
@@ -242,7 +241,7 @@ def customerInventory():
     elif order_by_column == 'date':
         inventory_query = inventory_query.order_by(Customer.dateAdded.desc())
     else :
-        # 'order_by' Rent status with and an outer join with the Rent table to include all customers, even if they have no related rents.
+        # 'order_by' Rent status and an outer join with the Rent table to include all customers, even if they have no related rents.
         inventory_query = inventory_query.outerjoin(Rent).group_by(Customer.id).order_by(Rent.returnDate.desc(), Rent.is_returned(Rent).desc())
 
     inventory_query, form = handle_search_form(inventory_query, model_columns, Customer)
@@ -258,6 +257,22 @@ def customerInventory():
         return redirect(url_for('admin.delete_object', dataBase='Customer', id=customer_id))
 
     return render_template('admin_views/inventory_customer.html', inventory=inventory, form=form, delete_form=delete_form, pagination=pagination, order_by_column=order_by_column, model=model)
+
+
+@adminBp.route('/update-rent-logs', methods=['POST'])
+@login_required
+@admin_required
+def update_rent_logs_endpoint():
+    
+    confirm = request.form.get('confirm', False)
+
+    if confirm:
+        Customer.update_rent_logs()
+        db.session.commit()
+        flash('Rent logs updated successfully.', 'success')
+
+    logging.debug("update_rent_logs() Customer class method called from dashboard")
+    return redirect(url_for('admin.customerInventory'))
 
 
 @adminBp.route("/update-db/<string:title>/<string:form_type>", methods=['GET', 'POST'])
@@ -277,6 +292,7 @@ def update(title, form_type):
     if form.validate_on_submit():
 
         if form_type == 'customer':
+
             customer = Customer(
                 email=form.email.data,
                 name=form.name.data,
@@ -309,7 +325,7 @@ def update(title, form_type):
                 size=form.size.data,
                 color=form.color.data,
                 style=form.style.data,
-                dressCost=form.dressCost.data,
+                cost=form.cost.data,
                 marketPrice=form.marketPrice.data,
                 rentPrice=form.rentPrice.data,
                 imageData=image_base64  # Store the image data in the database as base64 string or None
@@ -323,6 +339,7 @@ def update(title, form_type):
             return redirect(url_for('admin.inventory'))
         
         elif form_type == 'rent':
+
             dress_id = form.dressId.data
             customer_id = form.customerId.data
 
@@ -338,12 +355,9 @@ def update(title, form_type):
                 
                 db.session.add(rent)
                 
-                # Get id from un-committed rent
+                # Get id from un-committed rent (for debugging purposes)
                 provisional_id = Rent.query.order_by(Rent.id.desc()).first()
                 logging.debug(f'Rent {provisional_id} added but not yet committed')
-
-                # Convert the provisional ID to a regular integer
-                rent_id = provisional_id.id if provisional_id else None
 
                 # Increment timesRented for dress object
                 dress.update_times_rented()
@@ -353,30 +367,25 @@ def update(title, form_type):
                 dress.update_rent_status()
                 logging.debug(f"{dress} update_rent_status() method called by created rent {provisional_id}")
 
-                # Add rent log to the dress object
-                dress_log = {
-                    "date": form.rentDate.data.strftime('%Y-%m-%d'),
-                    "id": rent_id,
-                    "customer_id": [customer.id, customer.lastName, customer.name]
-                }
-                dress.update_rent_log(dress_log)
-                logging.debug(f"{dress} rent log updated by rent {provisional_id}")
-
-                # Add rent log to the customer object
-                customer_log = {
-                    "date": form.rentDate.data.strftime('%Y-%m-%d'),
-                    "id": rent_id,
-                    "dress_id": dress.id
-                }
-                customer.update_rent_log(customer_log)
-                logging.debug(f"{customer} rent log updated by rent {provisional_id}")
-
                 # Create log for rent
+                customer_info = {
+                    "id": customer.id,
+                    "last_name": customer.lastName,
+                    "name": customer.name
+                }
+                dress_info = {
+                    "id": dress.id,
+                    "brand": dress.brand,
+                    "style": dress.style,
+                    "size": dress.size,
+                    "color": dress.color,
+                    "rent_price": dress.rentPrice
+                }
                 rent_log = {
-                    "date": form.rentDate.data.strftime('%Y-%m-%d'),
-                    "customer_id": customer_id,
-                    "dress_id": dress_id
+                    "customer_data": customer_info,
+                    "dress_data": dress_info
                 } 
+                
                 rent.update_rent_log(rent_log)
                 logging.debug(f"rent {provisional_id} rent log updated by itself.")
 
@@ -386,7 +395,7 @@ def update(title, form_type):
                 flash(f'{rent} added successfully into the database.')
                 logging.debug(f"{rent} Added from dashboard")
 
-                return redirect(url_for('admin.rentInventory'))
+                return redirect(url_for('admin.rentInventory')) 
             else:
                 flash('Dress not available.')
 
@@ -415,7 +424,7 @@ def delete_object(dataBase, id):
         rent = Rent.query.get(int(id))
 
         if rent and rent.is_returned():
-            # Store dress ID before deleting rent object
+            # Store dress ID and customer ID before deleting rent object
             dress_id = rent.dressId
             db.session.delete(rent)
             # Attempt to find the associated dress and decrement times_rented

@@ -123,18 +123,20 @@
                   <div id="collapse{{ loop.index }}" class="collapse" aria-labelledby="heading{{ loop.index }}" data-parent="#accordion{{ loop.index }}">
                     <div class="card-body">
                       <table class="table table-striped table-hover table-sm table-dark" style="font-family: 'Courier New', Courier, monospace;">
-                        <tbody style="font-size: 13px;">
+                        <tbody style="font-size: 12px;">
                           <tr>
                             <td class="d-flex" style="padding-left: 10px;">
                               <!-- Main table column -->
-                              <div class="col-6">
+                              <div class="col-4">
                                 <!-- Inner table with the content of the rows -->
-                                <table class="w-100">
-                                  <tbody>
+                                <table class="w-100" style="font-family: 'Courier New', Courier, monospace;">
+                                  <thead style="font-size: 13px;">
                                     <tr>
                                       <th scope="row">{{ rent }}</th>
                                       <td></td>
                                     </tr>
+                                  </thead>
+                                  <tbody>
                                     <tr>
                                       <th scope="row">Rent Date:</th>
                                       <td>{{ rent.rentDate }}</td>
@@ -148,25 +150,54 @@
                                       <td>{{ rent.paymentTotal }}</td>
                                     </tr>
                                   </tbody>
+                                  <tfoot class="custom-footer">
+                                    <tr>
+                                      <td colspan="2">
+                                      </td>
+                                    </tr>
+                                  </tfoot>
                                 </table>
                               </div>
                               <!-- Maintenance log column -->
-                              <div class="col-6">
+                              <div class="col-8">
                                 <table class="table table-striped table-hover table-sm table-dark" style="font-family: 'Courier New', Courier, monospace;">
                                   {% if rent.rentLog %}
                                   <thead style="font-size: 13px;">
                                     <tr>
-                                      <th>Rent Log</th>
-                                      <th>Customer ID</th>
-                                      <th>Dress ID</th>
+                                      <th>Dress</th>
                                     </tr>
                                   </thead>
                                   <tbody style="font-size: 12px;">
                                     {% for log in rent.get_rent_log() %}
                                     <tr>
-                                        <td>{{ log.date }}</td>
-                                        <td>{{ log.customer_id }}</td>
-                                        <td>{{ log.dress_id }}</td>
+                                      <td>
+                                        D-0{{ log.dress_data['id'] }} |
+                                        {{ log.dress_data['brand'] }} |
+                                        {{ log.dress_data['style'] }} |
+                                        Size: {{ log.dress_data['size'] }} |
+                                        {{ log.dress_data['color'] }} |
+                                        Rent price: {{ log.dress_data['rent_price'] }}
+                                      </td>
+                                    </tr>
+                                    {% endfor %}
+                                  </tbody>
+                                  {% endif %}
+                                </table>
+                                <table class="table table-striped table-hover table-sm table-dark" style="font-family: 'Courier New', Courier, monospace;">
+                                  {% if rent.rentLog %}
+                                  <thead style="font-size: 13px;">
+                                    <tr>
+                                      <th>Customer</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody style="font-size: 12px;">
+                                    {% for log in rent.get_rent_log() %}
+                                    <tr>
+                                      <td>
+                                      C-0{{ log.customer_data['id'] }} |
+                                      {{ log.customer_data['last_name'] }}
+                                      {{ log.customer_data['name'] }}
+                                      </td>
                                     </tr>
                                     {% endfor %}
                                   </tbody>

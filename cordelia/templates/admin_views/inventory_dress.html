@@ -41,12 +41,27 @@
                           </div>
                         
                           <!-- Second column, middle part of the card -->
-                          <div class="col-md-4">
+                          <div class="col-md-2">
                             <div class="d-flex justify-content-start">
                               <div class="text-arrow-container">
                                 <span class="text-light typewriter-button" style="font-size: 13px;">Brand  |  {{ dress.brand }}</span>
                               </div>
                             </div>
+                          </div>
+                          <div class="col-md-2">
+                            {% if dress.rentStatus %}
+                            <div class="d-flex justify-content-start">
+                              <div class="text-arrow-container">
+                                <span class="text-light typewriter-button" style="font-size: 13px;">{{ dress.get_last_customer().lastName }}, {{ dress.get_last_customer().name }}</span>
+                              </div>
+                            </div>
+                            {% else %}
+                            <div class="d-flex justify-content-start">
+                              <div class="text-arrow-container">
+                                <span class="text-light typewriter-button" style="font-size: 13px;"></span>
+                              </div>
+                            </div>
+                            {% endif %}
                           </div>
 
                           <!-- Third column, sellable badge -->
@@ -54,7 +69,7 @@
                             {% if dress.sellable %}
                               <span class="neon-text clean-pink typewriter-button" style="font-size: 12px;">sellable</span>
                             {% else %}
-                              <span class="text text-dark" style="font-size: 12px;">{{ dress.sellable }}</span>
+                              <span class="text text-dark" style="font-size: 12px;"></span>
                             {% endif %}
                           </div>
                           
@@ -68,42 +83,37 @@
                                     @
                                 </button>
                             </form>
-                            {% elif not dress.rentStatus%}
-                              {% if not dress.rentLog and not dress.maintenanceLog %}
-                              <!-- Button to trigger the maintenance form modal -->
-                              <div type="button" data-toggle="modal" data-target="#maintenanceModal{{ dress.id }}">
-                                <span class="neon-text blue ml-auto typewriter-button py-2" style="font-size: 11px;">clean</span>
+
+                            {% elif dress.rentStatus %}
+                              <div type="button" disabled>
+                                <span class="text-dark ml-auto typewriter-button" style="font-size: 11px;"></span>
                               </div>
-                              {% elif not dress.maintenanceLog %}
-                              <!-- Button to trigger the maintenance form modal -->
-                              <div type="button" data-toggle="modal" data-target="#maintenanceModal{{ dress.id }}">
-                                  <span class="neon-text clean-pink ml-auto typewriter-button py-2" style="font-size: 11px;">check</span>
-                              </div>
-                              {% elif dress.rentLog and dress.maintenanceLog %}
-                                {% if dress.get_last_rent() > dress.get_last_maintenance() %}
+
+                            {% elif dress.rents %}
+                              {% if not dress.maintenanceLog %}
                                 <!-- Button to trigger the maintenance form modal -->
                                 <div type="button" data-toggle="modal" data-target="#maintenanceModal{{ dress.id }}">
-                                    <span class="neon-text clean-pink ml-auto typewriter-button py-2" style="font-size: 11px;">check</span>
+                                  <span class="neon-text clean-pink ml-auto typewriter-button py-2" style="font-size: 11px;">check</span>
                                 </div>
-                                {% else %}
+                              {% elif dress.get_last_rent().rentDate > dress.get_last_maintenance() %}
+                                <!-- Button to trigger the maintenance form modal -->
+                                <div type="button" data-toggle="modal" data-target="#maintenanceModal{{ dress.id }}">
+                                  <span class="neon-text clean-pink ml-auto typewriter-button py-2" style="font-size: 11px;">check</span>
+                                </div>
+                              {% else %}
                                 <!-- Button to trigger the maintenance form modal -->
                                 <div type="button" data-toggle="modal" data-target="#maintenanceModal{{ dress.id }}">
                                   <span class="neon-text blue ml-auto typewriter-button py-2" style="font-size: 11px;">clean</span>
                                 </div>
-                                {% endif %}
-                              {% else%}
-                              <!-- Button to trigger the maintenance form modal -->
-                              <div type="button" data-toggle="modal" data-target="#maintenanceModal{{ dress.id }}">
-                                <span class="neon-text blue ml-auto typewriter-button py-2" style="font-size: 11px;">clean</span>
-                              </div>
                               {% endif %}
                             {% else %}
-                            <div type="button" disabled>
-                              <span class="text-dark ml-auto typewriter-button" style="font-size: 11px;">clean</span>
-                            </div>
+                              <div type="button" disabled>
+                                <span class="text-dark ml-auto typewriter-button" style="font-size: 11px;"></span>
+                              </div>
                             {% endif %}
-                          </div>
+                          </div> 
 
+                                
                           <div class="modal fade" id="maintenanceModal{{ dress.id }}" tabindex="-1" role="dialog" aria-labelledby="maintenanceModalLabel{{ dress.id }}" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered" role="document">
                                 <div class="modal-content">
@@ -215,16 +225,16 @@
                                       <td>{{ dress.style }}</td>
                                     </tr>
                                     <tr>
-                                      <th scope="row">Times Rented:</th>
-                                      <td>{{ dress.timesRented }}</td>
-                                    </tr>
-                                    <tr>
-                                      <th scope="row">Dress Cost:</th>
-                                      <td>{{ dress.dressCost }}</td>
+                                      <th scope="row">Cost:</th>
+                                      <td>{{ dress.cost }}</td>
                                     </tr>
                                     <tr>
                                       <th scope="row">Rent for:</th>
                                       <td>{{ dress.rentPrice }}</td>
+                                    </tr>
+                                    <tr>
+                                      <th scope="row">Times Rented:</th>
+                                      <td>{{ dress.timesRented }}</td>
                                     </tr>
                                   </tbody>
                                 </table>
@@ -235,17 +245,17 @@
                                   {% if dress.rentLog %}
                                   <thead style="font-size: 12px;">
                                     <tr>
-                                      <th>Rent Log</th>
-                                      <th>Rent ID</th>
-                                      <th>Customer ID</th>
+                                      <th>Log</th>
+                                      <th>Rent</th>
+                                      <th>Customer</th>
                                     </tr>
                                   </thead>
                                   <tbody style="font-size: 11px;">
                                     {% for log in dress.get_rent_log() %}
                                     <tr>
                                         <td>{{ log.date }}</td>
-                                        <td>{{ log.id }}</td>
-                                        <td>{{ log.customer_id }}</td>
+                                        <td>R-0{{ log.id }}</td>
+                                        <td>{{ log.customer_info }}</td>
                                     </tr>
                                     {% endfor %}
                                   </tbody>

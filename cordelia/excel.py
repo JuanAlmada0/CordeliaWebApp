@@ -22,7 +22,7 @@ def excel_download():
             'Color': [dress.color for dress in dresses],
             'Style': [dress.style for dress in dresses],
             'Brand': [dress.brand for dress in dresses],
-            'Dress Cost': [dress.dressCost for dress in dresses],
+            'Cost': [dress.cost for dress in dresses],
             'Date Added': [dress.dateAdded.strftime('%Y-%m-%d') for dress in dresses],
             'Market Price': [dress.marketPrice for dress in dresses],
             'Rent Price': [dress.rentPrice for dress in dresses],
@@ -122,7 +122,7 @@ def excel_upload():
                     dress.color = row['color']
                     dress.style = row['style']
                     dress.brand = row['brand']
-                    dress.dressCost = row['dress cost']
+                    dress.cost = row['cost']
                     dress.marketPrice = row['market price'] if row['market price'] else None
                     dress.rentPrice = row['rent price']
                 else:
@@ -132,7 +132,7 @@ def excel_upload():
                         color = row['color'],
                         style = row['style'],
                         brand = row['brand'],
-                        dressCost = row['dress cost'],
+                        cost = row['cost'],
                         marketPrice = row['market price'] if row['market price'] else None,
                         rentPrice = row['rent price'],
                     )

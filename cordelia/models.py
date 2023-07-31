@@ -4,7 +4,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 import json
 
-import logging
 
 
 class Dress(db.Model):
@@ -12,11 +11,11 @@ class Dress(db.Model):
     __tablename__ = 'dress'
 
     id = db.Column(db.Integer, primary_key=True)
-    size = db.Column(db.String(20), index=True, nullable=False)
-    color = db.Column(db.String(20), index=True, nullable=False)
-    style = db.Column(db.String(20), index=True, nullable=False)
-    brand = db.Column(db.String(20), index=True, nullable=False)
-    dressCost = db.Column(db.Integer, index=True, nullable=False)
+    size = db.Column(db.String(40), index=True, nullable=False)
+    color = db.Column(db.String(40), index=True, nullable=False)
+    style = db.Column(db.String(40), index=True, nullable=False)
+    brand = db.Column(db.String(40), index=True, nullable=False)
+    cost = db.Column(db.Integer, index=True, nullable=False)
     marketPrice = db.Column(db.Integer, index=True, default=None)
     rentPrice = db.Column(db.Integer, index=True, nullable=False)
     rentsForReturns = db.Column(db.Integer, index=True)
@@ -24,10 +23,10 @@ class Dress(db.Model):
     sellable = db.Column(db.Boolean, index=True, default=False)
     dateAdded = db.Column(db.DateTime(), index=True, default=datetime.utcnow)
     rentStatus = db.Column(db.Boolean, index=True, default=False)
-    rentLog = db.Column(db.JSON, nullable=True, default=[])
+    rentLog = db.Column(db.JSON, default=[])
     maintenanceStatus = db.Column(db.Boolean, index=True, default=False)
-    maintenanceLog = db.Column(db.JSON, nullable=True, default=[])
-    imageData = db.Column(db.String(255), nullable=True, default=None)
+    maintenanceLog = db.Column(db.JSON, default=[])
+    imageData = db.Column(db.String(255), default=None)
 
     # Many-to-many relationship with Customer through Rent model
     customers = db.relationship('Customer', secondary='rent', back_populates='dresses', viewonly=True)
@@ -35,7 +34,7 @@ class Dress(db.Model):
     def __init__(self, *args, **kwargs):
         super(Dress, self).__init__(*args, **kwargs)
 
-        self.rentsForReturns = self.dressCost // self.rentPrice
+        self.rentsForReturns = self.cost // self.rentPrice
 
     def toggle_maintenance_status(self):
         self.maintenanceStatus = not self.maintenanceStatus
@@ -48,21 +47,7 @@ class Dress(db.Model):
             # Sort the list of maintenance log dictionaries by the 'date' key in descending order
             log.sort(key=lambda x: x['date'], reverse=True)
             return log
-    
-    def get_rent_log(self):
-        log = []
-        if self.rentLog:
-            log = json.loads(self.rentLog)
-            log.sort(key=lambda x: x['date'], reverse=True)
-            return log
         
-    def update_rent_log(self, log):
-        existing_rent_log = json.loads(self.rentLog) if self.rentLog else []
-        # Append the new rent data to the existing log
-        existing_rent_log.append(log)
-        # Save the updated rent log to the dress
-        self.rentLog = json.dumps(existing_rent_log)
-    
     def get_last_maintenance(self):
         if self.maintenanceLog:
             log = json.loads(self.maintenanceLog)
@@ -77,9 +62,18 @@ class Dress(db.Model):
             sorted_rents = sorted(self.rents, key=lambda rent: rent.rentDate, reverse=True)
             latest_rent = sorted_rents[0]
 
-            return latest_rent.rentDate 
+            return latest_rent
         else:
             return None
+    
+    def get_last_customer(self):
+        if self.rents:
+            sorted_rents = sorted(self.rents, key=lambda rent: rent.rentDate, reverse=True)
+            latest_rent = sorted_rents[0]
+
+            return latest_rent.customer
+        else:
+            return None    
 
     def update_times_rented(self):
         if self.rents:
@@ -100,6 +94,29 @@ class Dress(db.Model):
             self.rentStatus = not latest_rent.is_returned()
         else:
             self.rentStatus = False
+    
+    def update_rent_log(self):
+        rent_log = []
+        for rent in self.rents:
+            if rent.customer:
+                customer_info = {
+                    "last_name": rent.customer.lastName,
+                    "name": rent.customer.name
+                }
+                rent_log_entry = {
+                    "date": rent.rentDate.strftime('%Y-%m-%d'),
+                    "id": rent.id,
+                    "customer_info": customer_info
+                }
+                rent_log.append(rent_log_entry)
+
+        self.rentLog = json.dumps(rent_log)
+    
+    def get_rent_log(self):
+        log = []
+        if self.rentLog:
+            log = json.loads(self.rentLog)
+            return log
 
     @classmethod
     def update_rent_statuses(cls):
@@ -107,24 +124,22 @@ class Dress(db.Model):
 
         for dress in dresses:
             dress.update_rent_status()
-            dress.update_times_rented()      
-            
-        logging.debug("update_rent_statuses() method executed.")
+            dress.update_times_rented()
+            dress.update_rent_log()      
     
     def __repr__(self):
         return f"Dress D-0{self.id}"
     
-
 
 class Customer(db.Model):
     # User model representing a user in the database
     __tablename__ = 'customer'
 
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(80), index=True, unique=True, nullable=True)
-    name = db.Column(db.String(60), index=True)
-    lastName = db.Column(db.String(60), index=True)
-    phoneNumber = db.Column(db.Integer, index=True, unique=True, nullable=True)
+    email = db.Column(db.String(80), index=True, unique=True)
+    name = db.Column(db.String(40), index=True, nullable=False)
+    lastName = db.Column(db.String(40), index=True, nullable=False)
+    phoneNumber = db.Column(db.Integer, index=True, unique=True)
     dateAdded = db.Column(db.DateTime(), index=True, default=datetime.utcnow)
     rentLog = db.Column(db.JSON, nullable=True, default=[])
 
@@ -139,23 +154,50 @@ class Customer(db.Model):
             return not latest_rent.is_returned()
         else:
             return False
-    
-    def update_rent_log(self, log):
-        existing_rent_log = json.loads(self.rentLog) if self.rentLog else []
-        existing_rent_log.append(log)
+        
+    def get_last_rent(self):
+        if self.rents:
+            sorted_rents = sorted(self.rents, key=lambda rent: rent.rentDate, reverse=True)
+            latest_rent = sorted_rents[0]
 
-        self.rentLog = json.dumps(existing_rent_log)
+            return latest_rent.rentDate 
+        else:
+            return None
+    
+    def update_rent_log(self):
+        rent_log = []
+        for rent in self.rents:
+            if rent.dress:
+                dress_info = {
+                    "id": f"D-0{rent.dress.id}",
+                    "brand": rent.dress.brand,
+                    "style": rent.dress.style
+                }
+                rent_log_entry = {
+                    "date": rent.rentDate.strftime('%Y-%m-%d'),
+                    "id": rent.id,
+                    "total": f"Total: ${rent.paymentTotal}",
+                    "dress_info": dress_info
+                }
+                rent_log.append(rent_log_entry)
+
+        self.rentLog = json.dumps(rent_log)
     
     def get_rent_log(self):
         log = []
         if self.rentLog:
             log = json.loads(self.rentLog)
-            log.sort(key=lambda x: x['date'], reverse=True)
             return log
-    
+        
+    @classmethod
+    def update_rent_logs(cls):
+        customers = cls.query.all()
+
+        for customer in customers:
+            customer.update_rent_log()
+
     def __repr__(self):
         return f"Customer C-0{self.id}"
-
 
 
 class Rent(db.Model):
@@ -165,12 +207,12 @@ class Rent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     dressId = db.Column(db.Integer, db.ForeignKey('dress.id'))
     clientId = db.Column(db.Integer, db.ForeignKey('customer.id'))
-    rentDate = db.Column(db.Date, index=True)
+    rentDate = db.Column(db.Date, index=True, nullable=False)
     returnDate = db.Column(db.Date, index=True)
     paymentTotal = db.Column(db.Integer, index=True)
-    rentLog = db.Column(db.JSON, nullable=True, default=[])
+    rentLog = db.Column(db.JSON, default=[])
 
-    # Many Dress and Many customer to One Rent relationship for Rent through dressId and clientId
+    # Many Dress and Many customer to One Rent relationship connected for Rent through dressId and clientId
 
     dress = db.relationship('Dress', backref='rents')     # One Dress to Many Rents relationship for Dress
     customer = db.relationship('Customer', backref='rents')     # One User to Many Rents relationship for Customer
@@ -181,7 +223,6 @@ class Rent(db.Model):
             self.dress = Dress.query.get(self.dressId)
         if self.clientId:
             self.customer = Customer.query.get(self.clientId)
-
         # Calculate return date based on rentDate value.
         if self.rentDate:
             self.returnDate = self.rentDate + timedelta(days=2)
@@ -214,10 +255,10 @@ class Rent(db.Model):
 class User(UserMixin, db.Model):
     # User model representing a user in the database
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(60), index=True, unique=True)
+    username = db.Column(db.String(40), index=True, unique=True)
     email = db.Column(db.String(80), index=True, unique=True)
-    name = db.Column(db.String(60), index=True)
-    lastName = db.Column(db.String(60), index=True)
+    name = db.Column(db.String(40), index=True)
+    lastName = db.Column(db.String(40), index=True)
     phoneNumber = db.Column(db.Integer, index=True, unique=True)
     password_hash = db.Column(db.String(80))
     joinedAtDate = db.Column(db.DateTime(), index=True, default=datetime.utcnow)

@@ -54,7 +54,7 @@
               </td>
               {% if model == "Dress" %}
                 <td>
-                  <form id="update-rent-statuses-form" method="POST" action="{{ url_for('admin.update_rent_statuses_endpoint') }}" onsubmit="return confirmAction('Update Dress database??');">
+                  <form id="update-rent-statuses-form" method="POST" action="{{ url_for('admin.update_rent_statuses_endpoint') }}" onsubmit="return confirmAction('Update Dress database?');">
                     {{ form.hidden_tag() }}
                     <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Refresh">
                       <i class="fas fa-sync-alt"></i> <!-- Font Awesome refresh icon -->
@@ -104,7 +104,14 @@
                   {% endif %}
                 </td>
               {% if model == "Customer" %}
-                <td></td>
+                <td>
+                  <form id="update-rent-logs-form" method="POST" action="{{ url_for('admin.update_rent_logs_endpoint') }}" onsubmit="return confirmAction('Update Customer database?');">
+                    {{ form.hidden_tag() }}
+                    <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Refresh">
+                      <i class="fas fa-sync-alt"></i> <!-- Font Awesome refresh icon -->
+                    </button>
+                  </form>
+                </td>
                 <td>
                   <a href="{{ url_for('admin.update', title='Add Customer', form_type='customer') }}" class="btn btn-outline-light btn-smaller mr-2 btn-dark">
                     <i class="fas fa-plus"></i> <!-- Font Awesome "plus" icon -->

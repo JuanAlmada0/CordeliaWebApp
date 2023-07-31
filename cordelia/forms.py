@@ -7,7 +7,7 @@ from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Op
 from flask_wtf.file import FileAllowed
 import phonenumbers
 from phonenumbers.phonenumberutil import NumberParseException
-from cordelia.models import User
+from cordelia.models import User, Customer
 
 
 class RegistrationForm(FlaskForm):
@@ -82,17 +82,10 @@ class DressForm(FlaskForm):
     size = StringField('Size', validators=[DataRequired()])
     color = StringField('Color', validators=[DataRequired()])
     style = StringField('Style', validators=[DataRequired()])
-    dressCost = IntegerField('Dress Cost', validators=[DataRequired()])
+    cost = IntegerField('Dress Cost', validators=[DataRequired()])
     marketPrice = IntegerField('Market Price', validators=[Optional()])
     rentPrice = IntegerField('Rent Price', validators=[DataRequired()])
     image = FileField('Image', validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif', 'webp'])])
-    submit = SubmitField('Submit')
-
-
-class RentForm(FlaskForm):
-    customerId = IntegerField('Customer Id', validators=[DataRequired()])
-    dressId = IntegerField('Dress Id', validators=[DataRequired()])
-    rentDate = DateField('Rent Date', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
 
@@ -117,12 +110,20 @@ class CustomerForm(FlaskForm):
             raise ValidationError('Invalid phone number')
 
     def validate_email(self, field):
-        if User.query.filter_by(email=field.data).first():
+        if Customer.query.filter_by(email=field.data).first():
             raise ValidationError('Email already exists.')
 
     def validate_phoneNumber_duplicate(self, field):
-        if User.query.filter_by(phoneNumber=field.data).first():
+        if Customer.query.filter_by(phoneNumber=field.data).first():
             raise ValidationError('Phone number already exists.')
+        
+
+class RentForm(FlaskForm):
+    customerId = IntegerField('Customer Id', validators=[DataRequired()])
+    dressId = IntegerField('Dress Id', validators=[DataRequired()])
+    rentDate = DateField('Rent Date', validators=[DataRequired()])
+    submit = SubmitField('Submit')
+
 
 class UserRentForm(FlaskForm):
     rentDate = DateField('Rent Date', validators=[DataRequired()])
