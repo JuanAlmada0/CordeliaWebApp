@@ -24,11 +24,11 @@
                               </button>
                               {% if not customer.check_status() %}
                               <div class="text-arrow-container ml-2">
-                                <span class="text-left text-light typewriter-button" style="font-size: 13px;">{{ customer }}</span>
+                                <span class="text-left text-light" style="font-size: 13px; font-family: 'Courier New', Courier, monospace;">{{ customer }}</span>
                               </div>
                               {% else %}
                               <div class="text-arrow-container ml-2">
-                                <span class="neon-text clean-two typewriter-button" style="font-size: 13px;">{{ customer }}</span>
+                                <span class="neon-text clean-purple" style="font-size: 13px; font-family: 'Courier New', Courier, monospace;">{{ customer }}</span>
                               </div>
                               {% endif %}
                             </div>
@@ -39,14 +39,14 @@
                             <div class="col-md-3">
                               <div class="d-flex justify-content-start">
                                 <div class="text-arrow-container">
-                                  <span class="text-left text-light typewriter-button" style="font-size: 12px;">{{ customer.email }}</span>
+                                  <span class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ customer.email }}</span>
                                 </div>
                               </div>
                             </div>
                             <div class="col-md-3">
                               <div class="d-flex justify-content-start">
                                 <div class="text-arrow-container">
-                                  <span class="text-left text-light typewriter-button" style="font-size: 12px;">{{ customer.lastName }}, {{ customer.name }}</span>
+                                  <span class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ customer.lastName }}, {{ customer.name }}</span>
                                 </div>
                               </div>
                             </div>
@@ -54,14 +54,14 @@
                             <div class="col-md-3">
                               <div class="d-flex justify-content-start">
                                 <div class="text-arrow-container">
-                                  <span class="neon-text green typewriter-button" style="font-size: 12.5px;">{{ customer.email }}</span>
+                                  <span class="neon-text clean-white" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ customer.email }}</span>
                                 </div>
                               </div>
                             </div>
                             <div class="col-md-3">
                               <div class="d-flex justify-content-start">
                                 <div class="text-arrow-container">
-                                  <span class="neon-text green typewriter-button" style="font-size: 12.5px;">{{ customer.lastName }}, {{ customer.name }}</span>                              </div>
+                                  <span class="neon-text clean-white" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ customer.lastName }}, {{ customer.name }}</span>                              </div>
                               </div>
                             </div>
                           {% endif %}       
@@ -69,9 +69,9 @@
                           <!-- Third column -->
                           <div class="col-md-1 d-flex justify-content-end">
                             {% if not customer.check_status() %}
-                              <span class="neon-text sand typewriter-button" style="font-size: 12px;">inactive</span>
+                              <span class="neon-text sand typewriter" style="font-size: 12px;">inactive</span>
                             {% else %}
-                              <span class="neon-text clean-two typewriter-button" style="font-size: 12px;">active</span>
+                              <span class="neon-text clean-two typewriter" style="font-size: 12px;">active</span>
                             {% endif %}
                           </div>
 
@@ -156,8 +156,8 @@
                                     {% for log in customer.get_rent_log() %}
                                     <tr>
                                         <td>{{ log.date }}</td>
-                                        <td>R-0{{ log.id }}, {{ log.total }}</td>
-                                        <td>{{ log.dress_info['id'] }}, {{ log.dress_info['brand'] }}, {{ log.dress_info['style'] }}</td>
+                                        <td>{{ log.id }} | {{ log.total }}</td>
+                                        <td>{{ log.dress_info['id'] }} | {{ log.dress_info['brand'] }} | {{ log.dress_info['style'] }} | S:{{ log.dress_info['size'] }}</td>
                                     </tr>
                                     {% endfor %}
                                   </tbody>

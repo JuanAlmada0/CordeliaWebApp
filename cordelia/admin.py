@@ -27,6 +27,15 @@ def admin_required(f):
     return decorated_function
 
 
+@adminBp.route('/download/excel')
+@login_required
+def downloadExcel():
+
+    from cordelia.excel import excel_download
+
+    return excel_download()
+
+
 # SearchForm handler
 def handle_search_form(query, model_columns, model_class):
     form = SearchForm(model_columns=model_columns)
@@ -456,21 +465,3 @@ def delete_object(dataBase, id):
             return redirect(url_for('admin.customerInventory'))
         else:
             flash("Can't delete this customer.", 'danger')
-
-
-@adminBp.route('/download/excel')
-@login_required
-def downloadExcel():
-
-    from cordelia.excel import excel_download
-
-    return excel_download()
-
-
-@adminBp.route('/upload/excel')
-@login_required
-def uploadExcel():
-
-    from cordelia.excel import excel_upload
-
-    return excel_upload()

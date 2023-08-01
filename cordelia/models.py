@@ -55,6 +55,13 @@ class Dress(db.Model):
             # Convert the 'latest_maintenance_str' into a date object
             parsed_date = datetime.strptime(latest_maintenance_str, "%Y-%m-%d").date()
             return parsed_date
+    
+    def get_rent_log(self):
+        log = []
+        if self.rentLog:
+            log = json.loads(self.rentLog)
+            log.sort(key=lambda x: x['date'], reverse=True)
+            return log
 
     def get_last_rent(self):
         if self.rents:
@@ -73,7 +80,16 @@ class Dress(db.Model):
 
             return latest_rent.customer
         else:
-            return None    
+            return None
+
+    def check_status(self):
+        if self.rents:
+            sorted_rents = sorted(self.rents, key=lambda rent: rent.rentDate, reverse=True)
+            latest_rent = sorted_rents[0]
+
+            return not latest_rent.is_returned()
+        else:
+            return False    
 
     def update_times_rented(self):
         if self.rents:
@@ -100,23 +116,18 @@ class Dress(db.Model):
         for rent in self.rents:
             if rent.customer:
                 customer_info = {
+                    "id": f"D-{rent.customer.id:02}",
                     "last_name": rent.customer.lastName,
                     "name": rent.customer.name
                 }
                 rent_log_entry = {
                     "date": rent.rentDate.strftime('%Y-%m-%d'),
-                    "id": rent.id,
+                    "id": f"R-{rent.id:02}",
                     "customer_info": customer_info
                 }
                 rent_log.append(rent_log_entry)
 
         self.rentLog = json.dumps(rent_log)
-    
-    def get_rent_log(self):
-        log = []
-        if self.rentLog:
-            log = json.loads(self.rentLog)
-            return log
 
     @classmethod
     def update_rent_statuses(cls):
@@ -128,7 +139,7 @@ class Dress(db.Model):
             dress.update_rent_log()      
     
     def __repr__(self):
-        return f"Dress D-0{self.id}"
+        return f"Dress D-{self.id:02}"
     
 
 class Customer(db.Model):
@@ -169,13 +180,14 @@ class Customer(db.Model):
         for rent in self.rents:
             if rent.dress:
                 dress_info = {
-                    "id": f"D-0{rent.dress.id}",
+                    "id": f"D-{rent.dress.id:02}",
                     "brand": rent.dress.brand,
-                    "style": rent.dress.style
+                    "style": rent.dress.style,
+                    "size": rent.dress.size
                 }
                 rent_log_entry = {
                     "date": rent.rentDate.strftime('%Y-%m-%d'),
-                    "id": rent.id,
+                    "id": f"R-{rent.id:02}",
                     "total": f"Total: ${rent.paymentTotal}",
                     "dress_info": dress_info
                 }
@@ -187,6 +199,7 @@ class Customer(db.Model):
         log = []
         if self.rentLog:
             log = json.loads(self.rentLog)
+            log.sort(key=lambda x: x['date'], reverse=True)
             return log
         
     @classmethod
@@ -197,7 +210,7 @@ class Customer(db.Model):
             customer.update_rent_log()
 
     def __repr__(self):
-        return f"Customer C-0{self.id}"
+        return f"Customer C-{self.id:02}"
 
 
 class Rent(db.Model):
@@ -212,7 +225,7 @@ class Rent(db.Model):
     paymentTotal = db.Column(db.Integer, index=True)
     rentLog = db.Column(db.JSON, default=[])
 
-    # Many Dress and Many customer to One Rent relationship connected for Rent through dressId and clientId
+    # Many Dress to Many Customer relationship associated through dressId and clientId.
 
     dress = db.relationship('Dress', backref='rents')     # One Dress to Many Rents relationship for Dress
     customer = db.relationship('Customer', backref='rents')     # One User to Many Rents relationship for Customer
@@ -249,7 +262,7 @@ class Rent(db.Model):
             return log
     
     def __repr__(self):
-        return f"Rent R-0{self.id}"
+        return f"Rent R-{self.id:02}"
     
 
 class User(UserMixin, db.Model):
@@ -272,6 +285,6 @@ class User(UserMixin, db.Model):
     
     def __repr__(self):
         if self.isAdmin:
-            return f"ADMIN-0{self.id}"
+            return f"ADMIN-{self.id:02}"
         else:
-            return f"USER-0{self.id}"
+            return f"USER-{self.id:02}"

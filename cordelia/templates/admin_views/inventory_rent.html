@@ -24,14 +24,14 @@
                               </button>
                               {% if rent.is_returned() %}
                               <div class="text-arrow-container">
-                                <span class="text-left text-light typewriter-button" style="font-size: 13px;">
-                                  {{ rent.rentDate.strftime('%d - %B - %Y') }}
+                                <span class="text-left text-light" style="font-size: 13px; font-family: 'Courier New', Courier, monospace;">
+                                  {{ rent.rentDate.strftime('%d | %b | %Y') }}
                                 </span>
                               </div>
                               {% else %}
                               <div class="text-arrow-container">
-                                <span class="neon-text green typewriter-button" style="font-size: 13px;">
-                                  {{ rent.rentDate.strftime('%d - %B - %Y') }}
+                                <span class="neon-text clean-white" style="font-size: 13px; font-family: 'Courier New', Courier, monospace;">
+                                  {{ rent.rentDate.strftime('%d | %b | %Y') }}
                                 </span>
                               </div>
                               {% endif %}
@@ -42,40 +42,40 @@
                           {% if rent.is_returned() %}
                             <div class="col-md-2">
                               <div class="d-flex justify-content-start">
-                                <span class="text-left text-light typewriter-button" style="font-size: 12px;">{{ rent }}</span>
+                                <span class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ rent }}</span>
                               </div>
                             </div>
                             <div class="col-md-2">
                               <div class="d-flex justify-content-start">
                                 <div class="text-arrow-container">
-                                  <span class="text-left text-light typewriter-button" style="font-size: 12px;">{{ rent.dress }}</span>
+                                  <span class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ rent.dress }}</span>
                                 </div>
                               </div>
                             </div>
                             <div class="col-md-3">
                               <div class="d-flex justify-content-start">
                                 <div class="text-arrow-container">
-                                  <span class="text-left text-light typewriter-button" style="font-size: 12px;">{{ rent.customer.lastName }} {{ rent.customer.name }}</span>
+                                  <span class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ rent.customer.lastName }} {{ rent.customer.name }}</span>
                                 </div>
                               </div>
                             </div>
                           {% else %}
                             <div class="col-md-2">
                               <div class="d-flex justify-content-start">
-                                <span class="neon-text clean-two typewriter-button" style="font-size: 12.5px;">{{ rent }}</span>
+                                <span class="neon-text clean-two" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ rent }}</span>
                               </div>
                             </div>
                             <div class="col-md-2">
                               <div class="d-flex justify-content-start">
                                 <div class="text-arrow-container">
-                                  <span class="neon-text green typewriter-button" style="font-size: 12.5px;">{{ rent.dress }}</span>
+                                  <span class="neon-text clean-white" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ rent.dress }}</span>
                                 </div>
                               </div>
                             </div>
                             <div class="col-md-3">
                               <div class="d-flex justify-content-start">
                                 <div class="text-arrow-container">
-                                  <span class="neon-text green typewriter-button" style="font-size: 12.5px;">{{ rent.customer.lastName }} {{ rent.customer.name }}</span>                              </div>
+                                  <span class="neon-text clean-purple" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ rent.customer.lastName }} {{ rent.customer.name }}</span>                              </div>
                               </div>
                             </div>
                           {% endif %}                        
@@ -83,9 +83,9 @@
                           <!-- Third column, sellable badge -->
                           <div class="col-md-1 d-flex justify-content-center">
                             {% if rent.is_returned() %}
-                              <span class="neon-text sand typewriter-button" style="font-size: 12px;">inactive</span>
+                              <span class="neon-text sand typewriter" style="font-size: 12px;">inactive</span>
                             {% else %}
-                              <span class="neon-text clean-two typewriter-button" style="font-size: 12px;">active</span>
+                              <span class="neon-text clean-two typewriter" style="font-size: 12px;">active</span>
                             {% endif %}
                           </div>
                         
@@ -133,7 +133,7 @@
                                   <thead style="font-size: 13px;">
                                     <tr>
                                       <th scope="row">{{ rent }}</th>
-                                      <td></td>
+                                      <th></th>
                                     </tr>
                                   </thead>
                                   <tbody>
@@ -150,12 +150,6 @@
                                       <td>{{ rent.paymentTotal }}</td>
                                     </tr>
                                   </tbody>
-                                  <tfoot class="custom-footer">
-                                    <tr>
-                                      <td colspan="2">
-                                      </td>
-                                    </tr>
-                                  </tfoot>
                                 </table>
                               </div>
                               <!-- Maintenance log column -->
@@ -171,7 +165,7 @@
                                     {% for log in rent.get_rent_log() %}
                                     <tr>
                                       <td>
-                                        D-0{{ log.dress_data['id'] }} |
+                                        {{ "D-{:02d} |".format(log.dress_data['id']) }}
                                         {{ log.dress_data['brand'] }} |
                                         {{ log.dress_data['style'] }} |
                                         Size: {{ log.dress_data['size'] }} |
@@ -194,7 +188,7 @@
                                     {% for log in rent.get_rent_log() %}
                                     <tr>
                                       <td>
-                                      C-0{{ log.customer_data['id'] }} |
+                                      {{ "C-{:02d} |".format(log.customer_data['id']) }}
                                       {{ log.customer_data['last_name'] }}
                                       {{ log.customer_data['name'] }}
                                       </td>
