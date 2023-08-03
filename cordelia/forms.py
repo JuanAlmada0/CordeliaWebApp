@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import (
     StringField, PasswordField, SubmitField, BooleanField, IntegerField, 
-    SelectField, DateField, HiddenField, FileField
+    SelectField, DateField, HiddenField, FileField, FieldList, FormField
     )
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Optional
 from flask_wtf.file import FileAllowed
@@ -18,6 +18,7 @@ class RegistrationForm(FlaskForm):
     name = StringField('First name', validators=[DataRequired()])
     lastName = StringField('Last name', validators=[DataRequired()])
     phoneNumber = StringField('Phone Number', validators=[DataRequired()])
+    next = HiddenField()
     submit = SubmitField('Register')
 
     def validate_phoneNumber(self, field):
@@ -64,12 +65,15 @@ class SearchForm(FlaskForm):
         self.category.choices = [('Select', 'Select')] + [(column, column) for column in model_columns]
 
 
+class DressIdForm(FlaskForm):
+    dress_id = IntegerField('Dress ID', validators=[Optional()])
+
 class MaintenanceForm(FlaskForm):
-    dress_id = HiddenField('Dress ID', validators=[DataRequired()])
-    maintenanceDate = DateField('Maintenance Date')
-    maintenanceType = SelectField('Category', choices=[('None', None),('Dry-Cleaning','Dry-Cleaning'), ('Tailor', 'Tailor')])
+    dress_ids = FieldList(FormField(DressIdForm), min_entries=1)
+    maintenanceDate = DateField('Date')
+    maintenanceType = SelectField('Type', choices=[('None', None), ('Dry-Cleaning', 'Dry-Cleaning'), ('Tailor', 'Tailor')])
     maintenanceCost = IntegerField('Cost')
-    submit = SubmitField('Maintenance')
+    submit = SubmitField('Submit')
 
 
 class DeleteForm(FlaskForm):
@@ -79,7 +83,7 @@ class DeleteForm(FlaskForm):
 
 class DressForm(FlaskForm):
     brand = StringField('Brand', validators=[DataRequired()])
-    size = StringField('Size', validators=[DataRequired()])
+    size = IntegerField('Size', validators=[DataRequired()])
     color = StringField('Color', validators=[DataRequired()])
     style = StringField('Style', validators=[DataRequired()])
     cost = IntegerField('Dress Cost', validators=[DataRequired()])

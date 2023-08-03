@@ -1,13 +1,7 @@
 {% extends "admin_views/dashboard.html" %}
 
 
-
-  {% block inventory_table_head %}
-
-          {% endblock %}
-
-
-          {% block inventory_table_body %}
+  {% block inventory_table_body %}
 
           <tbody>
           {% for dress in inventory.items %}
@@ -19,7 +13,7 @@
                       <h6 class="mb-0">
                         <div class="row align-items-center">
                           <!-- First column, left part of the card -->
-                          <div class="col-md-3">
+                          <div class="col-md-2">
                             <div class="d-flex justify-content-start">
                               <button class="btn btn-sm" type="button" data-toggle="collapse" data-target="#collapse{{ loop.index }}" aria-expanded="true" aria-controls="collapse{{ loop.index }}">
                                 <span class="arrow-down"></span>
@@ -28,7 +22,7 @@
                               <div class="text-arrow-container ml-2">
                                 <span class="neon-text clean-two" style="font-size: 13px; font-family: 'Courier New', Courier, monospace;">{{ dress }}</span>
                               </div>
-                              {% elif dress.maintenanceStatus %}
+                              {% elif dress.check_maintenance_status() %}
                               <div class="text-arrow-container ml-2">
                                 <span class="neon-text clean-blue" style="font-size: 13px; font-family: 'Courier New', Courier, monospace;">{{ dress }}</span>
                               </div>
@@ -45,27 +39,60 @@
                             <div class="col-md-2">
                               <div class="d-flex justify-content-start">
                                 <div class="text-arrow-container">
-                                  <span class="neon-text clean-white" style="font-size: 13px; font-family: 'Courier New', Courier, monospace;">Brand  |  {{ dress.brand }}</span>
+                                  <span class="text-left text-light" style="font-size: 13px; font-family: 'Courier New', Courier, monospace;">{{ dress.brand }}</span>
                                 </div>
                               </div>
                             </div>
-                            <div class="col-md-3">
-                            
+                            <div class="col-md-2">
+                              <div class="d-flex justify-content-between">
+                                <div class="text-arrow-container">
+                                  <span class="text-left text-light" style="font-size: 13px; font-family: 'Courier New', Courier, monospace;">{{ dress.style }}</span>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-md-2">
                             <div class="d-flex justify-content-start">
                               <div class="text-arrow-container">
                                 <span class="neon-text clean-purple" style="font-size: 13px; font-family: 'Courier New', Courier, monospace;">{{ dress.get_last_customer().lastName }}, {{ dress.get_last_customer().name }}</span>
+                              </div>
+                            </div>
+                            {% elif dress.check_maintenance_status() %}
+                            <div class="col-md-2">
+                              <div class="d-flex justify-content-start">
+                                <div class="text-arrow-container">
+                                  <span class="text-left text-light" style="font-size: 13px; font-family: 'Courier New', Courier, monospace;">{{ dress.brand }}</span>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-md-2">
+                              <div class="d-flex justify-content-between">
+                                <div class="text-arrow-container">
+                                  <span class="text-left text-light" style="font-size: 13px; font-family: 'Courier New', Courier, monospace;">{{ dress.style }}</span>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-md-2">
+                            <div class="d-flex justify-content-start">
+                              <div class="text-arrow-container">
+                                <span class="neon-text clean-blue" style="font-size: 13px; font-family: 'Courier New', Courier, monospace;">{{ dress.get_last_maintenance().maintenance_type }}</span>
                               </div>
                             </div>
                             {% else %}
                             <div class="col-md-2">
                               <div class="d-flex justify-content-start">
                                 <div class="text-arrow-container">
-                                  <span class="text-light" style="font-size: 13px; font-family: 'Courier New', Courier, monospace;">Brand  |  {{ dress.brand }}</span>
+                                  <span class="text-left text-light" style="font-size: 13px; font-family: 'Courier New', Courier, monospace;">{{ dress.brand }}</span>
                                 </div>
                               </div>
                             </div>
-                            <div class="col-md-3">
-
+                            <div class="col-md-2">
+                              <div class="d-flex justify-content-between">
+                                <div class="text-arrow-container">
+                                  <span class="text-left text-light" style="font-size: 13px; font-family: 'Courier New', Courier, monospace;">{{ dress.style }}</span>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-md-2">
                             <div class="d-flex justify-content-start">
                               <div class="text-arrow-container">
                                 <span class="text-light" style="font-size: 13px;"></span>
@@ -77,99 +104,40 @@
                           <!-- Third column, sellable badge -->
                           <div class="col-md-1 d-flex justify-content-center">
                             {% if dress.sellable %}
-                              <span class="neon-text clean-pink typewriter" style="font-size: 12px;">sellable</span>
+                              <span class="neon-text sand typewriter" style="font-size: 12px;">sellable</span>
                             {% else %}
                               <span class="text text-dark" style="font-size: 12px;"></span>
                             {% endif %}
                           </div>
                           
                           <!-- Fourth column, middle part of the card -->
+                          
                           <div class="col-md-1 d-flex justify-content-center">
-                            {% if dress.maintenanceStatus %}
-                            <!-- Button to update maintenance status -->
-                            <form action="{{ url_for('admin.update_maintenance_status', dress_id=dress.id) }}" method="post" class="form-inline" onsubmit="return confirmAction('Are you sure you want to change status? This action cannot be undone.');">
-                                {{ form.hidden_tag() }}
-                                <button type="submit" class="neon-text clean-blue typewriter py-2" style="background: none; border: none; padding: 0; font-size: 14px;">
-                                    @
-                                </button>
-                            </form>
-
+                            {% if dress.check_maintenance_status() %}
+                              <button type="submit" class="neon-text clean-blue typewriter py-2" style="background: none; border: none; padding: 0; font-size: 14px;" disabled>
+                                @
+                              </button>
                             {% elif dress.check_status() %}
-                              <div type="button" disabled>
                                 <span class="text-dark ml-auto typewriter" style="font-size: 11px;"></span>
-                              </div>
-
                             {% elif dress.rents %}
-                              {% if not dress.maintenanceLog %}
-                                <!-- Button to trigger the maintenance form modal -->
-                                <div type="button" data-toggle="modal" data-target="#maintenanceModal{{ dress.id }}">
+                                {% if dress.get_last_rent() and dress.get_last_maintenance() and dress.get_last_rent().rentDate > dress.get_last_maintenance().date %}
                                   <span class="neon-text clean-pink ml-auto typewriter py-2" style="font-size: 11px;">check</span>
-                                </div>
-                              {% elif dress.get_last_rent().rentDate > dress.get_last_maintenance() %}
-                                <!-- Button to trigger the maintenance form modal -->
-                                <div type="button" data-toggle="modal" data-target="#maintenanceModal{{ dress.id }}">
+                                {% elif dress.get_last_maintenance() == None %} 
                                   <span class="neon-text clean-pink ml-auto typewriter py-2" style="font-size: 11px;">check</span>
-                                </div>
-                              {% else %}
-                                <!-- Button to trigger the maintenance form modal -->
-                                <div type="button" data-toggle="modal" data-target="#maintenanceModal{{ dress.id }}">
+                                {% else %}
                                   <span class="neon-text blue ml-auto typewriter py-2" style="font-size: 11px;">clean</span>
-                                </div>
-                              {% endif %}
+                                {% endif %}
                             {% else %}
-                              <div type="button" disabled>
-                                <span class="text-dark ml-auto typewriter" style="font-size: 11px;"></span>
-                              </div>
+                              <span class="text-dark ml-auto typewriter" style="font-size: 11px;"></span>
                             {% endif %}
-                          </div> 
-
-                                
-                          <div class="modal fade" id="maintenanceModal{{ dress.id }}" tabindex="-1" role="dialog" aria-labelledby="maintenanceModalLabel{{ dress.id }}" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="maintenanceModalLabel{{ dress.id }}">Maintenance</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body">
-                                      <!-- Maintenance form -->
-                                      <form method="POST" action="{{ url_for('admin.update_maintenance', dress_id=dress.id) }}" class="form-inline">
-                                          {{ maintenance_form.hidden_tag() }}
-                                          {{ maintenance_form.dress_id(value=dress.id) }}
-                                  
-                                          <div class="form-group">
-                                              <label for="{{ maintenance_form.maintenanceDate.id }}">{{ maintenance_form.maintenanceDate.label }}</label>
-                                              {{ maintenance_form.maintenanceDate(class="form-control", autocomplete="off") }}
-                                          </div>
-                                  
-                                          <div class="form-group">
-                                              <label for="{{ maintenance_form.maintenanceType.id }}">{{ maintenance_form.maintenanceType.label }}</label>
-                                              {{ maintenance_form.maintenanceType(class="form-control", autocomplete="off") }}
-                                          </div>
-                                  
-                                          <div class="form-group">
-                                              <label for="{{ maintenance_form.maintenanceCost.id }}">{{ maintenance_form.maintenanceCost.label }}</label>
-                                              {{ maintenance_form.maintenanceCost(class="form-control", autocomplete="off", type="number") }}
-                                          </div>
-                                  
-                                          <div class="form-group">
-                                              <button type="submit" class="btn btn-primary btn-dark" value="Submit">Submit</button>
-                                          </div>
-                                      </form>
-                                  </div>
-                                  
-                                </div>
-                            </div>
                           </div>
-
+                        
                           <div class="col-md-1 d-flex justify-content-center">
-                            {% if not dress.rentStatus %}
-                              {% if not dress.maintenanceStatus %}
+                            {% if not dress.check_status() %}
+                              {% if not dress.check_maintenance_status() %}
                                 <span class="neon-text green typewriter" style="font-size: 12px;">stock</span>
                               {% else %}
-                                <span class="neon-text clean-blue typewriter" style="font-size: 12px;">@cleaner</span>
+                                <span class="neon-text clean-blue typewriter" style="font-size: 12px;">cleaning</span>
                               {% endif %}
                             {% else %}
                               <span class="neon-text clean-two typewriter" style="font-size: 12px;">rented</span>
@@ -178,7 +146,7 @@
                         
                           <!-- Fourth column, availability badge -->
                           <div class="col-md-1 d-flex justify-content-end">
-                            {% if not dress.rentStatus and not dress.maintenanceStatus %}
+                            {% if not dress.check_status() and not dress.check_maintenance_status() %}
                             <form method="POST" action="{{ url_for('admin.delete_object', dataBase='Dress', id=dress.id) }}" class="form-inline" onsubmit="return confirm('Are you sure you want to delete this dress? This action cannot be undone.');">
                               {{ delete_form.hidden_tag() }}
                               <input type="hidden" name="dataBase" value="Dress">
@@ -253,14 +221,14 @@
                               <div class="col-5">
                                 <table class="table table-hover table-sm table-secondary" style="font-family: 'Courier New', Courier, monospace;">
                                   {% if dress.rentLog %}
-                                  <thead class="text-light" style="font-size: 12px;">
+                                  <thead class="text-left text-light" style="font-size: 12px;">
                                     <tr>
                                       <th>Log</th>
                                       <th>Rent</th>
                                       <th>Customer</th>
                                     </tr>
                                   </thead>
-                                  <tbody class="text-light" style="font-size: 11px;">
+                                  <tbody class="text-left text-light" style="font-size: 11px;">
                                     {% for log in dress.get_rent_log() %}
                                     <tr>
                                         <td>{{ log.date }}</td>
@@ -273,19 +241,19 @@
                                 </table>
                                 <table class="table table-hover table-sm table-secondary" style="font-family: 'Courier New', Courier, monospace;">
                                   {% if dress.maintenanceLog %}
-                                  <thead class="text-light" style="font-size: 12px;">
+                                  <thead class="text-left text-light" style="font-size: 12px;">
                                     <tr>
+                                      <th>Date</th>
                                       <th>Maintenance</th>
                                       <th>Type</th>
-                                      <th>Cost</th>
                                     </tr>
                                   </thead>
-                                  <tbody class="text-light" style="font-size: 11px;">
+                                  <tbody class="text-left text-light" style="font-size: 11px;">
                                     {% for log in dress.get_maintenance_log() %}
                                     <tr>
                                         <td>{{ log.date }}</td>
+                                        <td>{{ log.id }}</td>
                                         <td>{{ log.type }}</td>
-                                        <td>{{ log.cost }}</td>
                                     </tr>
                                     {% endfor %}
                                   </tbody>

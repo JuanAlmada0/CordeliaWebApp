@@ -37,7 +37,7 @@
               </td>
               {% if model == "Dress" %}
                 <td>
-                  <form id="update-rent-statuses-form" method="POST" action="{{ url_for('admin.update_rent_statuses_endpoint') }}" onsubmit="return confirmAction('Update Dress database?');">
+                  <form id="update-rent-statuses-form" method="POST" action="{{ url_for('admin.update_statuses_endpoint') }}" onsubmit="return confirmAction('Update Dress database?');">
                     {{ form.hidden_tag() }}
                     <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Refresh">
                       <i class="fas fa-sync-alt"></i> <!-- Font Awesome refresh icon -->
@@ -77,34 +77,53 @@
               {% endif %}            
             </tr>
             <tr>
-                <td>
-                  {% if current_user.is_authenticated %}
-                  <a href="{{ url_for('admin.customerInventory') }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Customer</a>
-                  <span class="badge badge-light">{{ inventory.total if model == 'Customer' }}</span>
-                  {% else %}
-                  <a href="{{ url_for('auth.login', next=url_for('admin.customerInventory')) }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Customer</a>
-                  <span class="badge badge-light">{{ inventory.total if model == 'Customer' }}</span>
-                  {% endif %}
-                </td>
+              <td>
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('admin.customerInventory') }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Customer</a>
+                <span class="badge badge-light">{{ inventory.total if model == 'Customer' }}</span>
+                {% else %}
+                <a href="{{ url_for('auth.login', next=url_for('admin.customerInventory')) }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Customer</a>
+                <span class="badge badge-light">{{ inventory.total if model == 'Customer' }}</span>
+                {% endif %}
+              </td>
               {% if model == "Customer" %}
-                <td>
-                  <form id="update-rent-logs-form" method="POST" action="{{ url_for('admin.update_rent_logs_endpoint') }}" onsubmit="return confirmAction('Update Customer database?');">
-                    {{ form.hidden_tag() }}
-                    <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Refresh">
-                      <i class="fas fa-sync-alt"></i> <!-- Font Awesome refresh icon -->
-                    </button>
-                  </form>
-                </td>
-                <td>
-                  <a href="{{ url_for('admin.update', title='Add Customer', form_type='customer') }}" class="btn btn-outline-light btn-smaller mr-2 btn-dark">
-                    <i class="fas fa-plus"></i> <!-- Font Awesome "plus" icon -->
-                  </a>
-                </td>
+              <td>
+                <form id="update-rent-logs-form" method="POST" action="{{ url_for('admin.update_customer_logs_endpoint') }}" onsubmit="return confirmAction('Update Customer database?');">
+                  {{ form.hidden_tag() }}
+                  <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Refresh">
+                    <i class="fas fa-sync-alt"></i> <!-- Font Awesome refresh icon -->
+                  </button>
+                </form>
+              </td>
+              <td>
+                <a href="{{ url_for('admin.update', title='Add Customer', form_type='customer') }}" class="btn btn-outline-light btn-smaller mr-2 btn-dark">
+                  <i class="fas fa-plus"></i> <!-- Font Awesome "plus" icon -->
+                </a>
+              </td>
+              {% else %}
+              <td></td>
+              <td></td>
+              {% endif %}           
+            </tr>
+            <tr>
+              <td>
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('admin.maintenance_inventory') }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Maintenance</a> 
+                <span class="badge badge-light">{{ inventory.total if model == 'Maintenance' }}</span>
+                {% else %}
+                <a href="{{ url_for('auth.login', next=url_for('admin.maintenance_inventory')) }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Maintenance</a> 
+                <span class="badge badge-light">{{ inventory.total if model == 'Maintenance' }}</span>
+                {% endif %}
+              </td>
+              {% if model == "Maintenance" %}
+                <td></td>
+                <td></td>
               {% else %}
                 <td></td>
                 <td></td>
-              {% endif %}
+              {% endif %} 
             </tr>
+
             <table class="table table-secondary flex-1 p-1">
               <thead>
                 <tr>
@@ -190,22 +209,98 @@
                     text-decoration: none;
                   }
                 </style>
-
-                
-                  {% if model == 'Dress' %}
+           
+                {% if model == 'Dress' %}
                   <div class="mx-auto breadcrumb file-cabinet">
                     <a class="breadcrumb-item {% if order_by_column == 'default' %}active{% endif %}" href="{{ url_for('admin.inventory', order_by='default') }}">status</a>
                     <a class="breadcrumb-item {% if order_by_column == 'id' %}active{% endif %}" href="{{ url_for('admin.inventory', order_by='id') }}">added</a>
                     <a class="breadcrumb-item {% if order_by_column == 'times_rented' %}active{% endif %}" href="{{ url_for('admin.inventory', order_by='times_rented') }}">popular</a>
                     <a class="breadcrumb-item {% if order_by_column == 'dress_cost' %}active{% endif %}" href="{{ url_for('admin.inventory', order_by='dress_cost') }}">cost</a>
                   </div>
+
+                  <!-- Modal for Maintenance form -->
+                  <div class="modal fade" id="maintenanceModal" tabindex="-1" role="dialog" aria-labelledby="maintenanceModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="maintenanceModalLabel">Maintenance</h5>
+
+                                <button type="button" class="btn btn-dark btn-sm ml-auto" onclick="addDressId()">Add Dress</button>
+
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <!-- Maintenance form -->
+                                <form method="POST" action="{{ url_for('admin.add_maintenance') }}" class="form-inline">
+                                    {{ maintenance_form.hidden_tag() }}
+
+                                    <div id="dress_ids">
+                                        {% for dress_id_field in maintenance_form.dress_ids %}
+                                            <div class="form-group">
+                                                <label for="{{ dress_id_field.dress_id.id }}">{{ dress_id_field.dress_id.label }}</label>
+                                                {{ dress_id_field.dress_id(class="form-control") }}
+                                                <button type="button" class="btn btn-danger btn-sm" onclick="removeDressId(this)">Remove</button>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    
+                                    <div class="form-group ml-2">
+                                        <label for="{{ maintenance_form.maintenanceDate.id }}">{{ maintenance_form.maintenanceDate.label }}</label>
+                                        {{ maintenance_form.maintenanceDate(class="form-control", autocomplete="off") }}
+                                   
+                                        <label for="{{ maintenance_form.maintenanceType.id }}">{{ maintenance_form.maintenanceType.label }}</label>
+                                        {{ maintenance_form.maintenanceType(class="form-control", autocomplete="off") }}
+                                    </div>
+                                    
+                                    <div class="form-group ml-2">
+                                      <label for="{{ maintenance_form.maintenanceCost.id }}">{{ maintenance_form.maintenanceCost.label }}</label>
+                                      {{ maintenance_form.maintenanceCost(class="form-control", autocomplete="off", type="number") }}
+
+                                      <button type="submit" class="btn btn-primary btn-dark btn-sm" name="submit">Submit</button>
+                                    </div>
+                                  
+                                    <!-- Add this hidden input field in the form -->
+                                    <input type="hidden" id="dressCountInput" value="{{ maintenance_form.dress_ids|length + 1 }}">
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                  </div>
+                  
+                  <script>
+                    // Retrieve dressCount value from the hidden input field
+                    var dressCount = parseInt(document.getElementById('dressCountInput').value);
+                  
+                    function addDressId() {
+                        var newField = document.createElement("div");
+                        newField.innerHTML = '<div class="form-group"> <label for="dress_ids-' + dressCount + '-dress_id">Dress ID</label> <input class="form-control" id="dress_ids-' + dressCount + '-dress_id" name="dress_ids-' + dressCount + '-dress_id" type="number"> <button type="button" class="btn btn-danger btn-sm" onclick="removeDressId(this)">Remove</button> </div>';
+                        document.getElementById("dress_ids").appendChild(newField);
+                        dressCount++;
+                    }
+                  
+                    function removeDressId(button) {
+                        var parentDiv = button.parentElement;
+                        parentDiv.remove();
+                    }
+                  </script>
+
+                  <!-- Maintenance form modal button-->
+                  <div class="justify-content-between mr-2">
+                    <button type="button" class="btn btn-outline-light btn-sm btn-smaller btn-dark" data-toggle="modal" data-target="#maintenanceModal">
+                      <i class="fas fa-wrench"></i>
+                    </button>
+                  </div>
+
+
                   <form method="POST" action="{{ url_for('admin.inventory') }}" class="form-inline">
                     {{ form.hidden_tag() }}
                     <div class="form-group" style="padding-right: 2.5px;">
                       <style>
                         /* Target the specific field and set the fixed width */
                         #category-input {
-                          width: 11em; /* Set the desired width here, for example, 10em */
+                          width: 10em; /* Set the desired width here, for example, 10em */
                         }
                       </style>
                       {{ form.category(class="form-control form-control-sm custom-form-control mr-2", id="category-input", style="width: 10em;", style="background-color: #b8a495dc; color: #fff; font-family: 'Courier New', Courier, monospace") }}
@@ -213,7 +308,28 @@
                       <button type="submit" class="btn btn-outline-light btn-smaller btn-dark" style="font-family: 'Courier New', Courier, monospace">Filter</button>
                     </div>
                   </form>
-                  {% elif model == 'Rent' %}
+                {% elif model == 'Maintenance' %}
+                  <div class="mx-auto breadcrumb file-cabinet">
+                    <a class="breadcrumb-item {% if order_by_column == 'default' %}active{% endif %}" href="{{ url_for('admin.maintenance_inventory', order_by='default') }}">status</a>
+                    <a class="breadcrumb-item {% if order_by_column == 'id' %}active{% endif %}" href="{{ url_for('admin.maintenance_inventory', order_by='date') }}">date</a>
+                    <a class="breadcrumb-item {% if order_by_column == 'dress_id' %}active{% endif %}" href="{{ url_for('admin.maintenance_inventory', order_by='type') }}">type</a>
+                    <a class="breadcrumb-item {% if order_by_column == 'user_lastName' %}active{% endif %}" href="{{ url_for('admin.maintenance_inventory', order_by='cost') }}">cost</a>
+                  </div>
+                  <form method="POST" action="{{ url_for('admin.maintenance_inventory') }}" class="form-inline">
+                    {{ form.hidden_tag() }}
+                    <div class="form-group" style="padding-right: 2.5px;">
+                      <style>
+                        /* Target the specific field and set the fixed width */
+                        #category-input {
+                          width: 10em; /* Set the desired width here, for example, 10em */
+                        }
+                      </style>
+                      {{ form.category(class="form-control form-control-sm custom-form-control mr-2", id="category-input", style="width: 10em;", style="background-color: #b8a495dc; color: #fff; font-family: 'Courier New', Courier, monospace") }}
+                      {{ form.search(class="form-control form-control-sm custom-form-control mr-2", type="search", placeholder="Search", style="font-family: 'Courier New', Courier, monospace; width: 10em;") }}
+                      <button type="submit" class="btn btn-outline-light btn-smaller btn-dark" style="font-family: 'Courier New', Courier, monospace">Filter</button>
+                    </div>
+                  </form>
+                {% elif model == 'Rent' %}
                   <div class="mx-auto breadcrumb file-cabinet">
                     <a class="breadcrumb-item {% if order_by_column == 'default' %}active{% endif %}" href="{{ url_for('admin.rentInventory', order_by='default') }}">status</a>
                     <a class="breadcrumb-item {% if order_by_column == 'id' %}active{% endif %}" href="{{ url_for('admin.rentInventory', order_by='id') }}">rent id</a>
@@ -226,7 +342,7 @@
                       <style>
                         /* Target the specific field and set the fixed width */
                         #category-input {
-                          width: 11em; /* Set the desired width here, for example, 10em */
+                          width: 10em; /* Set the desired width here, for example, 10em */
                         }
                       </style>
                       {{ form.category(class="form-control form-control-sm custom-form-control mr-2", id="category-input", style="width: 10em;", style="background-color: #b8a495dc; color: #fff; font-family: 'Courier New', Courier, monospace") }}
@@ -234,7 +350,7 @@
                       <button type="submit" class="btn btn-outline-light btn-smaller btn-dark" style="font-family: 'Courier New', Courier, monospace">Filter</button>
                     </div>
                   </form>
-                  {% elif model == 'Customer' %}
+                {% elif model == 'Customer' %}
                   <div class="mx-auto breadcrumb file-cabinet">
                     <a class="breadcrumb-item {% if order_by_column == 'default' %}active{% endif %}" href="{{ url_for('admin.customerInventory', order_by='default') }}">status</a>
                     <a class="breadcrumb-item {% if order_by_column == 'date' %}active{% endif %}" href="{{ url_for('admin.customerInventory', order_by='date') }}">joined</a>
@@ -261,6 +377,8 @@
           </tr>
         </thead> 
 
+
   {% block inventory_table_body %}{% endblock %}
 
+  
 {% endblock %}

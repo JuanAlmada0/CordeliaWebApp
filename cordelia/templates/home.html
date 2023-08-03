@@ -24,16 +24,7 @@
             color: #DCC6B6; 
             text-shadow: 0 0 2px #B07D47;
         }
-        @font-face {
-            font-family: 'Typewriter';
-            src: url(data:application/x-font-ttf;charset=utf-8;base64) format('truetype');
-        }
-        .typewriter-button {
-              font-family: 'Typewriter', monospace;
-              cursor: pointer;
-        }
-    </style>
-
+    </style>    
     <div class="d-flex justify-content-center">
         <div class="jumbotron custom-container" style="width: 80rem; background-color: #b8a495dc;">
             <h1 class="display-2 neon-text-2 sand" style="font-family: 'Courier New', Courier, monospace;">V.0.0.1</h1>
@@ -46,8 +37,8 @@
             <a class="btn btn-primary btn-lg btn-dark " href="{{ url_for('auth.login', next=url_for('admin.inventory')) }}" role="button">Start</a>
             {% endif %}
         </div>
-    </div>
-
+    </div>  
+    
     <div class="d-flex justify-content-center">
         <div class="card text-white" style="width: 80rem;">
             <img src="{{ url_for('static', filename='images/cordelia-logo-wallpaper.png') }}" class="card-img" style="object-fit: cover; width: 100%; height: 100%;" alt="...">
@@ -58,19 +49,4 @@
         </div>
     </div> 
 
-    <br>
-
-    <div class="d-flex justify-content-center card mb-3">
-        <img class="card-img-top" src="{{ url_for('static', filename='images/homeImageExample.webp') }}" alt="Card image cap">
-        <div class="card-body" style="width: 79rem; background-color: #b8a495dc;">
-          <h5 class="card-title">Card title</h5>
-          <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-          <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-        </div>
-    </div>
-    
-</div>
-
-</br>
-      
 {% endblock %}

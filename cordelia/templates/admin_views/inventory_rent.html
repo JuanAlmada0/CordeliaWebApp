@@ -1,10 +1,5 @@
 {% extends "admin_views/dashboard.html" %}
 
-  {% block inventory_table_head %}
-  
-          {% endblock %}
-
-
   {% block inventory_table_body %}
           
           <tbody>
@@ -17,22 +12,22 @@
                       <h6 class="mb-0">
                         <div class="row align-items-center">
                           <!-- First column, left part of the card -->
-                          <div class="col-md-3">
+                          <div class="col-md-2">
                             <div class="d-flex justify-content-start">
                               <button class="btn btn-sm" type="button" data-toggle="collapse" data-target="#collapse{{ loop.index }}" aria-expanded="true" aria-controls="collapse{{ loop.index }}">
                                 <span class="arrow-down"></span>
                               </button>
                               {% if rent.is_returned() %}
-                              <div class="text-arrow-container">
-                                <span class="text-left text-light" style="font-size: 13px; font-family: 'Courier New', Courier, monospace;">
-                                  {{ rent.rentDate.strftime('%d | %b | %Y') }}
-                                </span>
+                              <div class="text-arrow-container ml-2">
+                                <div class="d-flex justify-content-start">
+                                  <span class="text-left text-light" style="font-size: 13px; font-family: 'Courier New', Courier, monospace;">{{ rent }}</span>
+                                </div>
                               </div>
                               {% else %}
-                              <div class="text-arrow-container">
-                                <span class="neon-text clean-white" style="font-size: 13px; font-family: 'Courier New', Courier, monospace;">
-                                  {{ rent.rentDate.strftime('%d | %b | %Y') }}
-                                </span>
+                              <div class="text-arrow-container ml-2">
+                                <div class="d-flex justify-content-start">
+                                  <span class="neon-text clean-two" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ rent }}</span>
+                                </div>
                               </div>
                               {% endif %}
                             </div>
@@ -40,11 +35,15 @@
                           
                           <!-- Second column, middle part of the card -->
                           {% if rent.is_returned() %}
-                            <div class="col-md-2">
-                              <div class="d-flex justify-content-start">
-                                <span class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ rent }}</span>
+                          <div class="col-md-3">
+                            <div class="d-flex justify-content-start">
+                              <div class="text-arrow-container">
+                                <span class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">
+                                  {{ rent.rentDate.strftime('%d | %b | %y') }}
+                                </span>
                               </div>
                             </div>
+                          </div>
                             <div class="col-md-2">
                               <div class="d-flex justify-content-start">
                                 <div class="text-arrow-container">
@@ -55,27 +54,31 @@
                             <div class="col-md-3">
                               <div class="d-flex justify-content-start">
                                 <div class="text-arrow-container">
-                                  <span class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ rent.customer.lastName }} {{ rent.customer.name }}</span>
+                                  <span class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ rent.customer.lastName }}, {{ rent.customer.name }}</span>
                                 </div>
                               </div>
                             </div>
                           {% else %}
-                            <div class="col-md-2">
+                            <div class="col-md-3">
                               <div class="d-flex justify-content-start">
-                                <span class="neon-text clean-two" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ rent }}</span>
+                                <div class="text-arrow-container">
+                                  <span class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">
+                                    {{ rent.rentDate.strftime('%d | %b | %y') }}
+                                  </span>
+                                </div>
                               </div>
                             </div>
                             <div class="col-md-2">
                               <div class="d-flex justify-content-start">
                                 <div class="text-arrow-container">
-                                  <span class="neon-text clean-white" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ rent.dress }}</span>
+                                  <span class="neon-text green" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ rent.dress }}</span>
                                 </div>
                               </div>
                             </div>
                             <div class="col-md-3">
                               <div class="d-flex justify-content-start">
                                 <div class="text-arrow-container">
-                                  <span class="neon-text clean-purple" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ rent.customer.lastName }} {{ rent.customer.name }}</span>                              </div>
+                                  <span class="neon-text clean-purple" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ rent.customer.lastName }}, {{ rent.customer.name }}</span>                              </div>
                               </div>
                             </div>
                           {% endif %}                        
@@ -94,7 +97,7 @@
                             {% if rent.is_returned() %}
                             <form method="POST" action="{{ url_for('admin.delete_object', dataBase='Rent', id=rent.id) }}" class="form-inline" onsubmit="return confirm('Are you sure you want to delete this rent? This action cannot be undone.');">
                               {{ delete_form.hidden_tag() }}
-                              <input type="hidden" name="dataBase" value="Dress">
+                              <input type="hidden" name="dataBase" value="Rent">
                               <input type="hidden" name="id" value="{{ rent.id }}">
                               <!-- Use the Bootstrap close button here -->
                               <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Close">

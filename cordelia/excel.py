@@ -3,7 +3,7 @@ import pandas as pd
 import json
 import os
 from datetime import datetime
-from cordelia.models import Dress, Rent, Customer
+from cordelia.models import Dress, Rent, Customer, Maintenance
 from cordelia.db import db
 
 
@@ -13,11 +13,12 @@ def excel_download():
     dresses = Dress.query.all()
     customers = Customer.query.all()
     rents = Rent.query.all()
+    maintenances = Maintenance.query.all()
 
     if dresses:
         
         dress_data = {
-            'Dress Id': [dress.id for dress in dresses],
+            'Id': [dress.id for dress in dresses],
             'Size': [dress.size for dress in dresses],
             'Color': [dress.color for dress in dresses],
             'Style': [dress.style for dress in dresses],
@@ -40,7 +41,7 @@ def excel_download():
     if customers:
 
         customer_data = {
-            'Customer Id': [customer.id if customer.id else None for customer in customers],
+            'Id': [customer.id if customer.id else None for customer in customers],
             'Email': [customer.email for customer in customers],
             'Name': [customer.name for customer in customers],
             'Last Name': [customer.lastName for customer in customers],
@@ -54,7 +55,7 @@ def excel_download():
     if rents:
 
         rent_data = {
-            'Rent Id': [rent.id for rent in rents],
+            'Id': [rent.id for rent in rents],
             'Dress Id': [rent.dressId for rent in rents],
             'Customer Id': [rent.clientId for rent in rents],
             'Rent Date': [rent.rentDate.strftime('%Y-%m-%d') for rent in rents],
@@ -64,6 +65,20 @@ def excel_download():
         }
 
         df_rent = pd.DataFrame(rent_data)
+
+    if maintenances:
+
+        maintenance_data = {
+            'Id': [maintenance.id for maintenance in maintenances],
+            'Type': [maintenance.maintenance_type for maintenance in maintenances],
+            'Date': [maintenance.date.strftime('%Y-%m-%d') for maintenance in maintenances],
+            'Return Date': [maintenance.returnDate.strftime('%Y-%m-%d') if maintenance.returnDate else '' for maintenance in maintenances],
+            'Total Cost': [maintenance.cost for maintenance in maintenances],
+            'Dresses': [maintenance.dresses for maintenance in maintenances],
+        }
+
+        df_maintenance = pd.DataFrame(maintenance_data)
+
     
     instance_path = os.path.join(current_app.instance_path, 'uploads')
     os.makedirs(instance_path, exist_ok=True)
@@ -73,6 +88,7 @@ def excel_download():
     file_name = f'database_data_{current_datetime}.xlsx'
 
     file_path = os.path.join(current_app.instance_path, 'uploads', file_name)
+    
 
     with pd.ExcelWriter(file_path, engine='xlsxwriter') as excel_writer:
         if dresses:
@@ -81,6 +97,8 @@ def excel_download():
             df_customer.to_excel(excel_writer, sheet_name='Customers', index=False)
         if rents:
             df_rent.to_excel(excel_writer, sheet_name='Rents', index=False)
+        if maintenances:
+            df_maintenance.to_excel(excel_writer, sheet_name='Maintenances', index=False)
 
     # Return the file as an attachment
     return send_file(
