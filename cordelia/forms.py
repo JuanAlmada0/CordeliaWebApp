@@ -107,7 +107,6 @@ class CustomerForm(FlaskForm):
             if not phonenumbers.is_valid_number(parsed_number):
                 raise ValidationError('Invalid phone number')
 
-            # Store the parsed phone number in the form field
             field.data = phonenumbers.format_number(parsed_number, phonenumbers.PhoneNumberFormat.E164)
 
         except NumberParseException:

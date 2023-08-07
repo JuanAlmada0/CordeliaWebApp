@@ -3,7 +3,7 @@ from flask_login import current_user
 from sqlalchemy import case, desc, func
 from cordelia.auth import login_required
 from cordelia.db import db
-from cordelia.models import Dress, Customer, Rent, Maintenance
+from cordelia.models import Dress, Customer, Rent, Maintenance, maintenance_association
 from cordelia.forms import SearchForm, DressForm, RentForm, CustomerForm, MaintenanceForm, DeleteForm
 from functools import wraps
 from base64 import b64encode
@@ -59,7 +59,7 @@ def handle_search_form(query, model_columns, model_class):
 @login_required
 def inventory():
     model = 'Dress'
-    # Get the list of model columns for the Dress table
+    
     model_columns = Dress.__table__.columns.keys()
 
     # Pagination settings
@@ -69,7 +69,7 @@ def inventory():
     # Get the selected column for ordering from the query parameters
     order_by_column = request.args.get('order_by', default='default')
 
-    # Get the initial inventory query
+    # Initial inventory query
     inventory_query = Dress.query
 
     # Apply sorting based on the selected column
@@ -81,12 +81,19 @@ def inventory():
         inventory_query = inventory_query.order_by(Dress.cost.desc())
     else:
         # If 'default', sort by rentStatus and maintenanceStatus in descending order.
-        # Lastly by their last rent's rentDate if there is one.
+        # Lastly by their last rent's rentDate and maintenance date if there is one.
 
-        # Subquery to get the last rent date for each dress
+        # Subquery to get the last rent date and the last maintenance date for each dress
         subquery = db.session.query(
             Rent.dressId,
-            func.max(Rent.rentDate).label('last_rent_date')
+            func.max(Rent.rentDate).label('last_rent_date'),
+            func.max(Maintenance.date).label('last_maintenance_date')
+        ).outerjoin(
+            maintenance_association,
+            Rent.dressId == maintenance_association.c.dress_id
+        ).outerjoin(
+            Maintenance,
+            maintenance_association.c.maintenance_id == Maintenance.id
         ).group_by(Rent.dressId).subquery()
 
         # Query to order the Dress table
@@ -96,10 +103,9 @@ def inventory():
         ).order_by(
             desc(Dress.rentStatus),
             desc(Dress.maintenanceStatus),
-            case(
-                (subquery.c.last_rent_date != None, subquery.c.last_rent_date),
-                else_=Dress.dateAdded
-            )
+            desc(subquery.c.last_rent_date),
+            desc(subquery.c.last_maintenance_date),
+            desc(Dress.dateAdded)
         )
 
     # Handle search form
@@ -111,7 +117,6 @@ def inventory():
     # Separate pagination from the inventory query for pagination template to avoid errors.
     pagination = inventory_query.paginate(page=page, per_page=items_per_page)
 
-    # Initialize delete and maintenance forms
     delete_form = DeleteForm()
 
     maintenance_form = MaintenanceForm()
@@ -123,7 +128,6 @@ def inventory():
     
     # Handle form submissions for adding dresses to maintenance_form
     if maintenance_form.validate_on_submit():
-        # Redirect to the update_maintenance route 
         return redirect(url_for('admin.add_maintenance'))
 
     return render_template('admin_views/inventory_dress.html',
@@ -175,7 +179,6 @@ def maintenance_inventory():
     elif order_by_column == 'cost':
         inventory_query = inventory_query.order_by(Maintenance.cost.desc())
     else:
-        # Order by date and status
         inventory_query = inventory_query.order_by(Maintenance.date.desc(), Maintenance.is_returned(Maintenance).desc())
 
     inventory_query, form = handle_search_form(inventory_query, model_columns, Maintenance)
@@ -263,7 +266,6 @@ def rentInventory():
     elif order_by_column == 'dress_id':
         inventory_query = inventory_query.order_by(Rent.dressId.desc())
     else :
-        # Order by rent date and status
         inventory_query = inventory_query.order_by(Rent.rentDate.desc(),Rent.is_returned(Rent).desc())
 
     inventory_query, form = handle_search_form(inventory_query, model_columns, Rent)
@@ -418,7 +420,7 @@ def update(title, form_type):
                 cost=form.cost.data,
                 marketPrice=form.marketPrice.data,
                 rentPrice=form.rentPrice.data,
-                imageData=image_base64  # Store the image data in the database as base64 string or None
+                imageData=image_base64
             )
 
             db.session.add(dress)

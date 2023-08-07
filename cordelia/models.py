@@ -115,7 +115,6 @@ class Dress(db.Model):
 
     def get_last_rent(self):
         if self.rents:
-            # Sort rents by date in descending order to get the latest one
             sorted_rents = sorted(self.rents, key=lambda rent: rent.rentDate, reverse=True)
             latest_rent = sorted_rents[0]
 
@@ -136,7 +135,6 @@ class Dress(db.Model):
             sorted_rents = sorted(self.rents, key=lambda rent: rent.rentDate, reverse=True)
             latest_rent = sorted_rents[0]
 
-            # Check if the latest rent has been returned
             self.rentStatus = not latest_rent.is_returned()
         else:
             self.rentStatus = False
@@ -183,7 +181,7 @@ maintenance_association = db.Table('maintenance_association',
 
 
 class Maintenance(db.Model):
-    # Maintenance model representing maintenance for dresses in the database
+    # Maintenance model representing maintenances for dresses in the database
     __tablename__ = 'maintenance'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -204,7 +202,7 @@ class Maintenance(db.Model):
         current_datetime = datetime.utcnow()
         # Extract only the date portion from the current date and time
         current_date = current_datetime.date()
-        # Return True if current date is greater than or equal to the return date
+
         return current_date > self.returnDate
 
     def __repr__(self):
@@ -213,7 +211,7 @@ class Maintenance(db.Model):
 
 
 class Customer(db.Model):
-    # User model representing a user in the database
+    # Customer model representing a customer in the database
     __tablename__ = 'customer'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -252,8 +250,7 @@ class Customer(db.Model):
                 dress_info = {
                     "id": f"D-{rent.dress.id:02}",
                     "brand": rent.dress.brand,
-                    "style": rent.dress.style,
-                    "size": rent.dress.size
+                    "style": rent.dress.style
                 }
                 rent_log_entry = {
                     "date": rent.rentDate.strftime('%Y-%m-%d'),
@@ -307,7 +304,7 @@ class Rent(db.Model):
             self.dress = Dress.query.get(self.dressId)
         if self.clientId:
             self.customer = Customer.query.get(self.clientId)
-        # Calculate return date based on rentDate value.
+            
         if self.rentDate:
             self.returnDate = self.rentDate + timedelta(days=3)
         # Added Tax.
