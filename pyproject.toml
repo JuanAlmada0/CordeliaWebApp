@@ -10,9 +10,41 @@ dependencies = [
     "flask-login",
     "flask-wtf",
     "phonenumbers",
-    "email-validator"
+    "email-validator",
+    "pandas",
+    "xlsxwriter",
+    "blinker",
+    "coverage",
+    "dnspython",
+    "et-xmlfile",
+    "greenlet",
+    "iniconfig",
+    "itsdangerous",
+    "jinja2",
+    "markupsafe",
+    "numpy",
+    "openpyxl",
+    "packaging",
+    "phonenumbers",
+    "pluggy",
+    "python-dateutil",
+    "pytz",
+    "six",
+    "sqlalchemy",
+    "typing-extensions",
+    "tzdata",
+    "werkzeug",
+    "wtforms",
+    "xlsxwriter"
 ]
 
 [build-system]
 requires = ["flit_core<4"]
 build-backend = "flit_core.buildapi"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["cordelia"]
