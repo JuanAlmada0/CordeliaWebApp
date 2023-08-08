@@ -200,10 +200,11 @@ class Maintenance(db.Model):
     
     def is_returned(self):
         current_datetime = datetime.utcnow()
-        # Extract only the date portion from the current date and time
         current_date = current_datetime.date()
 
-        return current_date > self.returnDate
+        return current_date > self.returnDate if self.returnDate else False
+
+    
 
     def __repr__(self):
         return f"M-{self.id:02}"
@@ -300,22 +301,25 @@ class Rent(db.Model):
 
     def __init__(self, *args, **kwargs):
         super(Rent, self).__init__(*args, **kwargs)
+
         if self.dressId:
             self.dress = Dress.query.get(self.dressId)
         if self.clientId:
             self.customer = Customer.query.get(self.clientId)
             
-        if self.rentDate:
+        if not self.returnDate:
             self.returnDate = self.rentDate + timedelta(days=3)
+
         # Added Tax.
-        tax = self.dress.rentPrice * 0.16
-        self.paymentTotal = int(self.dress.rentPrice + tax)
+        if self.dress:
+            tax = self.dress.rentPrice * 0.16
+            self.paymentTotal = int(self.dress.rentPrice + tax)
 
     def is_returned(self):
         current_datetime = datetime.utcnow()
         current_date = current_datetime.date()
 
-        return current_date > self.returnDate
+        return current_date > self.returnDate if self.returnDate else False
     
     def update_rent_log(self, log):
         existing_rent_log = json.loads(self.rentLog) if self.rentLog else []
