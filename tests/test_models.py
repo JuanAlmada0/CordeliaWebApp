@@ -1,21 +1,21 @@
-from cordelia.models import User, Dress, Customer, Rent
+from cordelia.models import User, Dress, Customer, Rent, Maintenance
 from cordelia.db import db
 from datetime import datetime, timedelta
 
 
 
 def test_create_user(app):
-    new_user = User(username='testuser', email='testuser@example.com', isAdmin=True)
+    new_user = User(username='testuser', email='testuser@example.com')
     new_user.set_password('testpassword')
 
     with app.app_context():
         db.session.add(new_user)
         db.session.commit()
 
-        user = User.query.filter_by(username='testuser').first()
+        user = User.query.filter_by(email='testuser@example.com').first()
         assert user is not None
         assert user.email == 'testuser@example.com'
-        assert user.isAdmin
+        assert not user.isAdmin
         assert user.check_password('testpassword')
 
 
@@ -82,16 +82,66 @@ def test_rent_is_returned(app):
         db.session.add(customer)
         db.session.commit()
 
-        # Test rent with a return date in the past (already returned)
-        rent_date = datetime.utcnow().date() - timedelta(days=5)  # Rent date 5 days ago
+        rent_date = datetime.utcnow().date() - timedelta(days=5)
         test_rent = Rent(dressId=dress.id, clientId=customer.id, rentDate=rent_date)
 
-        # Should return True since the return date is in the past
         assert test_rent.is_returned()
 
-        # Test rent with a return date in the future (not yet returned)
-        rent_date = datetime.utcnow().date()  # Rent date today
+        rent_date = datetime.utcnow().date()
         test_rent = Rent(dressId=dress.id, clientId=customer.id, rentDate=rent_date)
 
-        # Should return False since the return date is in the future
         assert not test_rent.is_returned()
+
+
+def test_create_maintenance(app):
+    with app.app_context():
+        dress1 = Dress(size=4, color='example color 1', style='example style 1', brand='example brand 1', cost=4200, rentPrice=1800)
+        dress2 = Dress(size=8, color='example color 2', style='example style 2', brand='example brand 2', cost=4000, rentPrice=1800)
+        dress3 = Dress(size=6, color='example color 3', style='example style 3', brand='example brand 3', cost=3800, rentPrice=1700)
+        db.session.add(dress1)
+        db.session.add(dress2)
+        db.session.add(dress3)
+        db.session.commit()
+
+        maintenance_date = datetime.utcnow().date()
+        maintenance = Maintenance(maintenance_type='Tailor',date=maintenance_date, cost=200)
+        db.session.add(maintenance)
+        db.session.commit()
+
+        maintenance.dresses.extend([dress1, dress2, dress3])
+
+        maintenance = Maintenance.query.filter_by(id=maintenance.id).first()
+
+        assert maintenance is not None
+        assert maintenance.dresses == [dress1, dress2, dress3]
+        assert maintenance.dresses[0].size == 4
+        assert maintenance.maintenance_type == 'Tailor'
+
+
+def test_maintenance_is_returned(app):
+    with app.app_context():
+        dress1 = Dress(size=4, color='example color 1', style='example style 1', brand='example brand 1', cost=4200, rentPrice=1800)
+        dress2 = Dress(size=8, color='example color 2', style='example style 2', brand='example brand 2', cost=4000, rentPrice=1800)
+        dress3 = Dress(size=6, color='example color 3', style='example style 3', brand='example brand 3', cost=3800, rentPrice=1700)
+        db.session.add(dress1)
+        db.session.add(dress2)
+        db.session.add(dress3)
+        db.session.commit()
+
+        maintenance_date = datetime.utcnow().date()
+        test_maintenance = Maintenance(maintenance_type='Tailor',date=maintenance_date, cost=200)
+        db.session.add(test_maintenance)
+        db.session.commit()
+
+        test_maintenance.dresses.extend([dress1, dress2, dress3])
+
+        assert not test_maintenance.is_returned()
+
+        maintenance_date = datetime.utcnow().date() - timedelta(days=5)
+        test_maintenance = Maintenance(maintenance_type='Tailor',date=maintenance_date, cost=200)
+        db.session.add(test_maintenance)
+        db.session.commit()
+
+        test_maintenance.dresses.extend([dress1, dress2, dress3])
+
+        assert test_maintenance.is_returned()

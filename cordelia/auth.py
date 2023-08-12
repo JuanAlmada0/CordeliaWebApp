@@ -23,7 +23,7 @@ def init_app(app):
 # User loader
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return User.query.filter_by(id=user_id).first()
 
 # Set the login view & message
 login_manager.login_view = 'auth.login'

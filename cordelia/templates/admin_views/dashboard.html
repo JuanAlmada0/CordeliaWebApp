@@ -39,7 +39,7 @@
                 <td>
                   <form id="update-rent-statuses-form" method="POST" action="{{ url_for('admin.update_statuses_endpoint') }}" onsubmit="return confirmAction('Update Dress database?');">
                     {{ form.hidden_tag() }}
-                    <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Refresh">
+                    <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Refresh" disabled>
                       <i class="fas fa-sync-alt"></i> <!-- Font Awesome refresh icon -->
                     </button>
                   </form>
@@ -90,7 +90,7 @@
               <td>
                 <form id="update-rent-logs-form" method="POST" action="{{ url_for('admin.update_customer_logs_endpoint') }}" onsubmit="return confirmAction('Update Customer database?');">
                   {{ form.hidden_tag() }}
-                  <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Refresh">
+                  <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Refresh" disabled>
                     <i class="fas fa-sync-alt"></i> <!-- Font Awesome refresh icon -->
                   </button>
                 </form>
@@ -162,30 +162,110 @@
                 </span>
       
                 <div class="pagination-container ml-5">
-                  {% if inventory.has_prev or inventory.has_next %}
-                  <nav aria-label="Inventory pagination">
-                    <ul class="pagination">
-                      {% if inventory.has_prev %}
-                      <li class="page-item ml-1">
-                        <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.inventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">prev</a>
-                      </li>
-                      {% endif %}
-                      {% for page_num in inventory.iter_pages(left_edge=1, left_current=1, right_current=1, right_edge=1) %}
-                      {% if page_num %}
-                      <li class="page-item ml-1 {% if page_num == inventory.page %}active{% endif %}">
-                        <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.inventory', page=page_num, order_by=order_by_column) }}">{{ page_num }}</a>
-                      </li>
-                      {% else %}
-                      <li class="page-item ml-2 disabled"><span class="page-link">&hellip;</span></li>
-                      {% endif %}
-                      {% endfor %}
-                      {% if inventory.has_next %}
-                      <li class="page-item ml-2">
-                        <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.inventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">next</a>
-                      </li>
-                      {% endif %}
-                    </ul>
-                  </nav>
+                  {% if model == "Dress" %}
+                    {% if inventory.has_prev or inventory.has_next %}
+                    <nav aria-label="Inventory pagination">
+                      <ul class="pagination">
+                        {% if inventory.has_prev %}
+                        <li class="page-item ml-1">
+                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.inventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">prev</a>
+                        </li>
+                        {% endif %}
+                        {% for page_num in inventory.iter_pages(left_edge=1, left_current=1, right_current=1, right_edge=1) %}
+                        {% if page_num %}
+                        <li class="page-item ml-1 {% if page_num == inventory.page %}active{% endif %}">
+                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.inventory', page=page_num, order_by=order_by_column) }}">{{ page_num }}</a>
+                        </li>
+                        {% else %}
+                        <li class="page-item ml-2 disabled"><span class="page-link">&hellip;</span></li>
+                        {% endif %}
+                        {% endfor %}
+                        {% if inventory.has_next %}
+                        <li class="page-item ml-2">
+                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.inventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">next</a>
+                        </li>
+                        {% endif %}
+                      </ul>
+                    </nav>
+                    {% endif %}
+                  {% elif model == "Rent" %}
+                    {% if inventory.has_prev or inventory.has_next %}
+                    <nav aria-label="Inventory pagination">
+                      <ul class="pagination">
+                        {% if inventory.has_prev %}
+                        <li class="page-item ml-1">
+                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.rentInventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">prev</a>
+                        </li>
+                        {% endif %}
+                        {% for page_num in inventory.iter_pages(left_edge=1, left_current=1, right_current=1, right_edge=1) %}
+                        {% if page_num %}
+                        <li class="page-item ml-1 {% if page_num == inventory.page %}active{% endif %}">
+                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.rentInventory', page=page_num, order_by=order_by_column) }}">{{ page_num }}</a>
+                        </li>
+                        {% else %}
+                        <li class="page-item ml-2 disabled"><span class="page-link">&hellip;</span></li>
+                        {% endif %}
+                        {% endfor %}
+                        {% if inventory.has_next %}
+                        <li class="page-item ml-2">
+                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.rentInventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">next</a>
+                        </li>
+                        {% endif %}
+                      </ul>
+                    </nav>
+                    {% endif %}
+                  {% elif model == "Customer" %}
+                    {% if inventory.has_prev or inventory.has_next %}
+                    <nav aria-label="Inventory pagination">
+                      <ul class="pagination">
+                        {% if inventory.has_prev %}
+                        <li class="page-item ml-1">
+                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.customerInventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">prev</a>
+                        </li>
+                        {% endif %}
+                        {% for page_num in inventory.iter_pages(left_edge=1, left_current=1, right_current=1, right_edge=1) %}
+                        {% if page_num %}
+                        <li class="page-item ml-1 {% if page_num == inventory.page %}active{% endif %}">
+                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.customerInventory', page=page_num, order_by=order_by_column) }}">{{ page_num }}</a>
+                        </li>
+                        {% else %}
+                        <li class="page-item ml-2 disabled"><span class="page-link">&hellip;</span></li>
+                        {% endif %}
+                        {% endfor %}
+                        {% if inventory.has_next %}
+                        <li class="page-item ml-2">
+                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.customerInventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">next</a>
+                        </li>
+                        {% endif %}
+                      </ul>
+                    </nav>
+                    {% endif %}
+                  {% elif model == "Maintenance" %}
+                    {% if inventory.has_prev or inventory.has_next %}
+                    <nav aria-label="Inventory pagination">
+                      <ul class="pagination">
+                        {% if inventory.has_prev %}
+                        <li class="page-item ml-1">
+                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.maintenance_inventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">prev</a>
+                        </li>
+                        {% endif %}
+                        {% for page_num in inventory.iter_pages(left_edge=1, left_current=1, right_current=1, right_edge=1) %}
+                        {% if page_num %}
+                        <li class="page-item ml-1 {% if page_num == inventory.page %}active{% endif %}">
+                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.maintenance_inventory', page=page_num, order_by=order_by_column) }}">{{ page_num }}</a>
+                        </li>
+                        {% else %}
+                        <li class="page-item ml-2 disabled"><span class="page-link">&hellip;</span></li>
+                        {% endif %}
+                        {% endfor %}
+                        {% if inventory.has_next %}
+                        <li class="page-item ml-2">
+                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.maintenance_inventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">next</a>
+                        </li>
+                        {% endif %}
+                      </ul>
+                    </nav>
+                    {% endif %}
                   {% endif %}
                 </div>
 

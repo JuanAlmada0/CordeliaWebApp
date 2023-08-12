@@ -19,7 +19,7 @@ def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.isAdmin:
-            flash('This page requires Admin Access', 'message')
+            flash('This page requires Admin Access', 'warning')
             next_page = request.args.get('next')
             return redirect(url_for('auth.login', next=next_page))
         return f(*args, **kwargs)
@@ -262,7 +262,7 @@ def rentInventory():
         inventory_query = inventory_query.order_by(Rent.id.desc())
     elif order_by_column == 'user_lastName':
         # Join Rent and Customer tables and sort by Customer's lastName
-        inventory_query = inventory_query.join(Customer, Rent.clientId == Customer.id).order_by(Customer.lastName.desc())
+        inventory_query = inventory_query.join(Customer, Rent.clientId == Customer.id).order_by(Customer.lastName)
     elif order_by_column == 'dress_id':
         inventory_query = inventory_query.order_by(Rent.dressId.desc())
     else :
@@ -307,7 +307,7 @@ def customerInventory():
     if order_by_column == 'id':
         inventory_query = inventory_query.order_by(Customer.id)
     elif order_by_column == 'last_name':
-        inventory_query = inventory_query.order_by(Customer.lastName.desc())
+        inventory_query = inventory_query.order_by(Customer.lastName)
     elif order_by_column == 'date':
         inventory_query = inventory_query.order_by(Customer.dateAdded.desc())
     else :
@@ -347,23 +347,6 @@ def customerInventory():
                            pagination=pagination, 
                            order_by_column=order_by_column, 
                            model=model)
-
-
-
-@adminBp.route('/update-rent-logs', methods=['POST'])
-@login_required
-@admin_required
-def update_customer_logs_endpoint():
-    
-    confirm = request.form.get('confirm', False)
-
-    if confirm:
-        Customer.update_rent_logs()
-        db.session.commit()
-        flash('Rent logs updated successfully.', 'success')
-
-    logging.debug("update_rent_logs() Customer class method called from dashboard")
-    return redirect(url_for('admin.customerInventory'))
 
 
 

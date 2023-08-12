@@ -208,7 +208,11 @@
                                     </tr>
                                     <tr>
                                       <th scope="row">Rent for:</th>
-                                      <td>{{ dress.rentPrice }}</td>
+                                      <td>${{ dress.rentPrice }}</td>
+                                    </tr>
+                                    <tr>
+                                      <th scope="row">Rents for Returns:</th>
+                                      <td>{{ dress.rentsForReturns }}</td>
                                     </tr>
                                     <tr>
                                       <th scope="row">Times Rented:</th>
@@ -220,27 +224,27 @@
                               <!-- Maintenance log column -->
                               <div class="col-5">
                                 <table class="table table-hover table-sm table-secondary" style="font-family: 'Courier New', Courier, monospace;">
-                                  {% if dress.rentLog %}
+                                  {% if dress.rents %}
                                   <thead class="text-left text-light" style="font-size: 12px;">
                                     <tr>
-                                      <th>Log</th>
+                                      <th>Date</th>
                                       <th>Rent</th>
                                       <th>Customer</th>
                                     </tr>
                                   </thead>
                                   <tbody class="text-left text-light" style="font-size: 11px;">
-                                    {% for log in dress.get_rent_log() %}
+                                    {% for rent in dress.rents %}
                                     <tr>
-                                        <td>{{ log.date }}</td>
-                                        <td>{{ log.id }}</td>
-                                        <td>{{ log.customer_info['id'] }} | {{ log.customer_info['last_name'] }}, {{ log.customer_info['name'] }}</td>
+                                        <td>{{ rent.rentDate.strftime('%Y-%m-%d') }}</td>
+                                        <td>{{ rent }}</td>
+                                        <td>{{ rent.customer }} | {{ rent.customer.lastName }}, {{ rent.customer.name }}</td>
                                     </tr>
                                     {% endfor %}
                                   </tbody>
                                   {% endif %}
                                 </table>
                                 <table class="table table-hover table-sm table-secondary" style="font-family: 'Courier New', Courier, monospace;">
-                                  {% if dress.maintenanceLog %}
+                                  {% if dress.maintenances %}
                                   <thead class="text-left text-light" style="font-size: 12px;">
                                     <tr>
                                       <th>Date</th>
@@ -249,11 +253,11 @@
                                     </tr>
                                   </thead>
                                   <tbody class="text-left text-light" style="font-size: 11px;">
-                                    {% for log in dress.get_maintenance_log() %}
+                                    {% for maintenance in dress.maintenances %}
                                     <tr>
-                                        <td>{{ log.date }}</td>
-                                        <td>{{ log.id }}</td>
-                                        <td>{{ log.type }}</td>
+                                        <td>{{ maintenance.date.strftime('%Y-%m-%d') }}</td>
+                                        <td>{{ maintenance }}</td>
+                                        <td>{{ maintenance.maintenance_type }}</td>
                                     </tr>
                                     {% endfor %}
                                   </tbody>

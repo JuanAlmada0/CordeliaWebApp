@@ -139,20 +139,20 @@
                               <!-- Maintenance log column -->
                               <div class="col-6">
                                 <table class="table table-striped table-hover table-sm table-dark" style="font-family: 'Courier New', Courier, monospace;">
-                                  {% if customer.rentLog %}
+                                  {% if customer.rents %}
                                   <thead style="font-size: 13px;">
                                     <tr>
-                                      <th>Log</th>
-                                      <th>Rent</th>
+                                      <th>Date</th>
                                       <th>Dress</th>
+                                      <th>Rent</th>
                                     </tr>
                                   </thead>
                                   <tbody style="font-size: 12px;">
-                                    {% for log in customer.get_rent_log() %}
+                                    {% for rent in customer.rents %}
                                     <tr>
-                                        <td>{{ log.date }}</td>
-                                        <td>{{ log.id }} | {{ log.total }}</td>
-                                        <td>{{ log.dress_info['id'] }} | {{ log.dress_info['brand'] }} | {{ log.dress_info['style'] }}</td>
+                                        <td>{{ rent.rentDate.strftime('%Y-%m-%d') }}</td>
+                                        <td>{{ rent.dress }} | ${{ rent.dress.rentPrice }}</td>
+                                        <td>{{ rent }} | ${{ rent.paymentTotal }}</td>
                                     </tr>
                                     {% endfor %}
                                   </tbody>

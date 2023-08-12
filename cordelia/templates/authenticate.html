@@ -24,7 +24,7 @@
                                   {{ field.label.text }}
                               </label>
                           </div>
-                      {% else %}
+                      {% elif field.type != 'HiddenField' %}
                           {{ field.label }}
                           {{ field(class="form-control", autocomplete="off") }}
                           {% for error in field.errors %}
