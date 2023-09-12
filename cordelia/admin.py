@@ -1,11 +1,9 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
-from flask_login import current_user
 from sqlalchemy import case, desc, func
-from cordelia.auth import login_required
+from cordelia.auth import login_required, admin_required
 from cordelia.db import db
 from cordelia.models import Dress, Customer, Rent, Maintenance, maintenance_association
 from cordelia.forms import SearchForm, DressForm, RentForm, CustomerForm, MaintenanceForm, DeleteForm
-from functools import wraps
 from base64 import b64encode
 
 import logging
@@ -14,21 +12,10 @@ import logging
 adminBp = Blueprint('admin', __name__, url_prefix='/admin')
 
 
-# Wrapper @admin_required
-def admin_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not current_user.isAdmin:
-            flash('This page requires Admin Access', 'warning')
-            next_page = request.args.get('next')
-            return redirect(url_for('auth.login', next=next_page))
-        return f(*args, **kwargs)
-    return decorated_function
-
-
 
 @adminBp.route('/download/excel')
 @login_required
+@admin_required
 def downloadExcel():
 
     from cordelia.excel import excel_download
@@ -430,39 +417,16 @@ def update(title, form_type):
                 
                 db.session.add(rent)
                 
-                # Get id from un-committed rent for debugging purposes (rent.id cannot be retrieved before commit).
+                # Get id from un-committed rent for debugging purposes (cannot retrieve rent.id before commit).
                 provisional_id = Rent.query.order_by(Rent.id.desc()).first()
                 logging.debug(f'Rent {provisional_id} added but not yet committed')
 
-                # Update associated dress object
+                # Update associated dress
                 dress.update_times_rented()
                 dress.update_rent_status()
                 logging.debug(f"{dress} update_times_rented() method called by created rent {provisional_id}")
                 logging.debug(f"{dress} update_rent_status() method called by created rent {provisional_id}")
 
-                # Create log for rent
-                customer_info = {
-                    "id": customer.id,
-                    "last_name": customer.lastName,
-                    "name": customer.name
-                }
-                dress_info = {
-                    "id": dress.id,
-                    "brand": dress.brand,
-                    "style": dress.style,
-                    "size": dress.size,
-                    "color": dress.color,
-                    "rent_price": dress.rentPrice
-                }
-                rent_log = {
-                    "customer_data": customer_info,
-                    "dress_data": dress_info
-                } 
-                
-                rent.update_rent_log(rent_log)
-                logging.debug(f"rent {provisional_id} rent log updated by itself.")
-
-                # Commit rent object
                 db.session.commit()
                 logging.debug(f"{rent} committed")
                 flash(f'{rent} added successfully into the database.')
@@ -500,26 +464,25 @@ def delete_object(dataBase, id):
         if rent and rent.is_returned():
             # Store dress ID and customer ID before deleting rent object
             dress_id = rent.dressId
-            customer_id = rent.clientId
+
             db.session.delete(rent)
-            # Attempt to find the associated dress and decrement times_rented
+
             associated_dress = Dress.query.get(dress_id)
-            associated_customer = Customer.query.get(customer_id)
+
             if associated_dress:
                 associated_dress.update_times_rented()
-                associated_dress.update_rent_log()
-                associated_customer.update_rent_log()
+                associated_dress.update_rent_status()
                 
                 logging.debug(f"update_times_rented() method called for {associated_dress}. After {rent} deletion.")
-                logging.debug(f"update_rent_log() method called for {associated_dress}. After {rent} deletion.")
-                logging.debug(f"update_rent_log() method called for {associated_customer}. After {rent} deletion.")
+                logging.debug(f"update_rent_status() method called for {associated_dress}. After {rent} deletion.")
             else:
-                # Handle the case when the associated dress is not found
-                flash(f'{associated_dress} not found when trying to decrement times_rented.', 'danger')
+                flash(f'{associated_dress} not found.', 'danger')
 
             db.session.commit()
+
             flash(f'{rent} deleted successfully.', 'success')
             logging.debug(f"{rent} deleted from dashboard")
+
             return redirect(url_for('admin.rentInventory'))
         else:
             flash('Rent not found.', 'danger')
@@ -530,8 +493,10 @@ def delete_object(dataBase, id):
         if customer and not customer.check_status():
             db.session.delete(customer)
             db.session.commit()
+
             flash(f'{customer} deleted successfully.', 'success')
             logging.debug(f"{customer} deleted from dashboard")
+
             return redirect(url_for('admin.customerInventory'))
         else:
             flash("Can't delete this customer.", 'danger')
@@ -540,18 +505,21 @@ def delete_object(dataBase, id):
         maintenance = Maintenance.query.get(int(id))
 
         if maintenance and maintenance.is_returned():
-            assosciated_dresses = [dress for dress in maintenance.dresses]
+            dresses = maintenance.dresses
 
             db.session.delete(maintenance)
 
-            for dress in assosciated_dresses:
-                dress.update_maintenance_log()
-                logging.debug(f"{dress} update_maintenance_log() called by deleted {maintenance}")
-            
+            associated_dresses = Dress.query.filter(Dress.id.in_([dress.id for dress in dresses])).all()
+
+            if associated_dresses:
+                for dress in associated_dresses:
+                    dress.update_maintenance_status()
+
             db.session.commit()
 
             flash(f'{maintenance} deleted successfully.', 'success')
             logging.debug(f"{maintenance} deleted from dashboard")
+
             return redirect(url_for('admin.maintenance_inventory'))
         else:
             flash("Cannot delete this maintenance.", 'danger')

@@ -59,7 +59,7 @@ def test_create_rent(app):
         db.session.commit()
 
         rent_date = datetime.utcnow().date()
-        new_rent = Rent(dressId=dress.id, clientId=customer.id, rentDate=rent_date)
+        new_rent = Rent(dressId=dress.id, clientId=customer.id, rentDate=rent_date, paymentMethod='Transfer')
         db.session.add(new_rent)
         db.session.commit()
 

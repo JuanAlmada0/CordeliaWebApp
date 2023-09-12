@@ -71,7 +71,7 @@ class DressIdForm(FlaskForm):
 class MaintenanceForm(FlaskForm):
     dress_ids = FieldList(FormField(DressIdForm), min_entries=1)
     maintenanceDate = DateField('Date')
-    maintenanceType = SelectField('Type', choices=[('None', None), ('Dry-Cleaning', 'Dry-Cleaning'), ('Tailor', 'Tailor')])
+    maintenanceType = SelectField('Type', choices=[('None', None), ('Cleaning', 'Cleaning'), ('Repair', 'Repair'), ('Alteration', 'Alteration')])
     maintenanceCost = IntegerField('Cost')
     submit = SubmitField('Submit')
 
@@ -125,6 +125,7 @@ class RentForm(FlaskForm):
     customerId = IntegerField('Customer Id', validators=[DataRequired()])
     dressId = IntegerField('Dress Id', validators=[DataRequired()])
     rentDate = DateField('Rent Date', validators=[DataRequired()])
+    paymentMethod = SelectField('Payment Method', choices=[('Transfer', 'Transfer'), ('Cash', 'Cash'), ('Credit Card', 'Credit Card')])
     submit = SubmitField('Submit')
 
 

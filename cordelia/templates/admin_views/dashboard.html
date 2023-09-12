@@ -39,7 +39,7 @@
                 <td>
                   <form id="update-rent-statuses-form" method="POST" action="{{ url_for('admin.update_statuses_endpoint') }}" onsubmit="return confirmAction('Update Dress database?');">
                     {{ form.hidden_tag() }}
-                    <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Refresh" disabled>
+                    <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Refresh">
                       <i class="fas fa-sync-alt"></i> <!-- Font Awesome refresh icon -->
                     </button>
                   </form>
@@ -87,14 +87,7 @@
                 {% endif %}
               </td>
               {% if model == "Customer" %}
-              <td>
-                <form id="update-rent-logs-form" method="POST" action="{{ url_for('admin.update_customer_logs_endpoint') }}" onsubmit="return confirmAction('Update Customer database?');">
-                  {{ form.hidden_tag() }}
-                  <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Refresh" disabled>
-                    <i class="fas fa-sync-alt"></i> <!-- Font Awesome refresh icon -->
-                  </button>
-                </form>
-              </td>
+              <td></td>
               <td>
                 <a href="{{ url_for('admin.update', title='Add Customer', form_type='customer') }}" class="btn btn-outline-light btn-smaller mr-2 btn-dark">
                   <i class="fas fa-plus"></i> <!-- Font Awesome "plus" icon -->
@@ -171,15 +164,9 @@
                           <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.inventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">prev</a>
                         </li>
                         {% endif %}
-                        {% for page_num in inventory.iter_pages(left_edge=1, left_current=1, right_current=1, right_edge=1) %}
-                        {% if page_num %}
-                        <li class="page-item ml-1 {% if page_num == inventory.page %}active{% endif %}">
-                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.inventory', page=page_num, order_by=order_by_column) }}">{{ page_num }}</a>
+                        <li class="page-item ml-1">
+                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="javascript:void(0);" aria-label="Current Page">{{ inventory.page }}</a>
                         </li>
-                        {% else %}
-                        <li class="page-item ml-2 disabled"><span class="page-link">&hellip;</span></li>
-                        {% endif %}
-                        {% endfor %}
                         {% if inventory.has_next %}
                         <li class="page-item ml-2">
                           <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.inventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">next</a>
@@ -187,7 +174,7 @@
                         {% endif %}
                       </ul>
                     </nav>
-                    {% endif %}
+                    {% endif %}          
                   {% elif model == "Rent" %}
                     {% if inventory.has_prev or inventory.has_next %}
                     <nav aria-label="Inventory pagination">
@@ -197,15 +184,9 @@
                           <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.rentInventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">prev</a>
                         </li>
                         {% endif %}
-                        {% for page_num in inventory.iter_pages(left_edge=1, left_current=1, right_current=1, right_edge=1) %}
-                        {% if page_num %}
-                        <li class="page-item ml-1 {% if page_num == inventory.page %}active{% endif %}">
-                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.rentInventory', page=page_num, order_by=order_by_column) }}">{{ page_num }}</a>
+                        <li class="page-item ml-1">
+                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="javascript:void(0);" aria-label="Current Page">{{ inventory.page }}</a>
                         </li>
-                        {% else %}
-                        <li class="page-item ml-2 disabled"><span class="page-link">&hellip;</span></li>
-                        {% endif %}
-                        {% endfor %}
                         {% if inventory.has_next %}
                         <li class="page-item ml-2">
                           <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.rentInventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">next</a>
@@ -223,15 +204,9 @@
                           <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.customerInventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">prev</a>
                         </li>
                         {% endif %}
-                        {% for page_num in inventory.iter_pages(left_edge=1, left_current=1, right_current=1, right_edge=1) %}
-                        {% if page_num %}
-                        <li class="page-item ml-1 {% if page_num == inventory.page %}active{% endif %}">
-                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.customerInventory', page=page_num, order_by=order_by_column) }}">{{ page_num }}</a>
+                        <li class="page-item ml-1">
+                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="javascript:void(0);" aria-label="Current Page">{{ inventory.page }}</a>
                         </li>
-                        {% else %}
-                        <li class="page-item ml-2 disabled"><span class="page-link">&hellip;</span></li>
-                        {% endif %}
-                        {% endfor %}
                         {% if inventory.has_next %}
                         <li class="page-item ml-2">
                           <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.customerInventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">next</a>
@@ -249,15 +224,9 @@
                           <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.maintenance_inventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">prev</a>
                         </li>
                         {% endif %}
-                        {% for page_num in inventory.iter_pages(left_edge=1, left_current=1, right_current=1, right_edge=1) %}
-                        {% if page_num %}
-                        <li class="page-item ml-1 {% if page_num == inventory.page %}active{% endif %}">
-                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.maintenance_inventory', page=page_num, order_by=order_by_column) }}">{{ page_num }}</a>
+                        <li class="page-item ml-1">
+                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="javascript:void(0);" aria-label="Current Page">{{ inventory.page }}</a>
                         </li>
-                        {% else %}
-                        <li class="page-item ml-2 disabled"><span class="page-link">&hellip;</span></li>
-                        {% endif %}
-                        {% endfor %}
                         {% if inventory.has_next %}
                         <li class="page-item ml-2">
                           <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.maintenance_inventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">next</a>
@@ -267,7 +236,7 @@
                     </nav>
                     {% endif %}
                   {% endif %}
-                </div>
+                </div>                
 
                 <style>
                   .btn.active {
@@ -412,7 +381,7 @@
                 {% elif model == 'Rent' %}
                   <div class="mx-auto breadcrumb file-cabinet">
                     <a class="breadcrumb-item {% if order_by_column == 'default' %}active{% endif %}" href="{{ url_for('admin.rentInventory', order_by='default') }}">status</a>
-                    <a class="breadcrumb-item {% if order_by_column == 'id' %}active{% endif %}" href="{{ url_for('admin.rentInventory', order_by='id') }}">rent id</a>
+                    <a class="breadcrumb-item {% if order_by_column == 'id' %}active{% endif %}" href="{{ url_for('admin.rentInventory', order_by='id') }}">id</a>
                     <a class="breadcrumb-item {% if order_by_column == 'dress_id' %}active{% endif %}" href="{{ url_for('admin.rentInventory', order_by='dress_id') }}">dress</a>
                     <a class="breadcrumb-item {% if order_by_column == 'user_lastName' %}active{% endif %}" href="{{ url_for('admin.rentInventory', order_by='user_lastName') }}">user</a>
                   </div>

@@ -68,7 +68,6 @@ def create_app(test_config=None):
                         logging.FileHandler(log_file_path, mode='w')
                     ])
 
-    logging.debug(f"Flask environment: {app.config['FLASK_ENV']}")
 
 
     return app

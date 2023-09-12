@@ -3,6 +3,8 @@ from flask_login import LoginManager, login_user, login_required, logout_user
 from urllib.parse import urlparse, urljoin 
 from cordelia.models import db, User
 from cordelia.forms import RegistrationForm, LoginForm
+from functools import wraps
+from flask_login import current_user
 
 import logging
 
@@ -109,3 +111,15 @@ def logout():
     logout_user()
     flash("You've been logged out", 'message')
     return redirect(url_for('home.home'))
+
+
+# Wrapper @admin_required
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.isAdmin:
+            flash('This page requires Admin Access', 'warning')
+            next_page = request.args.get('next')
+            return redirect(url_for('auth.login', next=next_page))
+        return f(*args, **kwargs)
+    return decorated_function

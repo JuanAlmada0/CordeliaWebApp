@@ -152,51 +152,51 @@
                                       <th scope="row">Rent Total:</th>
                                       <td>{{ rent.paymentTotal }}</td>
                                     </tr>
+                                    <tr>
+                                      <th scope="row">Payment Method:</th>
+                                      <td>{{ rent.paymentMethod }}</td>
+                                    </tr>
                                   </tbody>
                                 </table>
                               </div>
                               <!-- Maintenance log column -->
                               <div class="col-8">
                                 <table class="table table-striped table-hover table-sm table-dark" style="font-family: 'Courier New', Courier, monospace;">
-                                  {% if rent.rentLog %}
+                                  {% if rent.dress %}
                                   <thead style="font-size: 13px;">
                                     <tr>
                                       <th>Dress</th>
                                     </tr>
                                   </thead>
                                   <tbody style="font-size: 12px;">
-                                    {% for log in rent.get_rent_log() %}
                                     <tr>
                                       <td>
-                                        {{ "D-{:02d} |".format(log.dress_data['id']) }}
-                                        {{ log.dress_data['brand'] }} |
-                                        {{ log.dress_data['style'] }} |
-                                        Size: {{ log.dress_data['size'] }} |
-                                        {{ log.dress_data['color'] }} |
-                                        Rent price: {{ log.dress_data['rent_price'] }}
+                                        {{ rent.dress }}
+                                        {{ rent.dress.brand }}  |
+                                        {{ rent.dress.style }} |
+                                        Size: {{ rent.dress.size }} |
+                                        {{ rent.dress.color }} |
+                                        Rent price: {{ rent.dress.rentPrice }}
                                       </td>
                                     </tr>
-                                    {% endfor %}
                                   </tbody>
                                   {% endif %}
                                 </table>
                                 <table class="table table-striped table-hover table-sm table-dark" style="font-family: 'Courier New', Courier, monospace;">
-                                  {% if rent.rentLog %}
+                                  {% if rent.customer %}
                                   <thead style="font-size: 13px;">
                                     <tr>
                                       <th>Customer</th>
                                     </tr>
                                   </thead>
                                   <tbody style="font-size: 12px;">
-                                    {% for log in rent.get_rent_log() %}
                                     <tr>
                                       <td>
-                                      {{ "C-{:02d} |".format(log.customer_data['id']) }}
-                                      {{ log.customer_data['last_name'] }}
-                                      {{ log.customer_data['name'] }}
+                                      {{ rent.customer }}
+                                      {{ rent.customer.name }}
+                                      {{ rent.customer.lastName }}
                                       </td>
                                     </tr>
-                                    {% endfor %}
                                   </tbody>
                                   {% endif %}
                                 </table>

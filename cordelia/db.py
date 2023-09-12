@@ -67,6 +67,16 @@ def init_db(app):
 def init_db_command():
     init_db(current_app)
     click.echo('Initialized the database.')
+    
+
+# Command to populate the database with sample data.
+@click.command('populate-db')
+@with_appcontext
+def populate_db_command():
+    from cordelia.sample_data import populate_db
+    with current_app.app_context():
+        populate_db()
+        click.echo('Updated the database.')
 
 
 def init_app(app):
@@ -76,3 +86,5 @@ def init_app(app):
     app.teardown_appcontext(close_session)
     # Add the init-db command to the app's CLI
     app.cli.add_command(init_db_command)
+    # Add the populate-db command to the app's CLI
+    app.cli.add_command(populate_db_command)

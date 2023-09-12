@@ -2,7 +2,6 @@ from cordelia.db import db
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-import json
 
 
 
@@ -24,8 +23,6 @@ class Dress(db.Model):
     timesRented = db.Column(db.Integer, index=True, default=0)
     rentStatus = db.Column(db.Boolean, index=True, default=False)
     maintenanceStatus = db.Column(db.Boolean, index=True, default=False)
-    rentLog = db.Column(db.JSON, default=[])
-    maintenanceLog = db.Column(db.JSON, default=[])
     imageData = db.Column(db.String(255), default=None)
 
     customers = db.relationship('Customer', secondary='rent', back_populates='dresses', viewonly=True) # Many-to-many relationship with Customer through Rent model
@@ -115,9 +112,11 @@ class Dress(db.Model):
         dresses = cls.query.all()
 
         for dress in dresses:
-            dress.update_times_rented()
-            dress.update_rent_status()
-            dress.update_maintenance_status()
+            if dress.rents:
+                dress.update_times_rented()
+                dress.update_rent_status()
+            if dress.maintenances:
+                dress.update_maintenance_status()
     
     def __repr__(self):
         return f"D-{self.id:02}"
@@ -171,7 +170,6 @@ class Customer(db.Model):
     lastName = db.Column(db.String(30), index=True, nullable=False)
     phoneNumber = db.Column(db.Integer, index=True, unique=True)
     dateAdded = db.Column(db.DateTime(), index=True, default=datetime.utcnow)
-    rentLog = db.Column(db.JSON, nullable=True, default=[])
 
     dresses = db.relationship('Dress', secondary='rent', back_populates='customers', viewonly=True) # Many-to-many relationship with Dress through Rent model
     
@@ -216,8 +214,8 @@ class Rent(db.Model):
     clientId = db.Column(db.Integer, db.ForeignKey('customer.id'))
     rentDate = db.Column(db.Date, index=True, nullable=False)
     returnDate = db.Column(db.Date, index=True)
+    paymentMethod = db.Column(db.String(20), index=True, nullable=False)
     paymentTotal = db.Column(db.Integer, index=True)
-    rentLog = db.Column(db.JSON, default=[])
 
     # Many Dress to Many Customer relationship associated through dressId and clientId.
 
@@ -247,17 +245,6 @@ class Rent(db.Model):
 
         return current_date > self.returnDate if self.returnDate else False
     
-    def update_rent_log(self, log):
-        existing_rent_log = json.loads(self.rentLog) if self.rentLog else []
-        existing_rent_log.append(log)
-        self.rentLog = json.dumps(existing_rent_log)
-    
-    def get_rent_log(self):
-        log = []
-        if self.rentLog:
-            log = json.loads(self.rentLog)
-            return log
-    
     def __repr__(self):
         return f"R-{self.id:02}"
     
@@ -273,7 +260,7 @@ class User(UserMixin, db.Model):
     phoneNumber = db.Column(db.Integer, index=True, unique=True)
     password_hash = db.Column(db.String(128))
     joinedAtDate = db.Column(db.DateTime(), index=True, default=datetime.utcnow)
-    isAdmin = db.Column(db.Boolean, default=False, nullable=True)
+    isAdmin = db.Column(db.Boolean, default=False)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
