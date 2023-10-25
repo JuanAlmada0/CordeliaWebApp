@@ -1,194 +1,183 @@
 {% extends "admin_views/dashboard.html" %}
 
-  {% block inventory_table_body %}
+{% block inventory_table_body %}
           
-          <tbody>
-          {% for maintenance in inventory.items %}
-            <tr>
-              <td colspan="2">
-                <div class="accordion" id="accordion{{ loop.index }}">
-                  <div class="card bg-dark">
-                    <div class="card-header" id="heading{{ loop.index }}">
-                      <h6 class="mb-0">
-                        <div class="row align-items-center">
-                          <!-- First column, left part of the card -->
-                          <div class="col-md-2">
-                            <div class="d-flex justify-content-start">
-                              <button class="btn btn-sm" type="button" data-toggle="collapse" data-target="#collapse{{ loop.index }}" aria-expanded="true" aria-controls="collapse{{ loop.index }}">
-                                <span class="arrow-down"></span>
-                              </button>
-                              {% if maintenance.is_returned() %}
-                                <div class="text-arrow-container ml-2">
-                                  <div class="d-flex justify-content-start">
-                                    <span class="text-left text-light" style="font-size: 13px; font-family: 'Courier New', Courier, monospace;">{{ maintenance }}</span>
-                                  </div>
-                                </div>
-                              {% else %}
-                                <div class="text-arrow-container ml-2">
-                                  <div class="d-flex justify-content-start">
-                                    <span class="neon-text clean-blue" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ maintenance }}</span>
-                                  </div>
-                                </div>
-                              {% endif %}
-                            </div>
+<tbody>
+  {% for maintenance in inventory.items %}
+    <tr>
+      <td colspan="2">
+        <div class="accordion" id="accordion{{ loop.index }}">
+          <div class="card bg-dark">
+            <div class="card-header" id="heading{{ loop.index }}">
+              <h6 class="mb-0">
+                <div class="row align-items-center">
+                  <!-- First column, left part of the card -->
+                  <div class="col-md-2">
+                    <div class="d-flex justify-content-start">
+                      <button class="btn btn-sm" type="button" data-toggle="collapse" data-target="#collapse{{ loop.index }}" aria-expanded="true" aria-controls="collapse{{ loop.index }}">
+                        <span class="arrow-down"></span>
+                      </button>
+                      {% if maintenance.is_returned() %}
+                        <div class="text-arrow-container ml-2">
+                          <div class="d-flex justify-content-start">
+                            <span class="text-left text-light" style="font-size: 13px; font-family: 'Courier New', Courier, monospace;">{{ maintenance }}</span>
                           </div>
-                          
-                          <!-- Second column, middle part of the card -->
-                          {% if maintenance.is_returned() %}
-                            <div class="col-md-4">
-                              <div class="d-flex justify-content-start">
-                                <div class="text-arrow-container">
-                                  <span class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">
-                                    {{ maintenance.date.strftime('%d | %b | %Y') }}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                            <div class="col-md-4">
-                              <div class="d-flex justify-content-start">
-                                <div class="text-arrow-container">
-                                  <span class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ maintenance.maintenance_type }}</span>
-                                </div>
-                              </div>
-                            </div>
-                          {% else %}
-                            <div class="col-md-4">
-                              <div class="d-flex justify-content-start">
-                                <div class="text-arrow-container">
-                                  <span class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">
-                                    {{ maintenance.date.strftime('%d | %b | %Y') }}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                            <div class="col-md-4">
-                              <div class="d-flex justify-content-start">
-                                <div class="text-arrow-container">
-                                  <span class="neon-text clean-blue" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ maintenance.maintenance_type}}</span>
-                                </div>
-                              </div>
-                            </div>
-                          {% endif %}                        
-                          
-                          <!-- Third column, sellable badge -->
-                          <div class="col-md-1 d-flex justify-content-center">
-                            {% if maintenance.is_returned() %}
-                              <span class="neon-text sand typewriter" style="font-size: 12px;">inactive</span>
-                            {% else %}
-                              <span class="neon-text blue typewriter" style="font-size: 12px;">active</span>
-                            {% endif %}
-                          </div>
-                        
-                          <!-- Fifth column, delete button -->
-                          <div class="col-md-1 d-flex justify-content-end">
-                            {% if maintenance.is_returned() %}
-                            <form method="POST" action="{{ url_for('admin.delete_object', dataBase='Maintenance', id=maintenance.id) }}" class="form-inline" onsubmit="return confirm('Are you sure you want to delete this maintenance? This action cannot be undone.');">
-                              {{ delete_form.hidden_tag() }}
-                              <input type="hidden" name="dataBase" value="Maintenance">
-                              <input type="hidden" name="id" value="{{ maintenance.id }}">
-                              <!-- Use the Bootstrap close button here -->
-                              <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                              </button>
-                            </form>
-                            {% else %}
-                            <form method="POST" action="{{ url_for('admin.delete_object', dataBase='Maintenance', id=maintenance.id) }}" class="form-inline" onsubmit="return false;">
-                              {{ delete_form.hidden_tag() }}
-                              <input type="hidden" name="dataBase" value="Maintenance">
-                              <input type="hidden" name="id" value="{{ maintenance.id }}">
-                              <!-- Use the Bootstrap close button here -->
-                              <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Close" disabled>
-                                <span aria-hidden="true">&times;</span>
-                              </button>
-                            </form>
-                            {% endif %}
-                          </div>                        
                         </div>
-                      </h6>
+                      {% else %}
+                        <div class="text-arrow-container ml-2">
+                          <div class="d-flex justify-content-start">
+                            <span class="neon-text clean-blue" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ maintenance }}</span>
+                          </div>
+                        </div>
+                      {% endif %}
                     </div>
                   </div>
-                </div>
-
-                <div>
-                  <div id="collapse{{ loop.index }}" class="collapse" aria-labelledby="heading{{ loop.index }}" data-parent="#accordion{{ loop.index }}">
-                    <div class="card-body">
-                      <table class="table table-striped table-hover table-sm table-dark" style="font-family: 'Courier New', Courier, monospace;">
-                        <tbody style="font-size: 12px;">
-                          <tr>
-                            <td class="d-flex" style="padding-left: 10px;">
-                              <!-- Main table column -->
-                              <div class="col-6">
-                                <!-- Inner table with the content of the rows -->
-                                <table class="w-100" style="font-family: 'Courier New', Courier, monospace;">
-                                  <thead style="font-size: 13px;">
-                                    <tr>
-                                      <th scope="row">{{ maintenance }}</th>
-                                      <th></th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    <tr>
-                                      <th scope="row">Date:</th>
-                                      <td>{{ maintenance.date }}</td>
-                                    </tr>
-                                    <tr>
-                                      <th scope="row">Type:</th>
-                                      <td>{{ maintenance.maintenance_type }}</td>
-                                    </tr>
-                                    <tr>
-                                      <th scope="row">Return Date:</th>
-                                      <td>{{ maintenance.returnDate }}</td>
-                                    </tr>
-                                    <tr>
-                                      <th scope="row">Cost:</th>
-                                      <td>{{ maintenance.cost }}</td>
-                                    </tr>
-                                  </tbody>
-                                </table>
-                              </div>
-                              <!-- Maintenance log column -->
-                              <div class="col-6">
-                                <table class="table table-striped table-hover table-sm table-dark" style="font-family: 'Courier New', Courier, monospace;">
-                                  <thead style="font-size: 13px;">
-                                    <tr>
-                                      <th>Dresses</th>
-                                      <th></th>
-                                      <th></th>
-                                    </tr>
-                                  </thead>
-                                  <tbody style="font-size: 12px;">
-                                    {% for i in range(0, maintenance.dresses|length, 3) %}
-                                    <tr>
-                                      {% for dress in maintenance.dresses[i:i+3] %}
-                                      <td>
-                                        {{ dress }}
-                                      </td>
-                                      {% endfor %}
-                                    </tr>
-                                    {% endfor %}
-                                  </tbody>
-                                </table>
-                              </div>                              
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>                                                           
+                  
+                  <!-- Second column, middle part of the card -->
+                  {% if maintenance.is_returned() %}
+                    <div class="col-md-4">
+                      <div class="d-flex justify-content-start">
+                        <div class="text-arrow-container">
+                          <span class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">
+                            {{ maintenance.date.strftime('%d | %b | %Y') }}
+                          </span>
+                        </div>
+                      </div>
                     </div>
+                    <div class="col-md-4">
+                      <div class="d-flex justify-content-start">
+                        <div class="text-arrow-container">
+                          <span class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ maintenance.maintenance_type }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  {% else %}
+                    <div class="col-md-4">
+                      <div class="d-flex justify-content-start">
+                        <div class="text-arrow-container">
+                          <span class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">
+                            {{ maintenance.date.strftime('%d | %b | %Y') }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="d-flex justify-content-start">
+                        <div class="text-arrow-container">
+                          <span class="neon-text clean-blue" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ maintenance.maintenance_type}}</span>
+                        </div>
+                      </div>
+                    </div>
+                  {% endif %}                        
+                  
+                  <!-- Third column, sellable badge -->
+                  <div class="col-md-1 d-flex justify-content-center">
+                    {% if maintenance.is_returned() %}
+                      <span class="neon-text sand typewriter" style="font-size: 12px;">inactive</span>
+                    {% else %}
+                      <span class="neon-text blue typewriter" style="font-size: 12px;">active</span>
+                    {% endif %}
                   </div>
+                
+                  <!-- Fifth column, delete button -->
+                  <div class="col-md-1 d-flex justify-content-end">
+                    {% if maintenance.is_returned() %}
+                    <form method="POST" action="{{ url_for('admin.delete_object', dataBase='Maintenance', id=maintenance.id) }}" class="form-inline" onsubmit="return confirm('Are you sure you want to delete this maintenance? This action cannot be undone.');">
+                      {{ delete_form.hidden_tag() }}
+                      <input type="hidden" name="dataBase" value="Maintenance">
+                      <input type="hidden" name="id" value="{{ maintenance.id }}">
+                      <!-- Use the Bootstrap close button here -->
+                      <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </form>
+                    {% else %}
+                    <form method="POST" action="{{ url_for('admin.delete_object', dataBase='Maintenance', id=maintenance.id) }}" class="form-inline" onsubmit="return false;">
+                      {{ delete_form.hidden_tag() }}
+                      <input type="hidden" name="dataBase" value="Maintenance">
+                      <input type="hidden" name="id" value="{{ maintenance.id }}">
+                      <!-- Use the Bootstrap close button here -->
+                      <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Close" disabled>
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </form>
+                    {% endif %}
+                  </div>                        
                 </div>
-              </td>
-            </tr>
-          {% endfor %}
-          </tbody>
-          <tfoot class="custom-footer">
-            <tr>
-              <td colspan="2">
-              </td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-    </div>
-  </div>
+              </h6>
+            </div>
+          </div>
+        </d
+        <div>
+          <div id="collapse{{ loop.index }}" class="collapse" aria-labelledby="heading{{ loop.index }}" data-parent="#accordion{{ loop.index }}">
+            <div class="card-body">
+              <table class="table table-striped table-hover table-sm table-dark" style="font-family: 'Courier New', Courier, monospace;">
+                <tbody style="font-size: 12px;">
+                  <tr>
+                    <td class="d-flex" style="padding-left: 10px;">
+                      <!-- Main table column -->
+                      <div class="col-6">
+                        <!-- Inner table with the content of the rows -->
+                        <table class="w-100" style="font-family: 'Courier New', Courier, monospace;">
+                          <thead style="font-size: 13px;">
+                            <tr>
+                              <th scope="row">{{ maintenance }}</th>
+                              <th></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <th scope="row">Date:</th>
+                              <td>{{ maintenance.date }}</td>
+                            </tr>
+                            <tr>
+                              <th scope="row">Type:</th>
+                              <td>{{ maintenance.maintenance_type }}</td>
+                            </tr>
+                            <tr>
+                              <th scope="row">Return Date:</th>
+                              <td>{{ maintenance.returnDate }}</td>
+                            </tr>
+                            <tr>
+                              <th scope="row">Cost:</th>
+                              <td>{{ maintenance.cost }}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <!-- Maintenance log column -->
+                      <div class="col-6">
+                        <table class="table table-striped table-hover table-sm table-dark" style="font-family: 'Courier New', Courier, monospace;">
+                          <thead style="font-size: 13px;">
+                            <tr>
+                              <th>Dresses</th>
+                              <th></th>
+                              <th></th>
+                            </tr>
+                          </thead>
+                          <tbody style="font-size: 12px;">
+                            {% for i in range(0, maintenance.dresses|length, 3) %}
+                            <tr>
+                              {% for dress in maintenance.dresses[i:i+3] %}
+                              <td>
+                                {{ dress }}
+                              </td>
+                              {% endfor %}
+                            </tr>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                      </div>                              
+                    </td>
+                  </tr>
+                </tbody>
+              </table>                                                           
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr>
+  {% endfor %}
+</tbody>
 
 {% endblock %}

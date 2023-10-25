@@ -1,4 +1,4 @@
-from cordelia.models import Dress, Customer, Rent, Maintenance, maintenance_association
+from cordelia.models import Dress, Customer, Rent, Maintenance
 from cordelia.db import db
 from faker import Faker
 import random
@@ -26,13 +26,13 @@ def generate_random_dresses(num_dresses):
                     "Express", "Lululemon Athletica"
                     ])
         rentPrice = random.choice(range(1300, 2001, 100))
-        cost = random.randint(rentPrice + 1, rentPrice + 3000)
-        marketPrice = random.randint(cost, cost + 3000)
+        cost = random.randint(rentPrice + 100, rentPrice + 2100)
+        marketPrice = random.randint(cost, cost + 2000)
         imageData = None 
 
         today = datetime.now()
-        three_months_ago = today - timedelta(days=3 * 30)
-        dateAdded = fake.date_time_between_dates(datetime_start=three_months_ago, datetime_end=today)
+        fourMonthsAgo = today - timedelta(days=6 * 30)
+        dateAdded = fake.date_time_between_dates(datetime_start=fourMonthsAgo, datetime_end=today)
 
         try:
             # Check if a dress with the same attributes exists
@@ -69,12 +69,11 @@ def generate_unique_email():
             return email
 
 
-mexico_area_codes = [
-    '55', '81', '33', '664', '662'
-]
-
 
 def generate_unique_phone_number():
+    mexico_area_codes = [
+    '55', '81', '33', '664', '662'
+    ]
     while True:
         area_code = random.choice(mexico_area_codes)
         local_number = fake.random_int(min=1000000, max=9999999)
@@ -91,10 +90,10 @@ def generate_random_customer():
     phone_number = generate_unique_phone_number()
 
     today = datetime.now()
-    three_months_ago = today - timedelta(days=3 * 30)
-    dateAdded = fake.date_time_between_dates(datetime_start=three_months_ago, datetime_end=today)
-
+    fourMonthsAgo = today - timedelta(days=6 * 30)
+    dateAdded = fake.date_time_between_dates(datetime_start=fourMonthsAgo, datetime_end=today)
     
+
     customer = Customer(
         email=email,
         name=name,
@@ -118,17 +117,14 @@ def generate_random_customers(num_customers):
 
 def generate_sample_rents(num_rents):
     for _ in range(num_rents):
-        dress = Dress.query.filter(
-            ~Dress.rents.any(Rent.rentDate >= datetime.now() - timedelta(days=7))
-        ).order_by(db.func.random()).first()
-
+        dress = random.choice(Dress.query.all())
         customer = Customer.query.order_by(db.func.random()).first()
 
         if dress and customer:
             today = datetime.now()
-            three_months_ago = today - timedelta(days=3 * 30)
+            four_months_ago = today - timedelta(days=6 * 30)
 
-            rent_date = fake.date_time_between_dates(datetime_start=three_months_ago, datetime_end=today)
+            rent_date = fake.date_time_between_dates(datetime_start=four_months_ago, datetime_end=today)
 
             payment_method = random.choice(['Credit Card', 'Cash', 'Transfer'])
 
@@ -144,57 +140,42 @@ def generate_sample_rents(num_rents):
 
 
 
-# def create_weekly_maintenance():
-#     # Calculate the maintenance start date (3 months ago from today)
-#     today = datetime.utcnow().date()
-#     maintenance_start_date = today - timedelta(days=3 * 30)
-# 
-#     # Iterate through each week in the last 3 months
-#     while maintenance_start_date <= today:
-#         # Calculate the maintenance date (next Sunday) for the current week
-#         days_until_next_sunday = (6 - maintenance_start_date.weekday()) % 7
-#         maintenance_date = maintenance_start_date + timedelta(days=days_until_next_sunday)
-# 
-#         # Get the date range for the past 7 days (last week)
-#         last_week_start = maintenance_date - timedelta(days=7)
-#         last_week_end = maintenance_date - timedelta(days=1)
-# 
-#         # Get all returned dresses that were returned in the last 7 days
-#         returned_dresses = Dress.query.join(Rent).filter(
-#             Rent.returnDate.between(last_week_start, last_week_end)
-#         ).all()
-# 
-#         if returned_dresses:
-#             # Randomly select a maintenance type
-#             maintenance_type = random.choice(['Cleaning', 'Repair', 'Alteration'])
-# 
-#             # Generate a random maintenance cost between 50 and 300
-#             maintenance_cost = random.randint(80, 300)
-# 
-#             # Create a Maintenance instance
-#             maintenance = Maintenance(
-#                 date=maintenance_date,
-#                 maintenance_type=maintenance_type,
-#                 cost=maintenance_cost
-#             )
-# 
-#             # Link the returned dresses to the maintenance
-#             maintenance.dresses.extend(returned_dresses)
-# 
-#             # Add the maintenance to the database session
-#             db.session.add(maintenance)
-# 
-#             # Move to the next week
-#             maintenance_start_date += timedelta(weeks=1)
-#     
-#     # Commit the changes to the database after creating all maintenance records
-#     db.session.commit()
+def create_weekly_maintenance():
+    today = datetime.utcnow().date()
+    firstDayOfTheWeek = datetime.utcnow().date() - timedelta(days = 6 * 30)
+    lastDayOfTheWeek = firstDayOfTheWeek + timedelta(days=7)
+    while lastDayOfTheWeek < today :
+        # Get all returned dresses that were returned in the 7 days between first and last day
+        returned_dresses = Dress.query.join(Rent).filter(
+            Rent.returnDate.between(firstDayOfTheWeek, lastDayOfTheWeek)
+        ).all()
+        for dress in returned_dresses:
+            if len(dress.maintenances) == len(dress.rents):
+                returned_dresses.remove(dress)
 
+        if returned_dresses:
+            maintenance_type = random.choice(['Cleaning', 'Repair', 'Alteration'])
+            maintenance_cost = 80 * len(returned_dresses)
+
+            maintenance = Maintenance(
+                date = lastDayOfTheWeek,
+                maintenance_type = maintenance_type,
+                cost = maintenance_cost
+            )
+            # Link the returned dresses to the maintenance object
+            maintenance.dresses.extend(returned_dresses)
+
+            db.session.add(maintenance)
+            db.session.commit()
+
+        lastDayOfTheWeek += timedelta(weeks=1)
+        firstDayOfTheWeek += timedelta(weeks=1)
+    
 
 
 def populate_db():
     with current_app.app_context():
-        generate_random_dresses(100)
-        generate_random_customers(60)
-        generate_sample_rents(80)
-        # create_weekly_maintenance()
+        generate_random_dresses(70)
+        generate_random_customers(80)
+        generate_sample_rents(125)
+        create_weekly_maintenance()

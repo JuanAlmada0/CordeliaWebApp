@@ -121,19 +121,24 @@
               <thead>
                 <tr>
                   <td class="text-left">
-                    <span class="text-left neon-text sand" style="color: #DCC6B6; font-size: 13px; font-family: 'Courier New', Courier, monospace">Accounting</span>
+                    <span class="text-left neon-text sand" style="color: #DCC6B6; font-size: 13px; font-family: 'Courier New', Courier, monospace">Query</span>
                   </td>                     
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td>
-                    <span class="text-left text-light sand" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Costs</span>
+                    <a href="{{ url_for('admin.display_plot', img_num=1) }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Rents Per Month</a> 
                   </td>
                 </tr>
                 <tr>
                   <td>
-                    <span class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Earnings</span>
+                    <a href="{{ url_for('admin.display_plot', img_num=2) }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Top Customers</a> 
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <a href="{{ url_for('admin.display_plot', img_num=3) }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Costs VS Earnings</a> 
                   </td>
                 </tr>
               </tbody>
@@ -426,8 +431,19 @@
           </tr>
         </thead> 
 
+        {% block inventory_table_body %}
+        
+        {% endblock %}
 
-  {% block inventory_table_body %}{% endblock %}
-
+        <tfoot class="custom-footer">
+          <tr>
+            <td colspan="2">
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</div>
   
 {% endblock %}

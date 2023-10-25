@@ -6,11 +6,11 @@ from cordelia.models import Dress, Customer, Rent, Maintenance, maintenance_asso
 from cordelia.forms import SearchForm, DressForm, RentForm, CustomerForm, MaintenanceForm, DeleteForm
 from base64 import b64encode
 
+
 import logging
 
 
 adminBp = Blueprint('admin', __name__, url_prefix='/admin')
-
 
 
 @adminBp.route('/download/excel')
@@ -22,6 +22,21 @@ def downloadExcel():
 
     return excel_download()
 
+
+@adminBp.route('/display_plot/<int:img_num>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def display_plot(img_num):
+    from cordelia.dataframe import monthly_rents, top_customers, costs_vs_earnings
+
+    if img_num == 1:
+        image_data = monthly_rents()  # Get the plot image
+    elif img_num == 2:
+        image_data = top_customers()
+    elif img_num == 3:
+        image_data = costs_vs_earnings()
+
+    return render_template('admin_views/plots_template.html', image_data=image_data)
 
 
 # SearchForm handler
@@ -39,6 +54,22 @@ def handle_search_form(query, model_columns, model_class):
             query = query.filter(column.ilike(f"%{filterSearch}%"))
 
     return query, form
+
+
+@adminBp.route('/update-statuses', methods=['POST'])
+@login_required
+@admin_required
+def update_statuses_endpoint():
+    
+    confirm = request.form.get('confirm', False)
+
+    if confirm:
+        Dress.update_statuses()
+        db.session.commit()
+        flash('Statuses updated successfully.', 'success')
+
+    logging.debug("update_statuses() method called from dashboard")
+    return redirect(url_for('admin.inventory'))
 
 
 
@@ -125,23 +156,6 @@ def inventory():
                            pagination=pagination,
                            order_by_column=order_by_column,
                            model=model)
-
-
-
-@adminBp.route('/update-statuses', methods=['POST'])
-@login_required
-@admin_required
-def update_statuses_endpoint():
-    
-    confirm = request.form.get('confirm', False)
-
-    if confirm:
-        Dress.update_statuses()
-        db.session.commit()
-        flash('Statuses updated successfully.', 'success')
-
-    logging.debug("update_statuses() method called from dashboard")
-    return redirect(url_for('admin.inventory'))
 
 
 
@@ -412,7 +426,8 @@ def update(title, form_type):
                 rent = Rent(
                     dressId=form.dressId.data,
                     clientId=form.customerId.data,
-                    rentDate=form.rentDate.data
+                    rentDate=form.rentDate.data,
+                    paymentMethod=form.paymentMethod.data
                 )
                 
                 db.session.add(rent)

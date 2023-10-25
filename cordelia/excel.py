@@ -31,9 +31,7 @@ def excel_download():
             'Times Rented': [dress.timesRented for dress in dresses],
             'Sellable': [dress.sellable for dress in dresses],
             'Rent Status': [dress.rentStatus for dress in dresses],
-            'Maintenance Status': [dress.maintenanceStatus for dress in dresses],
-            'Maintenance Log': [json.loads(dress.rentLog) if dress.rentLog else None for dress in dresses],
-            'Rent Log': [json.loads(dress.rentLog) if dress.rentLog else None for dress in dresses]
+            'Maintenance Status': [dress.maintenanceStatus for dress in dresses]
         }
 
         df_dress = pd.DataFrame(dress_data)
@@ -46,8 +44,7 @@ def excel_download():
             'Name': [customer.name for customer in customers],
             'Last Name': [customer.lastName for customer in customers],
             'Phone Number': [str(customer.phoneNumber) for customer in customers],
-            'Date Added': [customer.dateAdded.strftime('%Y-%m-%d') for customer in customers],
-            'Rent Log': [json.loads(customer.rentLog) if customer.rentLog else None for customer in customers]
+            'Date Added': [customer.dateAdded.strftime('%Y-%m-%d') for customer in customers]
         }
 
         df_customer = pd.DataFrame(customer_data)
@@ -61,7 +58,7 @@ def excel_download():
             'Rent Date': [rent.rentDate.strftime('%Y-%m-%d') for rent in rents],
             'Return Date': [rent.returnDate.strftime('%Y-%m-%d') if rent.returnDate else '' for rent in rents],
             'Payment Total': [rent.paymentTotal for rent in rents],
-            'Rent Log': [json.loads(rent.rentLog) if rent.rentLog else None for rent in rents]
+            'Payment Method': [rent.paymentMethod for rent in rents]
         }
 
         df_rent = pd.DataFrame(rent_data)

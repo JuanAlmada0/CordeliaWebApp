@@ -1,184 +1,169 @@
 {% extends "admin_views/dashboard.html" %}
 
-  {% block inventory_table_body %}
-          
-          <tbody>
-          {% for customer in inventory.items %}
-            <tr>
-              <td colspan="2">
-                <div class="accordion" id="accordion{{ loop.index }}">
-                  <div class="card bg-dark">
-                    <div class="card-header" id="heading{{ loop.index }}">
-                      <h6 class="mb-0">
-                        <div class="row align-items-center">
-                          <!-- First column, left part of the card -->
-                          <div class="col-md-3">
-                            <div class="d-flex justify-content-start">
-                              <button class="btn btn-sm" type="button" data-toggle="collapse" data-target="#collapse{{ loop.index }}" aria-expanded="true" aria-controls="collapse{{ loop.index }}">
-                                <span class="arrow-down"></span>
-                              </button>
-                              {% if not customer.check_status() %}
-                              <div class="text-arrow-container ml-2">
-                                <span class="text-left text-light" style="font-size: 13px; font-family: 'Courier New', Courier, monospace;">{{ customer }}</span>
-                              </div>
-                              {% else %}
-                              <div class="text-arrow-container ml-2">
-                                <span class="neon-text clean-purple" style="font-size: 13px; font-family: 'Courier New', Courier, monospace;">{{ customer }}</span>
-                              </div>
-                              {% endif %}
-                            </div>
-                          </div>
+{% block inventory_table_body %}
 
-                          <!-- Second column, middle part of the card -->
-                          {% if not customer.check_status() %}
-                            <div class="col-md-4">
-                              <div class="d-flex justify-content-start">
-                                <div class="text-arrow-container">
-                                  <span class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ customer.email }}</span>
-                                </div>
-                              </div>
-                            </div>
-                            <div class="col-md-3">
-                              <div class="d-flex justify-content-start">
-                                <div class="text-arrow-container">
-                                  <span class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ customer.lastName }}, {{ customer.name }}</span>
-                                </div>
-                              </div>
-                            </div>
-                          {% else %}
-                            <div class="col-md-4">
-                              <div class="d-flex justify-content-start">
-                                <div class="text-arrow-container">
-                                  <span class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ customer.email }}</span>
-                                </div>
-                              </div>
-                            </div>
-                            <div class="col-md-3">
-                              <div class="d-flex justify-content-start">
-                                <div class="text-arrow-container">
-                                  <span class="neon-text clean-purple" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ customer.lastName }}, {{ customer.name }}</span>                              </div>
-                              </div>
-                            </div>
-                          {% endif %}       
-
-                          <!-- Third column -->
-                          <div class="col-md-1 d-flex justify-content-end">
-                            {% if not customer.check_status() %}
-                              <span class="neon-text sand typewriter" style="font-size: 12px;">inactive</span>
-                            {% else %}
-                              <span class="neon-text clean-two typewriter" style="font-size: 12px;">active</span>
-                            {% endif %}
-                          </div>
-
-                        
-                          <!-- Fifth column, delete button -->
-                          <div class="col-md-1 d-flex justify-content-end">
-                            {% if not customer.check_status() %}
-                            <form method="POST" action="{{ url_for('admin.delete_object', dataBase='Customer', id=customer.id) }}" class="form-inline" onsubmit="return confirm('Are you sure you want to delete this customer? This action cannot be undone.');">
-                              {{ delete_form.hidden_tag() }}
-                              <input type="hidden" name="dataBase" value="Customer">
-                              <input type="hidden" name="id" value="{{ customer.id }}">
-                              <!-- Use the Bootstrap close button here -->
-                              <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                              </button>
-                            </form>
-                            {% else %}
-                            <form method="POST" action="{{ url_for('admin.delete_object', dataBase='Customer', id=customer.id) }}" class="form-inline" onsubmit="return false;">
-                              {{ delete_form.hidden_tag() }}
-                              <input type="hidden" name="dataBase" value="Customer">
-                              <input type="hidden" name="id" value="{{ customer.id }}">
-                              <!-- Use the Bootstrap close button here -->
-                              <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Close" disabled>
-                                <span aria-hidden="true">&times;</span>
-                              </button>
-                            </form>
-                            {% endif %}
-                          </div> 
-                        </div>
-                      </h6>
+<tbody>
+  {% for customer in inventory.items %}
+  <tr>
+    <td colspan="2">
+      <div class="accordion" id="accordion{{ loop.index }}">
+        <div class="card bg-dark">
+          <div class="card-header" id="heading{{ loop.index }}">
+            <h6 class="mb-0">
+              <div class="row align-items-center">
+                <!-- First column, left part of the card -->
+                <div class="col-md-3">
+                  <div class="d-flex justify-content-start">
+                    <button class="btn btn-sm" type="button" data-toggle="collapse" data-target="#collapse{{ loop.index }}" aria-expanded="true" aria-controls="collapse{{ loop.index }}">
+                      <span class="arrow-down"></span>
+                    </button>
+                    {% if not customer.check_status() %}
+                    <div class="text-arrow-container ml-2">
+                      <span class="text-left text-light" style="font-size: 13px; font-family: 'Courier New', Courier, monospace;">{{ customer }}</span>
                     </div>
+                    {% else %}
+                    <div class="text-arrow-container ml-2">
+                      <span class="neon-text clean-purple" style="font-size: 13px; font-family: 'Courier New', Courier, monospace;">{{ customer }}</span>
+                    </div>
+                    {% endif %}
                   </div>
                 </div>
-
-                <div>
-                  <div id="collapse{{ loop.index }}" class="collapse" aria-labelledby="heading{{ loop.index }}" data-parent="#accordion{{ loop.index }}">
-                    <div class="card-body">
-                      <table class="table table-striped table-hover table-sm table-dark" style="font-family: 'Courier New', Courier, monospace;">
-                        <tbody style="font-size: 13px;">
-                          <tr>
-                            <td class="d-flex" style="padding-left: 10px;">
-                              <!-- Main table column -->
-                              <div class="col-6">
-                                <!-- Inner table with the content of the rows -->
-                                <table class="w-100">
-                                  <tbody>
-                                    <tr>
-                                      <th scope="row">Email:</th>
-                                      <td>{{ customer.email }}</td>
-                                    </tr>
-                                    <tr>
-                                      <th scope="row">Name:</th>
-                                      <td>{{ customer.name }}</td>
-                                    </tr>
-                                    <tr>
-                                      <th scope="row">Last Name:</th>
-                                      <td>{{ customer.lastName }}</td>
-                                    </tr>
-                                    <tr>
-                                      <th scope="row">Phone Number:</th>
-                                      <td>{{ customer.phoneNumber }}</td>
-                                    </tr>
-                                    <tr>
-                                      <th scope="row">Date Added:</th>
-                                      <td>{{ customer.dateAdded }}</td>
-                                    </tr>
-                                  </tbody>
-                                </table>
-                              </div>
-                              <!-- Maintenance log column -->
-                              <div class="col-6">
-                                <table class="table table-striped table-hover table-sm table-dark" style="font-family: 'Courier New', Courier, monospace;">
-                                  {% if customer.rents %}
-                                  <thead style="font-size: 13px;">
-                                    <tr>
-                                      <th>Date</th>
-                                      <th>Dress</th>
-                                      <th>Rent</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody style="font-size: 12px;">
-                                    {% for rent in customer.rents %}
-                                    <tr>
-                                        <td>{{ rent.rentDate.strftime('%Y-%m-%d') }}</td>
-                                        <td>{{ rent.dress }} | ${{ rent.dress.rentPrice }}</td>
-                                        <td>{{ rent }} | ${{ rent.paymentTotal }}</td>
-                                    </tr>
-                                    {% endfor %}
-                                  </tbody>
-                                  {% endif %}
-                                </table>
-                              </div>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>                                                           
+                <!-- Second column, middle part of the card -->
+                {% if not customer.check_status() %}
+                  <div class="col-md-4">
+                    <div class="d-flex justify-content-start">
+                      <div class="text-arrow-container">
+                        <span class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ customer.email }}</span>
+                      </div>
                     </div>
                   </div>
+                  <div class="col-md-3">
+                    <div class="d-flex justify-content-start">
+                      <div class="text-arrow-container">
+                        <span class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ customer.lastName }}, {{ customer.name }}</span>
+                      </div>
+                    </div>
+                  </div>
+                {% else %}
+                  <div class="col-md-4">
+                    <div class="d-flex justify-content-start">
+                      <div class="text-arrow-container">
+                        <span class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ customer.email }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="d-flex justify-content-start">
+                      <div class="text-arrow-container">
+                        <span class="neon-text clean-purple" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ customer.lastName }}, {{ customer.name }}</span>                              </div>
+                    </div>
+                  </div>
+                {% endif %}    
+                <!-- Third column -->
+                <div class="col-md-1 d-flex justify-content-end">
+                  {% if not customer.check_status() %}
+                    <span class="neon-text sand typewriter" style="font-size: 12px;">inactive</span>
+                  {% else %}
+                    <span class="neon-text clean-two typewriter" style="font-size: 12px;">active</span>
+                  {% endif %}
                 </div>
-              </td>
-            </tr>
-          {% endfor %}
-          </tbody>
-          <tfoot class="custom-footer">
-            <tr>
-              <td colspan="2">
-              </td>
-            </tr>
-          </tfoot>
-        </table>
+              
+                <!-- Fifth column, delete button -->
+                <div class="col-md-1 d-flex justify-content-end">
+                  {% if not customer.check_status() %}
+                  <form method="POST" action="{{ url_for('admin.delete_object', dataBase='Customer', id=customer.id) }}" class="form-inline" onsubmit="return confirm('Are you sure you want to delete this customer? This action cannot be undone.');">
+                    {{ delete_form.hidden_tag() }}
+                    <input type="hidden" name="dataBase" value="Customer">
+                    <input type="hidden" name="id" value="{{ customer.id }}">
+                    <!-- Use the Bootstrap close button here -->
+                    <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </form>
+                  {% else %}
+                  <form method="POST" action="{{ url_for('admin.delete_object', dataBase='Customer', id=customer.id) }}" class="form-inline" onsubmit="return false;">
+                    {{ delete_form.hidden_tag() }}
+                    <input type="hidden" name="dataBase" value="Customer">
+                    <input type="hidden" name="id" value="{{ customer.id }}">
+                    <!-- Use the Bootstrap close button here -->
+                    <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Close" disabled>
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </form>
+                  {% endif %}
+                </div> 
+              </div>
+            </h6>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
+
+      <div id="collapse{{ loop.index }}" class="collapse" aria-labelledby="heading{{ loop.index }}" data-parent="#accordion{{ loop.index }}">
+        <div class="card-body">
+          <table class="table table-striped table-hover table-sm table-dark" style="font-family: 'Courier New', Courier, monospace;">
+            <tbody style="font-size: 13px;">
+              <tr>
+                <td class="d-flex" style="padding-left: 10px;">
+                  <!-- Main table column -->
+                  <div class="col-6">
+                    <!-- Inner table with the content of the rows -->
+                    <table class="w-100">
+                      <tbody>
+                        <tr>
+                          <th scope="row">Email:</th>
+                          <td>{{ customer.email }}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Name:</th>
+                          <td>{{ customer.name }}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Last Name:</th>
+                          <td>{{ customer.lastName }}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Phone Number:</th>
+                          <td>{{ customer.phoneNumber }}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Date Added:</th>
+                          <td>{{ customer.dateAdded }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <!-- Maintenance log column -->
+                  <div class="col-6">
+                    <table class="table table-striped table-hover table-sm table-dark" style="font-family: 'Courier New', Courier, monospace;">
+                      {% if customer.rents %}
+                      <thead style="font-size: 13px;">
+                        <tr>
+                          <th>Date</th>
+                          <th>Dress</th>
+                          <th>Rent</th>
+                        </tr>
+                      </thead>
+                      <tbody style="font-size: 12px;">
+                        {% for rent in customer.rents %}
+                        <tr>
+                            <td>{{ rent.rentDate.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ rent.dress }} | ${{ rent.dress.rentPrice }}</td>
+                            <td>{{ rent }} | ${{ rent.paymentTotal }}</td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                      {% endif %}
+                    </table>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>                                                           
+        </div>
+      </div>
+    </td>
+  </tr>
+  {% endfor %}
+</tbody>
 
 {% endblock %}
