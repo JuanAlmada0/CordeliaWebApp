@@ -1,32 +1,18 @@
 {% extends "admin_views/dashboard.html" %}
 
 {% block inventory_table_body %}
-   
- <table class="table table-secondary table-sm" style="width: 100%; height: auto;"> 
-     <thead>
-         <tr>
-           <td>
-             {% if not image_data %}
-             <div style="font-size: 13px;">404</div>
-             {% endif %}
-           </td>
-         </tr>
-     </thead>
      <tbody>
          <tr>
              <td>
-               {% if image_data %}
-                 <img src="data:image/png;base64,{{ image_data }}" alt="Histogram of Rents per Month" style="width: auto; height: auto;">
-               {% endif %}
+                {% if image_data %}
+                <div style="padding-left: 100px;">
+                  <img src="data:image/png;base64,{{ image_data }}" alt="Histogram of Rents per Month" style="width: auto; height: auto;">
+                </div>
+                {% else %}
+                <div style="font-size: 13px;">404</div>
+                {% endif %}
              </td>
          </tr>
-     </tbody>
-     <tfoot class="custom-footer">
-       <tr>
-         <td colspan="2">
-         </td>
-       </tr>
-     </tfoot>
- </table>
+      </tbody>
 
 {% endblock %}

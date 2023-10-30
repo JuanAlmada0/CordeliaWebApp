@@ -202,7 +202,7 @@ def costs_vs_earnings():
 
         matplotlib.use('Agg')
 
-        plt.style.use('ggplot')
+        plt.style.use('seaborn')
         # Convert date columns to datetime
         df_rent['Rent Date'] = pd.to_datetime(df_rent['Rent Date'])
         df_maintenance['Date'] = pd.to_datetime(df_maintenance['Date'])
@@ -238,17 +238,14 @@ def costs_vs_earnings():
         # Create a figure and axis
         fig, ax = plt.subplots(figsize=(8, 4))
 
-        fig.set_facecolor('#DCC6B6')
-        ax.set_facecolor("#b8b8b8dc")    
-
         # Plot earnings
-        ax.plot(x_values, df_costs_earnings['Earnings'], marker='o', color='#00ff9d', label='Earnings')
+        ax.plot(x_values, df_costs_earnings['Earnings'], color='#00ff9d', label='Earnings')
 
         # Plot maintenance costs 
-        ax.plot(x_values, df_costs_earnings['Maintenance Costs'], marker='o', color='b', label='Maintenance Costs')
+        ax.plot(x_values, df_costs_earnings['Maintenance Costs'],label='Maintenance Costs')
 
         # Plot dress acquisition costs
-        ax.plot(x_values, df_costs_earnings['Dress Acquisition Costs'], marker='o', color='orange', label='Dress Acquisition Costs')
+        ax.plot(x_values, df_costs_earnings['Dress Acquisition Costs'], label='Dress Acquisition Costs')
 
         # Set the x-axis labels
         ax.set_xticks(x_values)

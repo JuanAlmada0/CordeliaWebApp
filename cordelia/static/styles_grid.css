@@ -73,28 +73,32 @@ body {
 }
 
 .table {
-    background: linear-gradient(135deg, #8b7d71 0%, #464444de 100%);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-blend-mode: multiply;
+    width: 100%;
+    table-layout: responsive;
+    display: flex;
+    flex-direction: column;
 }
 
 .table-header {
     text-align: center;
 }
 
-table {
-    width: 100%;
-}
-
 table thead {
+    background: linear-gradient(135deg, #8b7d71 0%, #626060de 100%);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
     border-bottom: 1px solid #DCC6B6; /* Example border between rows */
     width: 100%;
     display: flex;
     justify-content: space-between;
+    height: 40px;
+    white-space: nowrap; /* Prevent text from wrapping */
+    overflow: hidden; /* Hide content that overflows */
 }
+
 table thead tr {
     border-bottom: 1px solid #DCC6B6; /* Example border between rows */
     width: 100%;
@@ -104,7 +108,6 @@ table thead tr {
 
 table thead th {
     flex: 1;
-    border-bottom: 1px solid #DCC6B6; /* Example border between rows */
     width: 100%;
     flex-direction: column;
     justify-content: space-between;

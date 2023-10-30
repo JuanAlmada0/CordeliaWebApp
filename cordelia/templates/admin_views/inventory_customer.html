@@ -2,6 +2,13 @@
 
 {% block inventory_table_body %}
 
+<tr class="text-light text-left" style="font-size: 10px; font-family: 'Courier New', Courier, monospace; height: 15px; display: flex; align-items: center;">
+  <th style="flex: 3; margin-left: 40px;">ID</th>
+  <th style="flex: 4;">EMAIL</th>
+  <th style="flex: 2;">NAME</th>
+  <td style="flex: 2;">STATUS</th>
+</tr>
+
 <tbody>
   {% for customer in inventory.items %}
   <tr>
