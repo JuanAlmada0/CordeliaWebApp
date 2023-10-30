@@ -1,16 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> 
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles_grid.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> 
+      <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles_grid.css') }}">
+      <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <body>
     <header>
-
         <nav class="navbar navbar-expand-lg navbar-light custom-navbar">
             <a class="navbar-brand" href="{{ url_for('home.home') }}">CORDELIA</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,7 +54,6 @@
           </div>
         {% endif %}
         {% endwith %}
-
     </header>
 
     <section>
@@ -63,60 +61,10 @@
       {% endblock %}
     </section>
 
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      var alert = document.querySelector('.alert');
-      if (alert) {
-        alert.classList.add('fade-out');
-        setTimeout(function() {
-          alert.classList.add('fade-out-active');
-        }, 1250); // Set the desired duration for the flash message to stay before fading out (in milliseconds)
-      }
-    });
-  </script>
-
-  <script>
-      // Function to show the confirmation dialog
-      function confirmAction(message) {
-        // Show the confirmation dialog
-        var result = confirm(message);
-      
-        if (result) {
-          // If the user confirms, submit the form with an additional parameter "confirm" set to true
-          var form = event.target;
-          var input = document.createElement('input');
-          input.type = 'hidden';
-          input.name = 'confirm';
-          input.value = 'true';
-          form.appendChild(input);
-          form.submit();
-        } else {
-          alert('Action canceled.');
-          return false;
-        }
-      }
-  </script>
-  
-  <script>
-    // Script for maintenace modal 
-    // Retrieve dressCount value from the hidden input field
-    var dressCount = parseInt(document.getElementById('dressCountInput').value);
-  
-    function addDressId() {
-        var newField = document.createElement("div");
-        newField.innerHTML = '<div class="form-group"> <label for="dress_ids-' + dressCount + '-dress_id">Dress ID</label> <input class="form-control" id="dress_ids-' + dressCount + '-dress_id" name="dress_ids-' + dressCount + '-dress_id" type="number"> <button type="button" class="btn btn-danger btn-sm" onclick="removeDressId(this)">Remove</button> </div>';
-        document.getElementById("dress_ids").appendChild(newField);
-        dressCount++;
-    }
-  
-    function removeDressId(button) {
-        var parentDiv = button.parentElement;
-        parentDiv.remove();
-    }
-  </script> 
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename='custom.js') }}"></script>
      
-</body>
+  </body>
 </html>

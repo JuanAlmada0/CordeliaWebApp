@@ -2,7 +2,7 @@
 
 {% block inventory_table_body %}
 
-<tr class="text-light text-left" style="font-size: 10px; font-family: 'Courier New', Courier, monospace; height: 15px; display: flex; align-items: center;">
+<tr class="text-light text-left" style="font-size: 11px; font-family: 'Courier New', Courier, monospace; height: 20px; display: flex; align-items: center;">
   <th style="flex: 3; margin-left: 40px;">ID</th>
   <th style="flex: 4;">EMAIL</th>
   <th style="flex: 2;">NAME</th>
@@ -134,7 +134,7 @@
                         </tr>
                         <tr>
                           <th scope="row">Date Added:</th>
-                          <td>{{ customer.dateAdded }}</td>
+                          <td>{{ customer.dateAdded.strftime('%d %b %Y') }}</td>
                         </tr>
                       </tbody>
                     </table>
@@ -153,7 +153,7 @@
                       <tbody style="font-size: 12px;">
                         {% for rent in customer.rents %}
                         <tr>
-                            <td>{{ rent.rentDate.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ rent.rentDate.strftime('%d %b %Y') }}</td>
                             <td>{{ rent.dress }} | ${{ rent.dress.rentPrice }}</td>
                             <td>{{ rent }} | ${{ rent.paymentTotal }}</td>
                         </tr>

@@ -88,14 +88,13 @@ body {
 }
 
 table thead {
-    background: linear-gradient(135deg, #8b7d71 0%, #626060de 100%);
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
     border-bottom: 1px solid #DCC6B6; /* Example border between rows */
     width: 100%;
     display: flex;
     justify-content: space-between;
     height: 40px;
-    white-space: nowrap; /* Prevent text from wrapping */
+    flex-wrap: nowrap;
     overflow: hidden; /* Hide content that overflows */
 }
 

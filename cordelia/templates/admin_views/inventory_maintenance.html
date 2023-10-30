@@ -2,7 +2,7 @@
 
 {% block inventory_table_body %}
 
-<tr class="text-light text-left" style="font-size: 10px; font-family: 'Courier New', Courier, monospace; height: 15px; display: flex; align-items: center;">
+<tr class="text-light text-left" style="font-size: 11px; font-family: 'Courier New', Courier, monospace; height: 20px; display: flex; align-items: center;">
   <th style="flex: 2; margin-left: 40px;">ID</th>
   <th style="flex: 3;">DATE</th>
   <th style="flex: 3;">TYPE</th>
@@ -135,7 +135,7 @@
                           <tbody>
                             <tr>
                               <th scope="row">Date:</th>
-                              <td>{{ maintenance.date }}</td>
+                              <td>{{ maintenance.date.strftime('%d %b %Y') }}</td>
                             </tr>
                             <tr>
                               <th scope="row">Type:</th>
@@ -143,7 +143,7 @@
                             </tr>
                             <tr>
                               <th scope="row">Return Date:</th>
-                              <td>{{ maintenance.returnDate }}</td>
+                              <td>{{ maintenance.returnDate.strftime('%d %b %Y') }}</td>
                             </tr>
                             <tr>
                               <th scope="row">Cost:</th>
