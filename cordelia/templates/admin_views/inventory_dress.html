@@ -105,7 +105,7 @@
                 <!-- Third column, sellable badge -->
                 <div class="col-md-1 d-flex justify-content-center">
                   {% if dress.sellable %}
-                    <span class="neon-text sand typewriter" style="font-size: 12px;">sellable</span>
+                    <span class="neon-text sand typewriter py-2" style="font-size: 12px;">sellable</span>
                   {% else %}
                     <span class="text text-dark" style="font-size: 12px;"></span>
                   {% endif %}
@@ -138,7 +138,7 @@
                     {% if not dress.check_maintenance_status() %}
                       <span class="neon-text green typewriter" style="font-size: 12px;">stock</span>
                     {% else %}
-                      <span class="neon-text clean-blue typewriter" style="font-size: 12px;">cleaning</span>
+                      <span class="neon-text clean-blue typewriter" style="font-size: 12px;">service</span>
                     {% endif %}
                   {% else %}
                     <span class="neon-text clean-two typewriter" style="font-size: 12px;">rented</span>

@@ -27,16 +27,20 @@ def downloadExcel():
 @login_required
 @admin_required
 def display_plot(img_num):
-    from cordelia.dataframe import monthly_rents, top_customers, costs_vs_earnings
+    if Dress.query.first() and Rent.query.first() and Customer.query.first() and Maintenance.query.first():
+        
+        from cordelia.dataframe import monthly_rents, top_customers, costs_vs_earnings
 
-    if img_num == 1:
-        image_data = monthly_rents()  # Get the plot image
-    elif img_num == 2:
-        image_data = top_customers()
-    elif img_num == 3:
-        image_data = costs_vs_earnings()
-
-    return render_template('admin_views/plots_template.html', image_data=image_data)
+        if img_num == 1:
+            image_data = monthly_rents()  # Get the plot image
+        elif img_num == 2:
+            image_data = top_customers()
+        elif img_num == 3:
+            image_data = costs_vs_earnings()
+    
+        return render_template('admin_views/plots_template.html', image_data=image_data)
+    else:
+        return render_template('admin_views/plots_template.html')
 
 
 # SearchForm handler
@@ -204,47 +208,6 @@ def maintenance_inventory():
 
 
 
-@adminBp.route('/set-maintenance', methods=['POST'])
-@login_required
-@admin_required
-def add_maintenance():
-    form = MaintenanceForm(request.form)
-
-    selected_dresses = []
-    for dress_id_form in form.dress_ids:
-        dress_id = dress_id_form.dress_id.data
-        if dress_id:
-            dress = Dress.query.get(dress_id)
-            if dress and not dress.check_status() and not dress.check_maintenance_status():
-                selected_dresses.append(dress)
-            else:
-                flash('One or more dresses are unavaiable.', 'error')
-                return redirect(url_for('admin.inventory'))
-
-    date = form.maintenanceDate.data
-    type = form.maintenanceType.data
-    cost = form.maintenanceCost.data
-
-    maintenance = Maintenance(
-        date=date,
-        maintenance_type=type,
-        cost=cost,
-        dresses=selected_dresses 
-    )
-
-    # Update maintenance status for selected dresses
-    for dress in selected_dresses:
-        if dress and not dress.rentStatus:
-            dress.update_maintenance_status()
-
-    db.session.add(maintenance)
-    db.session.commit()
-    flash('Maintenance record updated successfully!', 'success')
-        
-    return redirect(url_for('admin.inventory'))
-
-
-
 @adminBp.route('/rent-inventory', methods=['GET', 'POST'])
 @login_required
 def rentInventory():
@@ -260,7 +223,7 @@ def rentInventory():
     inventory_query = Rent.query
 
     if order_by_column == 'id':
-        inventory_query = inventory_query.order_by(Rent.id.desc())
+        inventory_query = inventory_query.order_by(Rent.id)
     elif order_by_column == 'user_lastName':
         # Join Rent and Customer tables and sort by Customer's lastName
         inventory_query = inventory_query.join(Customer, Rent.clientId == Customer.id).order_by(Customer.lastName)
@@ -452,6 +415,47 @@ def update(title, form_type):
                 flash('Dress not available.')
 
     return render_template('admin_views/update.html', title=title, form_type=form_type, form=form)
+
+
+
+@adminBp.route('/set-maintenance', methods=['POST'])
+@login_required
+@admin_required
+def add_maintenance():
+    form = MaintenanceForm(request.form)
+
+    selected_dresses = []
+    for dress_id_form in form.dress_ids:
+        dress_id = dress_id_form.dress_id.data
+        if dress_id:
+            dress = Dress.query.get(dress_id)
+            if dress and not dress.check_status() and not dress.check_maintenance_status():
+                selected_dresses.append(dress)
+            else:
+                flash('One or more dresses are unavaiable.', 'error')
+                return redirect(url_for('admin.inventory'))
+
+    date = form.maintenanceDate.data
+    type = form.maintenanceType.data
+    cost = form.maintenanceCost.data
+
+    maintenance = Maintenance(
+        date=date,
+        maintenance_type=type,
+        cost=cost,
+        dresses=selected_dresses 
+    )
+
+    # Update maintenance status for selected dresses
+    for dress in selected_dresses:
+        if dress and not dress.rentStatus:
+            dress.update_maintenance_status()
+
+    db.session.add(maintenance)
+    db.session.commit()
+    flash('Maintenance record updated successfully!', 'success')
+        
+    return redirect(url_for('admin.inventory'))
 
 
 

@@ -1,265 +1,67 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> 
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles_grid.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
 </head>
-<body style="background-color: #DCC6B6;">
-  <header class="site-header">
-    <style>
-        .fade-out {
-            opacity: 1;
-            transition: opacity 0.4s ease-in-out;
-            visibility: visible;
-            position: absolute;
-            top: 10px;
-            left: 0;
-            right: 0;
-            width: 20%; 
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .fade-out.fade-out-active {
-            opacity: 0;
-            visibility: hidden;
-        }
-        .custom-navbar {
-            background-color: #DCC6B6;
-            width: 80rem;
-            max-width: 100%;
-            margin-left: auto;
-            margin-right: auto; 
-        }
-        .custom-navbar .navbar-nav .nav-link {
-            color: #B07D47; 
-        }
-        .content-container {
-          max-width: 80rem;
-          margin: 0 auto;
-          height: 100%;
-        }
-    </style>
+<body>
+    <header>
 
-    <nav class="navbar navbar-expand-lg navbar-light custom-navbar">
-      <a class="navbar-brand" href="{{ url_for('home.home') }}">CORDELIA</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-      </button>
-      {% if current_user.is_authenticated %}
-      <li class="navbar-nav">
-        <a class="nav-link" href="{{ url_for('admin.inventory') }}">Dashboard</a>
-      </li>
-      {% endif %}
+        <nav class="navbar navbar-expand-lg navbar-light custom-navbar">
+            <a class="navbar-brand" href="{{ url_for('home.home') }}">CORDELIA</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            {% if current_user.is_authenticated %}
+            <li class="navbar-nav">
+              <a class="nav-link" href="{{ url_for('admin.inventory') }}">Dashboard</a>
+            </li>
+            {% endif %}
+            <div class="collapse navbar-collapse" id="navbarNav">
+                {% if not current_user.is_authenticated %}
+                  <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{{ url_for('auth.login', next=url_for('admin.inventory')) }}">Login</a>
+                    </li>
+                  </ul>
+                {% else %}
+                  <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
+                    </li>
+                  </ul>
+                {% endif %}
+            </div>
+        </nav>
 
-      <div class="collapse navbar-collapse" id="navbarNav">
-          {% if not current_user.is_authenticated %}
-            <ul class="navbar-nav ml-auto">
-              <li class="nav-item">
-                  <a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('auth.login', next=url_for('home.home')) }}">Login</a>
-              </li>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="alert alert-info alert-sm alert-dismissible fade-out" role="alert">
+            <ul class="messages" style="font-size: 14px; padding: 10px;">
+              {% for message in messages %}
+                <li class="mb-0">{{ message }}</li>
+              {% endfor %}
             </ul>
-          {% else %}
-            <ul class="navbar-nav ml-auto">
-              <li class="nav-item">
-                  <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
-              </li>
-            </ul>
-          {% endif %}
-        
-      </div>
-    </nav>
+            <button type="button" class="close close-sm" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+        {% endif %}
+        {% endwith %}
 
-    {% block header %}
-    
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <div class="alert alert-info alert-sm alert-dismissible fade-out" role="alert">
-          <ul class="messages" style="font-size: 14px; padding: 10px;">
-            {% for message in messages %}
-              <li class="mb-0">{{ message }}</li>
-            {% endfor %}
-          </ul>
-          <button type="button" class="close close-sm" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-      {% endif %}
-    {% endwith %}
-      
-    {% endblock %}
-  </header>
-  
-  <section class="content-container">
-    <style>
-      .table {
-        background: linear-gradient(135deg, #8b7d71 0%, #464444de 100%);
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-        background-blend-mode: multiply;
-      }
-      .btn-smaller {
-        padding: 0.08rem 0.15rem;
-        font-size: 0.7rem;
-        background-color: #b8a495dc;
-        border: none;
-        box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.5)
-      }
-      .custom-btn {
-        position: relative;
-      }
-      .arrow-down {
-        border: solid #ffffff;
-        border-width: 0 3px 3px 0;
-        display: inline-block;
-        padding: 2px;
-        transform: rotate(45deg);
-        -webkit-transform: rotate(45deg);
-      }
-      /* Custom CSS for reducing space between text and arrow button */
-      .text-arrow-container {
-        display: flex;
-        align-items: center;
-      }
-      .text-arrow-container .text-left {
-        margin-right: 5px; 
-      }
-      .custom-form-control {
-        padding: 0.25rem 0.5rem; 
-        font-size: 0.7rem; 
-      }
-      /* Custom CSS for breadcrumb */
-      .breadcrumb.file-cabinet {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin: 0;
-        padding: 0;
-        background: none; /* Remove the background color */
-        box-shadow: none; /* Remove the box-shadow */
-      }
-      /* Custom CSS for breadcrumb items (links) */
-      .breadcrumb-item {
-        font-family: 'Courier New', Courier, monospace;
-        font-size: 11.5px;
-        text-transform: uppercase;
-        padding: 3px 6px;
-        color: #ccbfb4;
-        border: none; /* Remove the border */
-        margin-right: 8px; /* Add some space between items */
-        text-decoration: none;
-        background: none; /* Remove the background color */
-        box-shadow: none;
-      }
-      .breadcrumb-item:hover {
-          color: black; /* Change the link color to black on hover */
-      }
-      /* Custom CSS for active breadcrumb item (current page) */
-      .breadcrumb-item.active {
-        color: #fff;
-        background: none;
-      /*  background-color: #817568;  */
-        border: none; /* Remove the border */
-      }
-      .custom-footer::before {
-        content: ""; 
-        display: block;
-        height: 20px; 
-      }
-      .pagination-container {
-        position: absolute; top: 5px; left: 50px;
-      }
-      .content-container {
-        border-radius: 8px;
-        padding: 4px;
-        background: #b8a495dc;
-        background-image: linear-gradient(to bottom, rgba(216, 216, 216, 0.4), rgba(184, 164, 149, 0.6));
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      }
-      .neon-text {
-        font-size: 11px;
-        animation: neon 1s infinite;
-        display: inline-block;
-        margin-right: 10px;
-      }
-      .green {
-         
-        text-shadow: 0 0 3px #00ff9d;
-        color: hsl(145, 71%, 68%);
-      }
-      .sand {
-        text-shadow: 0 0 3px #B07D47;
-        color: hsl(35, 19%, 83%);
-      }
-      .blue {
-         
-        text-shadow: 0 0 3px #00ffff;
-        color: hsl(184, 100%, 50%);
-      }
-      .clean-blue {
-        
-        text-shadow: 0 0 3px #00ffc8;
-        color: hsl(165, 100%, 60%);
-      }
-      .clean-two {
-        
-        text-shadow: 0 0 3px #ff9900;
-        color: hsl(35, 100%, 60%);
-      }
-      .clean-pink {
-         
-        text-shadow: 0 0 3px #ff7ed8;
-        color: hsl(315, 100%, 60%);
-      }
-      .clean-purple {
-         
-        text-shadow: 0 0 3px rgb(212, 0, 255);
-        color: hsl(285, 100%, 87%);
-      }
-      .clean-white {
-         
-        text-shadow: 0 0 3px rgb(255, 255, 255);
-        color: hsl(280, 26%, 96%);
-      }
-      .clean-three {
-        
-        text-shadow: 0 0 3px #2bff00;
-        color: hsl(88, 100%, 50%);
-      }
-      .dress-image {
-        height: 200px;
-        max-width: 100%;
-      }
-      .image-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 200px;
-        width: 150px;
-        background-color: #6b6b6b;
-        box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
-      }
-      @font-face {
-        font-family: 'Typewriter';
-        src: url(data:application/x-font-ttf;charset=utf-8;base64) format('truetype');
-      }
-      .typewriter {
-        font-family: 'Typewriter', monospace;
-      }
-    </style>
-    {% block content %}
-    {% endblock %}
-  </section>
+    </header>
 
-  </br>
-
-  {% block scripts %}
+    <section>
+      {% block content %}
+      {% endblock %}
+    </section>
 
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
@@ -271,32 +73,50 @@
         alert.classList.add('fade-out');
         setTimeout(function() {
           alert.classList.add('fade-out-active');
-        }, 2000); // Set the desired duration for the flash message to stay before fading out (in milliseconds)
+        }, 1250); // Set the desired duration for the flash message to stay before fading out (in milliseconds)
       }
     });
   </script>
+
   <script>
-    // Function to show the confirmation dialog
-    function confirmAction(message) {
-      // Show the confirmation dialog
-      var result = confirm(message);
-  
-      if (result) {
-        // If the user confirms, submit the form with an additional parameter "confirm" set to true
-        var form = event.target;
-        var input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'confirm';
-        input.value = 'true';
-        form.appendChild(input);
-        form.submit();
-      } else {
-        alert('Action canceled.');
-        return false;
+      // Function to show the confirmation dialog
+      function confirmAction(message) {
+        // Show the confirmation dialog
+        var result = confirm(message);
+      
+        if (result) {
+          // If the user confirms, submit the form with an additional parameter "confirm" set to true
+          var form = event.target;
+          var input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = 'confirm';
+          input.value = 'true';
+          form.appendChild(input);
+          form.submit();
+        } else {
+          alert('Action canceled.');
+          return false;
+        }
       }
+  </script>
+  
+  <script>
+    // Script for maintenace modal 
+    // Retrieve dressCount value from the hidden input field
+    var dressCount = parseInt(document.getElementById('dressCountInput').value);
+  
+    function addDressId() {
+        var newField = document.createElement("div");
+        newField.innerHTML = '<div class="form-group"> <label for="dress_ids-' + dressCount + '-dress_id">Dress ID</label> <input class="form-control" id="dress_ids-' + dressCount + '-dress_id" name="dress_ids-' + dressCount + '-dress_id" type="number"> <button type="button" class="btn btn-danger btn-sm" onclick="removeDressId(this)">Remove</button> </div>';
+        document.getElementById("dress_ids").appendChild(newField);
+        dressCount++;
+    }
+  
+    function removeDressId(button) {
+        var parentDiv = button.parentElement;
+        parentDiv.remove();
     }
   </script> 
      
-  {% endblock %}
 </body>
 </html>

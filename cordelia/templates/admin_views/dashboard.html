@@ -1,449 +1,388 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
 {% block content %}
 
-<div class="d-flex justify-content-center" style="background-color: #b8a495dc; padding-top: 10px; padding-bottom: 10px;">
-  <div class="col-md-2 d-flex flex-column">
-    <div class="row pl-3"> 
-      <table class="table table-secondary flex-1 p-1">
-        <thead>
-          <tr>
-              <td>
-                  <span class="text-left neon-text sand" style="color: #DCC6B6; font-size: 13px; font-family: 'Courier New', Courier, monospace">Database</span>
-              </td>
-              
-              <td></td>
+<div class="dashboard">
 
-              <td>
-                  <form action="{{ url_for('admin.downloadExcel') }}" method="get" onsubmit="return confirmAction('confirm download?');">
-                      <button type="submit" class="btn btn-outline-light btn-smaller ml-auto btn-dark">
-                          <i class="fas fa-download fa-sm"></i> <!-- Font Awesome download icon, larger size -->
-                      </button>
-                  </form>
-              </td>
-          </tr>
-        </thead>
-      
-        <tbody>
-            <tr>
-              <td>
-                {% if current_user.is_authenticated %}
-                <a href="{{ url_for('admin.inventory') }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Dress</a>
-                <span class="badge badge-light">{{ inventory.total if model == 'Dress'}}</span>
-                {% else %}
-                <a href="{{ url_for('auth.login', next=url_for('admin.inventory')) }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Dress</a>
-                <span class="badge badge-light">{{ inventory.total if model == 'Dress'}}</span>
-                {% endif %}
-              </td>
-              {% if model == "Dress" %}
-                <td>
-                  <form id="update-rent-statuses-form" method="POST" action="{{ url_for('admin.update_statuses_endpoint') }}" onsubmit="return confirmAction('Update Dress database?');">
-                    {{ form.hidden_tag() }}
-                    <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Refresh">
-                      <i class="fas fa-sync-alt"></i> <!-- Font Awesome refresh icon -->
-                    </button>
-                  </form>
-                </td>
-                <td>
-                  <a href="{{ url_for('admin.update', title='Add Dress', form_type='dress') }}" class="btn btn-outline-light btn-smaller mr-2 btn-dark">
-                    <i class="fas fa-plus"></i> <!-- Font Awesome "plus" icon -->
-                  </a>
-                </td>
-              {% else %}
-                <td></td>
-                <td></td>
-              {% endif %}
-            </tr>
-            <tr>
-                <td>
-                  {% if current_user.is_authenticated %}
-                  <a href="{{ url_for('admin.rentInventory') }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Rent</a> 
-                  <span class="badge badge-light">{{ inventory.total if model == 'Rent' }}</span>
-                  {% else %}
-                  <a href="{{ url_for('auth.login', next=url_for('admin.rentInventory')) }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Rent</a> 
-                  <span class="badge badge-light">{{ inventory.total if model == 'Rent' }}</span>
-                  {% endif %}
-                </td>
-              {% if model == "Rent" %}
-                <td></td>
-                <td>
-                  <a href="{{ url_for('admin.update', title='Add Rent', form_type='rent') }}" class="btn btn-outline-light btn-smaller mr-2 btn-dark">
-                    <i class="fas fa-plus"></i> <!-- Font Awesome "plus" icon -->
-                  </a>
-                </td>
-              {% else %}
-                <td></td>
-                <td></td>
-              {% endif %}            
-            </tr>
-            <tr>
-              <td>
-                {% if current_user.is_authenticated %}
-                <a href="{{ url_for('admin.customerInventory') }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Customer</a>
-                <span class="badge badge-light">{{ inventory.total if model == 'Customer' }}</span>
-                {% else %}
-                <a href="{{ url_for('auth.login', next=url_for('admin.customerInventory')) }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Customer</a>
-                <span class="badge badge-light">{{ inventory.total if model == 'Customer' }}</span>
-                {% endif %}
-              </td>
-              {% if model == "Customer" %}
-              <td></td>
-              <td>
-                <a href="{{ url_for('admin.update', title='Add Customer', form_type='customer') }}" class="btn btn-outline-light btn-smaller mr-2 btn-dark">
-                  <i class="fas fa-plus"></i> <!-- Font Awesome "plus" icon -->
-                </a>
-              </td>
-              {% else %}
-              <td></td>
-              <td></td>
-              {% endif %}           
-            </tr>
-            <tr>
-              <td>
-                {% if current_user.is_authenticated %}
-                <a href="{{ url_for('admin.maintenance_inventory') }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Maintenance</a> 
-                <span class="badge badge-light">{{ inventory.total if model == 'Maintenance' }}</span>
-                {% else %}
-                <a href="{{ url_for('auth.login', next=url_for('admin.maintenance_inventory')) }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Maintenance</a> 
-                <span class="badge badge-light">{{ inventory.total if model == 'Maintenance' }}</span>
-                {% endif %}
-              </td>
-              {% if model == "Maintenance" %}
-                <td></td>
-                <td></td>
-              {% else %}
-                <td></td>
-                <td></td>
-              {% endif %} 
-            </tr>
+    <div class="sidebar">
 
-            <table class="table table-secondary flex-1 p-1">
-              <thead>
-                <tr>
-                  <td class="text-left">
-                    <span class="text-left neon-text sand" style="color: #DCC6B6; font-size: 13px; font-family: 'Courier New', Courier, monospace">Query</span>
-                  </td>                     
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <a href="{{ url_for('admin.display_plot', img_num=1) }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Rents Per Month</a> 
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <a href="{{ url_for('admin.display_plot', img_num=2) }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Top Customers</a> 
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <a href="{{ url_for('admin.display_plot', img_num=3) }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Costs VS Earnings</a> 
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-      </table>
-    </div>
-  </div>
-  
-  <div class="col-md-10 ml-auto">
-    <div class="d-flex justify-content-center">
-      <table class="table table-secondary table-sm" style="width: 100%; height: auto;"> 
-        <thead>
-          <tr>
-            <th colspan="2" style="width: 100%; position: relative;">
-              <div class="d-flex justify-content-between align-items-center">
-                
-                <span class="text-left text-light" style="font-size: 14px;">
-                  <span style="margin-right: 1rem; font-family: 'Courier New', Courier, monospace">{{ model }}</span>
-                </span>
-      
-                <div class="pagination-container ml-5">
-                  {% if model == "Dress" %}
-                    {% if inventory.has_prev or inventory.has_next %}
-                    <nav aria-label="Inventory pagination">
-                      <ul class="pagination">
-                        {% if inventory.has_prev %}
-                        <li class="page-item ml-1">
-                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.inventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">prev</a>
-                        </li>
-                        {% endif %}
-                        <li class="page-item ml-1">
-                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="javascript:void(0);" aria-label="Current Page">{{ inventory.page }}</a>
-                        </li>
-                        {% if inventory.has_next %}
-                        <li class="page-item ml-2">
-                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.inventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">next</a>
-                        </li>
-                        {% endif %}
-                      </ul>
-                    </nav>
-                    {% endif %}          
-                  {% elif model == "Rent" %}
-                    {% if inventory.has_prev or inventory.has_next %}
-                    <nav aria-label="Inventory pagination">
-                      <ul class="pagination">
-                        {% if inventory.has_prev %}
-                        <li class="page-item ml-1">
-                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.rentInventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">prev</a>
-                        </li>
-                        {% endif %}
-                        <li class="page-item ml-1">
-                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="javascript:void(0);" aria-label="Current Page">{{ inventory.page }}</a>
-                        </li>
-                        {% if inventory.has_next %}
-                        <li class="page-item ml-2">
-                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.rentInventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">next</a>
-                        </li>
-                        {% endif %}
-                      </ul>
-                    </nav>
-                    {% endif %}
-                  {% elif model == "Customer" %}
-                    {% if inventory.has_prev or inventory.has_next %}
-                    <nav aria-label="Inventory pagination">
-                      <ul class="pagination">
-                        {% if inventory.has_prev %}
-                        <li class="page-item ml-1">
-                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.customerInventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">prev</a>
-                        </li>
-                        {% endif %}
-                        <li class="page-item ml-1">
-                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="javascript:void(0);" aria-label="Current Page">{{ inventory.page }}</a>
-                        </li>
-                        {% if inventory.has_next %}
-                        <li class="page-item ml-2">
-                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.customerInventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">next</a>
-                        </li>
-                        {% endif %}
-                      </ul>
-                    </nav>
-                    {% endif %}
-                  {% elif model == "Maintenance" %}
-                    {% if inventory.has_prev or inventory.has_next %}
-                    <nav aria-label="Inventory pagination">
-                      <ul class="pagination">
-                        {% if inventory.has_prev %}
-                        <li class="page-item ml-1">
-                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.maintenance_inventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">prev</a>
-                        </li>
-                        {% endif %}
-                        <li class="page-item ml-1">
-                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="javascript:void(0);" aria-label="Current Page">{{ inventory.page }}</a>
-                        </li>
-                        {% if inventory.has_next %}
-                        <li class="page-item ml-2">
-                          <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.maintenance_inventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">next</a>
-                        </li>
-                        {% endif %}
-                      </ul>
-                    </nav>
-                    {% endif %}
-                  {% endif %}
-                </div>                
-
-                <style>
-                  .btn.active {
-                    background-color: #817467 !important;
-                    border: none !important;
-                    color: #000 !important; /* Set the text color to dark */
-                  }
-                  /* Style the active link inside buttons */
-                  .btn.active .text-light {
-                    color: #DCC6B6 !important;
-                    text-shadow: 0 0 2px #B07D47;
-                  }
-                  .btn.active:hover {
-                    color: #000 !important; /* Set the text color to dark on hover */
-                  }
-      
-                  /* Remove underline from the links inside buttons */
-                  .btn.custom-link {
-                    text-decoration: none;
-                  }
-                </style>
-           
-                {% if model == 'Dress' %}
-                  <div class="mx-auto breadcrumb file-cabinet">
-                    <a class="breadcrumb-item {% if order_by_column == 'default' %}active{% endif %}" href="{{ url_for('admin.inventory', order_by='default') }}">status</a>
-                    <a class="breadcrumb-item {% if order_by_column == 'id' %}active{% endif %}" href="{{ url_for('admin.inventory', order_by='id') }}">added</a>
-                    <a class="breadcrumb-item {% if order_by_column == 'times_rented' %}active{% endif %}" href="{{ url_for('admin.inventory', order_by='times_rented') }}">popular</a>
-                    <a class="breadcrumb-item {% if order_by_column == 'dress_cost' %}active{% endif %}" href="{{ url_for('admin.inventory', order_by='dress_cost') }}">cost</a>
-                  </div>
-
-                  <!-- Modal for Maintenance form -->
-                  <div class="modal fade" id="maintenanceModal" tabindex="-1" role="dialog" aria-labelledby="maintenanceModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="maintenanceModalLabel">Maintenance</h5>
-
-                                <button type="button" class="btn btn-dark btn-sm ml-auto" onclick="addDressId()">Add Dress</button>
-
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <!-- Maintenance form -->
-                                <form method="POST" action="{{ url_for('admin.add_maintenance') }}" class="form-inline">
-                                    {{ maintenance_form.hidden_tag() }}
-
-                                    <div id="dress_ids">
-                                        {% for dress_id_field in maintenance_form.dress_ids %}
-                                            <div class="form-group">
-                                                <label for="{{ dress_id_field.dress_id.id }}">{{ dress_id_field.dress_id.label }}</label>
-                                                {{ dress_id_field.dress_id(class="form-control") }}
-                                                <button type="button" class="btn btn-danger btn-sm" onclick="removeDressId(this)">Remove</button>
-                                            </div>
-                                        {% endfor %}
-                                    </div>
-                                    
-                                    <div class="form-group ml-2">
-                                        <label for="{{ maintenance_form.maintenanceDate.id }}">{{ maintenance_form.maintenanceDate.label }}</label>
-                                        {{ maintenance_form.maintenanceDate(class="form-control", autocomplete="off") }}
-                                   
-                                        <label for="{{ maintenance_form.maintenanceType.id }}">{{ maintenance_form.maintenanceType.label }}</label>
-                                        {{ maintenance_form.maintenanceType(class="form-control", autocomplete="off") }}
-                                    </div>
-                                    
-                                    <div class="form-group ml-2">
-                                      <label for="{{ maintenance_form.maintenanceCost.id }}">{{ maintenance_form.maintenanceCost.label }}</label>
-                                      {{ maintenance_form.maintenanceCost(class="form-control", autocomplete="off", type="number") }}
-
-                                      <button type="submit" class="btn btn-primary btn-dark btn-sm" name="submit">Submit</button>
-                                    </div>
-                                  
-                                    <!-- Add this hidden input field in the form -->
-                                    <input type="hidden" id="dressCountInput" value="{{ maintenance_form.dress_ids|length + 1 }}">
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                  </div>
-                  
-                  <script>
-                    // Retrieve dressCount value from the hidden input field
-                    var dressCount = parseInt(document.getElementById('dressCountInput').value);
-                  
-                    function addDressId() {
-                        var newField = document.createElement("div");
-                        newField.innerHTML = '<div class="form-group"> <label for="dress_ids-' + dressCount + '-dress_id">Dress ID</label> <input class="form-control" id="dress_ids-' + dressCount + '-dress_id" name="dress_ids-' + dressCount + '-dress_id" type="number"> <button type="button" class="btn btn-danger btn-sm" onclick="removeDressId(this)">Remove</button> </div>';
-                        document.getElementById("dress_ids").appendChild(newField);
-                        dressCount++;
-                    }
-                  
-                    function removeDressId(button) {
-                        var parentDiv = button.parentElement;
-                        parentDiv.remove();
-                    }
-                  </script>
-
-                  <!-- Maintenance form modal button-->
-                  <div class="justify-content-between mr-2">
-                    <button type="button" class="btn btn-outline-light btn-sm btn-smaller btn-dark" data-toggle="modal" data-target="#maintenanceModal">
-                      <i class="fas fa-wrench"></i>
-                    </button>
-                  </div>
-
-
-                  <form method="POST" action="{{ url_for('admin.inventory') }}" class="form-inline">
-                    {{ form.hidden_tag() }}
-                    <div class="form-group" style="padding-right: 2.5px;">
-                      <style>
-                        /* Target the specific field and set the fixed width */
-                        #category-input {
-                          width: 10em; /* Set the desired width here, for example, 10em */
-                        }
-                      </style>
-                      {{ form.category(class="form-control form-control-sm custom-form-control mr-2", id="category-input", style="width: 10em;", style="background-color: #b8a495dc; color: #fff; font-family: 'Courier New', Courier, monospace") }}
-                      {{ form.search(class="form-control form-control-sm custom-form-control mr-2", type="search", placeholder="Search", style="font-family: 'Courier New', Courier, monospace; width: 10em;") }}
-                      <button type="submit" class="btn btn-outline-light btn-smaller btn-dark" style="font-family: 'Courier New', Courier, monospace">Filter</button>
-                    </div>
-                  </form>
-                {% elif model == 'Maintenance' %}
-                  <div class="mx-auto breadcrumb file-cabinet">
-                    <a class="breadcrumb-item {% if order_by_column == 'default' %}active{% endif %}" href="{{ url_for('admin.maintenance_inventory', order_by='default') }}">status</a>
-                    <a class="breadcrumb-item {% if order_by_column == 'id' %}active{% endif %}" href="{{ url_for('admin.maintenance_inventory', order_by='date') }}">date</a>
-                    <a class="breadcrumb-item {% if order_by_column == 'dress_id' %}active{% endif %}" href="{{ url_for('admin.maintenance_inventory', order_by='type') }}">type</a>
-                    <a class="breadcrumb-item {% if order_by_column == 'user_lastName' %}active{% endif %}" href="{{ url_for('admin.maintenance_inventory', order_by='cost') }}">cost</a>
-                  </div>
-                  <form method="POST" action="{{ url_for('admin.maintenance_inventory') }}" class="form-inline">
-                    {{ form.hidden_tag() }}
-                    <div class="form-group" style="padding-right: 2.5px;">
-                      <style>
-                        /* Target the specific field and set the fixed width */
-                        #category-input {
-                          width: 10em; /* Set the desired width here, for example, 10em */
-                        }
-                      </style>
-                      {{ form.category(class="form-control form-control-sm custom-form-control mr-2", id="category-input", style="width: 10em;", style="background-color: #b8a495dc; color: #fff; font-family: 'Courier New', Courier, monospace") }}
-                      {{ form.search(class="form-control form-control-sm custom-form-control mr-2", type="search", placeholder="Search", style="font-family: 'Courier New', Courier, monospace; width: 10em;") }}
-                      <button type="submit" class="btn btn-outline-light btn-smaller btn-dark" style="font-family: 'Courier New', Courier, monospace">Filter</button>
-                    </div>
-                  </form>
-                {% elif model == 'Rent' %}
-                  <div class="mx-auto breadcrumb file-cabinet">
-                    <a class="breadcrumb-item {% if order_by_column == 'default' %}active{% endif %}" href="{{ url_for('admin.rentInventory', order_by='default') }}">status</a>
-                    <a class="breadcrumb-item {% if order_by_column == 'id' %}active{% endif %}" href="{{ url_for('admin.rentInventory', order_by='id') }}">id</a>
-                    <a class="breadcrumb-item {% if order_by_column == 'dress_id' %}active{% endif %}" href="{{ url_for('admin.rentInventory', order_by='dress_id') }}">dress</a>
-                    <a class="breadcrumb-item {% if order_by_column == 'user_lastName' %}active{% endif %}" href="{{ url_for('admin.rentInventory', order_by='user_lastName') }}">user</a>
-                  </div>
-                  <form method="POST" action="{{ url_for('admin.rentInventory') }}" class="form-inline">
-                    {{ form.hidden_tag() }}
-                    <div class="form-group" style="padding-right: 2.5px;">
-                      <style>
-                        /* Target the specific field and set the fixed width */
-                        #category-input {
-                          width: 10em; /* Set the desired width here, for example, 10em */
-                        }
-                      </style>
-                      {{ form.category(class="form-control form-control-sm custom-form-control mr-2", id="category-input", style="width: 10em;", style="background-color: #b8a495dc; color: #fff; font-family: 'Courier New', Courier, monospace") }}
-                      {{ form.search(class="form-control form-control-sm custom-form-control mr-2", type="search", placeholder="Search", style="font-family: 'Courier New', Courier, monospace; width: 10em;") }}
-                      <button type="submit" class="btn btn-outline-light btn-smaller btn-dark" style="font-family: 'Courier New', Courier, monospace">Filter</button>
-                    </div>
-                  </form>
-                {% elif model == 'Customer' %}
-                  <div class="mx-auto breadcrumb file-cabinet">
-                    <a class="breadcrumb-item {% if order_by_column == 'default' %}active{% endif %}" href="{{ url_for('admin.customerInventory', order_by='default') }}">status</a>
-                    <a class="breadcrumb-item {% if order_by_column == 'date' %}active{% endif %}" href="{{ url_for('admin.customerInventory', order_by='date') }}">joined</a>
-                    <a class="breadcrumb-item {% if order_by_column == 'id' %}active{% endif %}" href="{{ url_for('admin.customerInventory', order_by='id') }}">id</a>
-                    <a class="breadcrumb-item {% if order_by_column == 'last_name' %}active{% endif %}" href="{{ url_for('admin.customerInventory', order_by='last_name') }}">last name</a>
-                  </div>
-                  <form method="POST" action="{{ url_for('admin.customerInventory') }}" class="form-inline">
-                    {{ form.hidden_tag() }}
-                    <div class="form-group" style="padding-right: 2px;">
-                      <style>
-                        /* Target the specific field and set the fixed width */
-                        #category-input {
-                          width: 10em; 
-                        }
-                      </style>
-                      {{ form.category(class="form-control form-control-sm custom-form-control mr-2", id="category-input", style="width: 10em;", style="background-color: #b8a495dc; color: #fff; font-family: 'Courier New', Courier, monospace") }}
-                      {{ form.search(class="form-control form-control-sm custom-form-control mr-2", type="search", placeholder="search", style="font-family: 'Courier New', Courier, monospace; width: 10em;") }}
-                      <button type="submit" class="btn btn-outline-light btn-smaller btn-dark" style="font-family: 'Courier New', Courier, monospace">Filter</button>
-                    </div>
-                  </form>
-                {% endif %}
-              </div>
-            </th>
-          </tr>
-        </thead> 
-
-        {% block inventory_table_body %}
+        <div class="menu">
+            <span class="text-left neon-text sand" style="color: #DCC6B6; font-size: 13px; font-family: 'Courier New', Courier, monospace">Database</span>
+            
+            <form action="{{ url_for('admin.downloadExcel') }}" method="get" onsubmit="return confirmAction('confirm download?');">
+                <button type="submit" class="btn btn-outline-light btn-smaller btn-dark">
+                    <i class="fas fa-download fa-sm"></i> <!-- Font Awesome download icon, larger size -->
+                </button>
+            </form>
+        </div>
         
-        {% endblock %}
+        <div class="menu">
+            <a href="{{ url_for('admin.inventory') }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Dress</a>
+            {% if model == "Dress" %}
+            <span class="badge badge-light ml-2">{{ inventory.total if model == 'Dress'}}</span>
+           
+            <div class="spacer"></div>
+               
+            <a href="{{ url_for('admin.update', title='Add Dress', form_type='dress') }}" class="btn btn-outline-light btn-smaller mr-2 btn-dark">
+                <i class="fas fa-plus"></i> <!-- Font Awesome "plus" icon -->
+            </a>
+            {% endif %}
+        </div>
 
-        <tfoot class="custom-footer">
-          <tr>
-            <td colspan="2">
-            </td>
-          </tr>
-        </tfoot>
-      </table>
+        <div class="menu">
+            <a href="{{ url_for('admin.rentInventory') }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Rent</a>
+            {% if model == 'Rent' %}
+            <span class="badge badge-light ml-2">{{ inventory.total if model == 'Rent'}}</span>
+
+            <div class="spacer"></div>
+
+            <a href="{{ url_for('admin.update', title='Add Dress', form_type='dress') }}" class="btn btn-outline-light btn-smaller mr-2 btn-dark">
+                <i class="fas fa-plus"></i> <!-- Font Awesome "plus" icon -->
+            </a>
+            {% endif %}
+        </div>
+
+        <div class="menu">
+            <a href="{{ url_for('admin.customerInventory') }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Customer</a>
+            {% if model == 'Customer' %}
+            <span class="badge badge-light ml-2">{{ inventory.total if model == 'Customer' }}</span>
+
+            <div class="spacer"></div>
+
+            <a href="{{ url_for('admin.update', title='Add Customer', form_type='customer') }}" class="btn btn-outline-light btn-smaller mr-2 btn-dark">
+                <i class="fas fa-plus"></i> <!-- Font Awesome "plus" icon -->
+            </a>
+            {% endif %}
+        </div>
+
+        <div class="menu">
+            <a href="{{ url_for('admin.maintenance_inventory') }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Maintenance</a>
+            {% if model == 'Maintenance' %}
+            <span class="badge badge-light ml-2">{{ inventory.total if model == 'Maintenance' }}</span>
+
+            <div class="spacer"></div>
+
+            {% endif %}
+        </div>
+        
+        <div class="footer">
+            <span>Section 1 Footer</span>
+        </div>
+
+
+
+        <div class="menu">
+            <span class="text-left neon-text sand" style="color: #DCC6B6; font-size: 13px; font-family: 'Courier New', Courier, monospace">Query</span>
+        </div>
+        <div class="menu">
+            <a href="{{ url_for('admin.display_plot', img_num=1) }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Rents Per Month</a> 
+        </div>
+        <div class="menu">
+            <a href="{{ url_for('admin.display_plot', img_num=2) }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Top Customers</a> 
+        </div>
+        <div class="menu">
+            <a href="{{ url_for('admin.display_plot', img_num=3) }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Costs VS Earnings</a> 
+        </div>
+
+        <div class="footer">
+            <span>Section 2 Footer</span>
+        </div>
+
     </div>
-  </div>
+    
+    <div class="main-section">
+        <div class="table table-dark table-sm">
+            <div class="table-header" style="margin-right: 1rem; font-family: 'Courier New', Courier, monospace;">INVENTORY</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>
+                            <span class="text-left text-light" style="margin-right: 1rem; font-family: 'Courier New', Courier, monospace; font-size: 14px;">{{ model }}</span>
+                        </th>
+                        <th>
+                            <div class="pagination-container">
+                              {% if model == "Dress" %}
+                                {% if inventory.has_prev or inventory.has_next %}
+                                <nav aria-label="Inventory pagination">
+                                  <ul class="pagination">
+                                    {% if inventory.has_prev %}
+                                    <li class="page-item ml-1">
+                                      <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.inventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">prev</a>
+                                    </li>
+                                    {% endif %}
+                                    <li class="page-item ml-1">
+                                      <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="javascript:void(0);" aria-label="Current Page">{{ inventory.page }}</a>
+                                    </li>
+                                    {% if inventory.has_next %}
+                                    <li class="page-item ml-2">
+                                      <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.inventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">next</a>
+                                    </li>
+                                    {% endif %}
+                                  </ul>
+                                </nav>
+                                {% endif %}          
+                              {% elif model == "Rent" %}
+                                {% if inventory.has_prev or inventory.has_next %}
+                                <nav aria-label="Inventory pagination">
+                                  <ul class="pagination">
+                                    {% if inventory.has_prev %}
+                                    <li class="page-item ml-1">
+                                      <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.rentInventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">prev</a>
+                                    </li>
+                                    {% endif %}
+                                    <li class="page-item ml-1">
+                                      <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="javascript:void(0);" aria-label="Current Page">{{ inventory.page }}</a>
+                                    </li>
+                                    {% if inventory.has_next %}
+                                    <li class="page-item ml-2">
+                                      <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.rentInventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">next</a>
+                                    </li>
+                                    {% endif %}
+                                  </ul>
+                                </nav>
+                                {% endif %}
+                              {% elif model == "Customer" %}
+                                {% if inventory.has_prev or inventory.has_next %}
+                                <nav aria-label="Inventory pagination">
+                                  <ul class="pagination">
+                                    {% if inventory.has_prev %}
+                                    <li class="page-item ml-1">
+                                      <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.customerInventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">prev</a>
+                                    </li>
+                                    {% endif %}
+                                    <li class="page-item ml-1">
+                                      <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="javascript:void(0);" aria-label="Current Page">{{ inventory.page }}</a>
+                                    </li>
+                                    {% if inventory.has_next %}
+                                    <li class="page-item ml-2">
+                                      <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.customerInventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">next</a>
+                                    </li>
+                                    {% endif %}
+                                  </ul>
+                                </nav>
+                                {% endif %}
+                              {% elif model == "Maintenance" %}
+                                {% if inventory.has_prev or inventory.has_next %}
+                                <nav aria-label="Inventory pagination">
+                                  <ul class="pagination">
+                                    {% if inventory.has_prev %}
+                                    <li class="page-item ml-1">
+                                      <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.maintenance_inventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">prev</a>
+                                    </li>
+                                    {% endif %}
+                                    <li class="page-item ml-1">
+                                      <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="javascript:void(0);" aria-label="Current Page">{{ inventory.page }}</a>
+                                    </li>
+                                    {% if inventory.has_next %}
+                                    <li class="page-item ml-2">
+                                      <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.maintenance_inventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">next</a>
+                                    </li>
+                                    {% endif %}
+                                  </ul>
+                                </nav>
+                                {% endif %}
+                              {% endif %}
+                            </div>
+                        </th>
+              
+                            {% if model == 'Dress' %}
+                        <th style="flex: 3;">
+                            <div class="mx-auto breadcrumb file-cabinet">
+                              <a class="breadcrumb-item {% if order_by_column == 'default' %}active{% endif %}" href="{{ url_for('admin.inventory', order_by='default') }}">status</a>
+                              <a class="breadcrumb-item {% if order_by_column == 'id' %}active{% endif %}" href="{{ url_for('admin.inventory', order_by='id') }}">added</a>
+                              <a class="breadcrumb-item {% if order_by_column == 'times_rented' %}active{% endif %}" href="{{ url_for('admin.inventory', order_by='times_rented') }}">popular</a>
+                              <a class="breadcrumb-item {% if order_by_column == 'dress_cost' %}active{% endif %}" href="{{ url_for('admin.inventory', order_by='dress_cost') }}">cost</a>
+                            </div>
+                        </th>
+
+                        <th style="flex: .5;">
+                          <form id="update-rent-statuses-form" method="POST" action="{{ url_for('admin.update_statuses_endpoint') }}" onsubmit="return confirmAction('Update Dress database?');">
+                            {{ form.hidden_tag() }}
+                            <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Refresh">
+                              <i class="fas fa-sync-alt"></i> <!-- Font Awesome refresh icon -->
+                            </button>
+                          </form>
+                        </th>
+
+                        <th style="flex: .5;">
+                            <!-- Modal for Maintenance form -->
+                            <div class="modal fade" id="maintenanceModal" tabindex="-1" role="dialog" aria-labelledby="maintenanceModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                          <h5 class="modal-title" id="maintenanceModalLabel">Maintenance</h5>
+        
+                                          <button type="button" class="btn btn-dark btn-sm ml-auto" onclick="addDressId()">Add Dress</button>
+        
+                                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                              <span aria-hidden="true">&times;</span>
+                                          </button>
+                                        </div>
+                                        <div class="modal-body">
+                                          <!-- Maintenance form -->
+                                          <form method="POST" action="{{ url_for('admin.add_maintenance') }}" class="form-inline">
+                                              {{ maintenance_form.hidden_tag() }}
+        
+                                              <div id="dress_ids">
+                                                  {% for dress_id_field in maintenance_form.dress_ids %}
+                                                      <div class="form-group">
+                                                          <label for="{{ dress_id_field.dress_id.id }}">{{ dress_id_field.dress_id.label }}</label>
+                                                          {{ dress_id_field.dress_id(class="form-control") }}
+                                                          <button type="button" class="btn btn-danger btn-sm" onclick="removeDressId(this)">Remove</button>
+                                                      </div>
+                                                  {% endfor %}
+                                              </div>
+                                              
+                                              <div class="form-group ml-2">
+                                                  <label for="{{ maintenance_form.maintenanceDate.id }}">{{ maintenance_form.maintenanceDate.label }}</label>
+                                                  {{ maintenance_form.maintenanceDate(class="form-control", autocomplete="off") }}
+                                             
+                                                  <label for="{{ maintenance_form.maintenanceType.id }}">{{ maintenance_form.maintenanceType.label }}</label>
+                                                  {{ maintenance_form.maintenanceType(class="form-control", autocomplete="off") }}
+                                              </div>
+                                              
+                                              <div class="form-group ml-2">
+                                                <label for="{{ maintenance_form.maintenanceCost.id }}">{{ maintenance_form.maintenanceCost.label }}</label>
+                                                {{ maintenance_form.maintenanceCost(class="form-control", autocomplete="off", type="number") }}
+        
+                                                <button type="submit" class="btn btn-primary btn-dark btn-sm" name="submit">Submit</button>
+                                              </div>
+                                            
+                                              <!-- Add this hidden input field in the form -->
+                                              <input type="hidden" id="dressCountInput" value="{{ maintenance_form.dress_ids|length + 1 }}">
+                                          </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+      
+                            <!-- Maintenance form modal button-->
+                            <button type="button" class="btn btn-outline-light btn-sm btn-smaller btn-dark" data-toggle="modal" data-target="#maintenanceModal">
+                              <i class="fas fa-wrench"></i>
+                            </button>
+                        </th>
+
+
+                        <th style="flex: 3;">
+                            <form method="POST" action="{{ url_for('admin.inventory') }}" class="form-inline">
+                              {{ form.hidden_tag() }}
+                              <div class="form-group" style="padding-right: 2.5px;">
+                                <style>
+                                  /* Target the specific field and set the fixed width */
+                                  #category-input {
+                                    width: 10em; /* Set the desired width here, for example, 10em */
+                                  }
+                                </style>
+                                {{ form.category(class="form-control form-control-sm custom-form-control mr-2", id="category-input", style="width: 10em;", style="background-color: #b8a495dc; color: #fff; font-family: 'Courier New', Courier, monospace") }}
+                                {{ form.search(class="form-control form-control-sm custom-form-control mr-2", type="search", placeholder="Search", style="font-family: 'Courier New', Courier, monospace; width: 10em;") }}
+                                <button type="submit" class="btn btn-outline-light btn-smaller btn-dark" style="font-family: 'Courier New', Courier, monospace">Filter</button>
+                              </div>
+                            </form>
+                        </th>
+
+                            {% elif model == 'Maintenance' %}
+                        <th style="flex: 3;">
+                            <div class="breadcrumb file-cabinet">
+                              <a class="breadcrumb-item {% if order_by_column == 'default' %}active{% endif %}" href="{{ url_for('admin.maintenance_inventory', order_by='default') }}">status</a>
+                              <a class="breadcrumb-item {% if order_by_column == 'id' %}active{% endif %}" href="{{ url_for('admin.maintenance_inventory', order_by='date') }}">date</a>
+                              <a class="breadcrumb-item {% if order_by_column == 'dress_id' %}active{% endif %}" href="{{ url_for('admin.maintenance_inventory', order_by='type') }}">type</a>
+                              <a class="breadcrumb-item {% if order_by_column == 'user_lastName' %}active{% endif %}" href="{{ url_for('admin.maintenance_inventory', order_by='cost') }}">cost</a>
+                            </div>
+                        </th>
+
+                        <th></th>
+
+                        <th style="flex: 3;">
+                            <form method="POST" action="{{ url_for('admin.maintenance_inventory') }}" class="form-inline">
+                              {{ form.hidden_tag() }}
+                              <div class="form-group" style="padding-right: 2.5px;">
+                                <style>
+                                  /* Target the specific field and set the fixed width */
+                                  #category-input {
+                                    width: 10em; /* Set the desired width here, for example, 10em */
+                                  }
+                                </style>
+                                {{ form.category(class="form-control form-control-sm custom-form-control mr-2", id="category-input", style="width: 10em;", style="background-color: #b8a495dc; color: #fff; font-family: 'Courier New', Courier, monospace") }}
+                                {{ form.search(class="form-control form-control-sm custom-form-control mr-2", type="search", placeholder="Search", style="font-family: 'Courier New', Courier, monospace; width: 10em;") }}
+                                <button type="submit" class="btn btn-outline-light btn-smaller btn-dark" style="font-family: 'Courier New', Courier, monospace">Filter</button>
+                              </div>
+                            </form>
+                        </th>
+
+                            {% elif model == 'Rent' %}
+                        <th style="flex: 3;">
+                            <div class="breadcrumb file-cabinet">
+                              <a class="breadcrumb-item {% if order_by_column == 'default' %}active{% endif %}" href="{{ url_for('admin.rentInventory', order_by='default') }}">status</a>
+                              <a class="breadcrumb-item {% if order_by_column == 'id' %}active{% endif %}" href="{{ url_for('admin.rentInventory', order_by='id') }}">id</a>
+                              <a class="breadcrumb-item {% if order_by_column == 'dress_id' %}active{% endif %}" href="{{ url_for('admin.rentInventory', order_by='dress_id') }}">dress</a>
+                              <a class="breadcrumb-item {% if order_by_column == 'user_lastName' %}active{% endif %}" href="{{ url_for('admin.rentInventory', order_by='user_lastName') }}">user</a>
+                            </div>
+                        </th>
+
+                        <th></th>
+
+                        <th style="flex: 3;">
+                            <form method="POST" action="{{ url_for('admin.rentInventory') }}" class="form-inline">
+                              {{ form.hidden_tag() }}
+                              <div class="form-group" style="padding-right: 2.5px;">
+                                <style>
+                                  /* Target the specific field and set the fixed width */
+                                  #category-input {
+                                    width: 10em; /* Set the desired width here, for example, 10em */
+                                  }
+                                </style>
+                                {{ form.category(class="form-control form-control-sm custom-form-control mr-2", id="category-input", style="width: 10em;", style="background-color: #b8a495dc; color: #fff; font-family: 'Courier New', Courier, monospace") }}
+                                {{ form.search(class="form-control form-control-sm custom-form-control mr-2", type="search", placeholder="Search", style="font-family: 'Courier New', Courier, monospace; width: 10em;") }}
+                                <button type="submit" class="btn btn-outline-light btn-smaller btn-dark" style="font-family: 'Courier New', Courier, monospace">Filter</button>
+                              </div>
+                            </form>
+                        </th>
+
+                            {% elif model == 'Customer' %}
+                        <th style="flex: 3;">
+                            <div class="breadcrumb file-cabinet">
+                              <a class="breadcrumb-item {% if order_by_column == 'default' %}active{% endif %}" href="{{ url_for('admin.customerInventory', order_by='default') }}">status</a>
+                              <a class="breadcrumb-item {% if order_by_column == 'date' %}active{% endif %}" href="{{ url_for('admin.customerInventory', order_by='date') }}">joined</a>
+                              <a class="breadcrumb-item {% if order_by_column == 'id' %}active{% endif %}" href="{{ url_for('admin.customerInventory', order_by='id') }}">id</a>
+                              <a class="breadcrumb-item {% if order_by_column == 'last_name' %}active{% endif %}" href="{{ url_for('admin.customerInventory', order_by='last_name') }}">last name</a>
+                            </div>
+                        </th>
+
+                        <th></th>
+
+                        <th style="flex: 3;">
+                            <form method="POST" action="{{ url_for('admin.customerInventory') }}" class="form-inline">
+                              {{ form.hidden_tag() }}
+                              <div class="form-group" style="padding-right: 2px;">
+                                <style>
+                                  /* Target the specific field and set the fixed width */
+                                  #category-input {
+                                    width: 10em; 
+                                  }
+                                </style>
+                                {{ form.category(class="form-control form-control-sm custom-form-control mr-2", id="category-input", style="width: 10em;", style="background-color: #b8a495dc; color: #fff; font-family: 'Courier New', Courier, monospace") }}
+                                {{ form.search(class="form-control form-control-sm custom-form-control mr-2", type="search", placeholder="search", style="font-family: 'Courier New', Courier, monospace; width: 10em;") }}
+                                <button type="submit" class="btn btn-outline-light btn-smaller btn-dark" style="font-family: 'Courier New', Courier, monospace">Filter</button>
+                              </div>
+                            </form>
+                            {% endif %}
+                        </th>
+                    </tr>
+                </thead> 
+
+                {% block inventory_table_body %}
+        
+                {% endblock %}
+
+                <tfoot>
+                    <tr>
+                        <td>Main Section Footer</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
 </div>
-  
+
 {% endblock %}

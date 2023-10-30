@@ -151,6 +151,7 @@ def create_weekly_maintenance():
         ).all()
         for dress in returned_dresses:
             if len(dress.maintenances) == len(dress.rents):
+           #if dress.get_last_maintenance().date > dress.get_last_rent().rentDate:
                 returned_dresses.remove(dress)
 
         if returned_dresses:

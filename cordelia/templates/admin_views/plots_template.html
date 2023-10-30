@@ -1,174 +1,32 @@
-{% extends "base.html" %}
+{% extends "admin_views/dashboard.html" %}
 
-{% block content %}
-<div class="d-flex justify-content-center" style="background-color: #b8a495dc; padding-top: 10px; padding-bottom: 10px;">
-
-    <div class="col-md-2 d-flex flex-column">
-      <div class="row pl-3"> 
-        <table class="table table-secondary flex-1 p-1">
-          <thead>
-            <tr>
-                <td>
-                    <span class="text-left neon-text sand" style="color: #DCC6B6; font-size: 13px; font-family: 'Courier New', Courier, monospace">Database</span>
-                </td>
-                
-                <td></td>
-  
-                <td>
-                    <form action="{{ url_for('admin.downloadExcel') }}" method="get" onsubmit="return confirmAction('confirm download?');">
-                        <button type="submit" class="btn btn-outline-light btn-smaller ml-auto btn-dark">
-                            <i class="fas fa-download fa-sm"></i> <!-- Font Awesome download icon, larger size -->
-                        </button>
-                    </form>
-                </td>
-            </tr>
-          </thead>
-        
-          <tbody>
-              <tr>
-                <td>
-                  {% if current_user.is_authenticated %}
-                  <a href="{{ url_for('admin.inventory') }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Dress</a>
-                  <span class="badge badge-light">{{ inventory.total if model == 'Dress'}}</span>
-                  {% else %}
-                  <a href="{{ url_for('auth.login', next=url_for('admin.inventory')) }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Dress</a>
-                  <span class="badge badge-light">{{ inventory.total if model == 'Dress'}}</span>
-                  {% endif %}
-                </td>
-                {% if model == "Dress" %}
-                  <td>
-                    <form id="update-rent-statuses-form" method="POST" action="{{ url_for('admin.update_statuses_endpoint') }}" onsubmit="return confirmAction('Update Dress database?');">
-                      {{ form.hidden_tag() }}
-                      <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Refresh">
-                        <i class="fas fa-sync-alt"></i> <!-- Font Awesome refresh icon -->
-                      </button>
-                    </form>
-                  </td>
-                  <td>
-                    <a href="{{ url_for('admin.update', title='Add Dress', form_type='dress') }}" class="btn btn-outline-light btn-smaller mr-2 btn-dark">
-                      <i class="fas fa-plus"></i> <!-- Font Awesome "plus" icon -->
-                    </a>
-                  </td>
-                {% else %}
-                  <td></td>
-                  <td></td>
-                {% endif %}
-              </tr>
-              <tr>
-                  <td>
-                    {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('admin.rentInventory') }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Rent</a> 
-                    <span class="badge badge-light">{{ inventory.total if model == 'Rent' }}</span>
-                    {% else %}
-                    <a href="{{ url_for('auth.login', next=url_for('admin.rentInventory')) }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Rent</a> 
-                    <span class="badge badge-light">{{ inventory.total if model == 'Rent' }}</span>
-                    {% endif %}
-                  </td>
-                {% if model == "Rent" %}
-                  <td></td>
-                  <td>
-                    <a href="{{ url_for('admin.update', title='Add Rent', form_type='rent') }}" class="btn btn-outline-light btn-smaller mr-2 btn-dark">
-                      <i class="fas fa-plus"></i> <!-- Font Awesome "plus" icon -->
-                    </a>
-                  </td>
-                {% else %}
-                  <td></td>
-                  <td></td>
-                {% endif %}            
-              </tr>
-              <tr>
-                <td>
-                  {% if current_user.is_authenticated %}
-                  <a href="{{ url_for('admin.customerInventory') }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Customer</a>
-                  <span class="badge badge-light">{{ inventory.total if model == 'Customer' }}</span>
-                  {% else %}
-                  <a href="{{ url_for('auth.login', next=url_for('admin.customerInventory')) }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Customer</a>
-                  <span class="badge badge-light">{{ inventory.total if model == 'Customer' }}</span>
-                  {% endif %}
-                </td>
-                {% if model == "Customer" %}
-                <td></td>
-                <td>
-                  <a href="{{ url_for('admin.update', title='Add Customer', form_type='customer') }}" class="btn btn-outline-light btn-smaller mr-2 btn-dark">
-                    <i class="fas fa-plus"></i> <!-- Font Awesome "plus" icon -->
-                  </a>
-                </td>
-                {% else %}
-                <td></td>
-                <td></td>
-                {% endif %}           
-              </tr>
-              <tr>
-                <td>
-                  {% if current_user.is_authenticated %}
-                  <a href="{{ url_for('admin.maintenance_inventory') }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Maintenance</a> 
-                  <span class="badge badge-light">{{ inventory.total if model == 'Maintenance' }}</span>
-                  {% else %}
-                  <a href="{{ url_for('auth.login', next=url_for('admin.maintenance_inventory')) }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Maintenance</a> 
-                  <span class="badge badge-light">{{ inventory.total if model == 'Maintenance' }}</span>
-                  {% endif %}
-                </td>
-                {% if model == "Maintenance" %}
-                  <td></td>
-                  <td></td>
-                {% else %}
-                  <td></td>
-                  <td></td>
-                {% endif %} 
-              </tr>
-  
-              <table class="table table-secondary flex-1 p-1">
-                <thead>
-                  <tr>
-                    <td class="text-left">
-                      <span class="text-left neon-text sand" style="color: #DCC6B6; font-size: 13px; font-family: 'Courier New', Courier, monospace">Query</span>
-                    </td>                     
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <a href="{{ url_for('admin.display_plot', img_num=1) }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Rents Per Month</a> 
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <a href="{{ url_for('admin.display_plot', img_num=2) }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Top Customers</a> 
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <a href="{{ url_for('admin.display_plot', img_num=3) }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Costs VS Earnings</a> 
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-        </table>
-      </div>
-    </div>
-    
-
-    <div class="col-md-10 ml-auto">
-        <div class="d-flex justify-content-center">
-            <table class="table table-secondary table-sm" style="width: 100%; height: auto;"> 
-                <thead>
-                    <tr>
-                        <th style="width: 100%;">
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            <img src="data:image/png;base64,{{ image_data }}" alt="Histogram of Rents per Month" style="width: 100%; height: auto;">
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-</div>
-    
+{% block inventory_table_body %}
+   
+ <table class="table table-secondary table-sm" style="width: 100%; height: auto;"> 
+     <thead>
+         <tr>
+           <td>
+             {% if not image_data %}
+             <div style="font-size: 13px;">404</div>
+             {% endif %}
+           </td>
+         </tr>
+     </thead>
+     <tbody>
+         <tr>
+             <td>
+               {% if image_data %}
+                 <img src="data:image/png;base64,{{ image_data }}" alt="Histogram of Rents per Month" style="width: auto; height: auto;">
+               {% endif %}
+             </td>
+         </tr>
+     </tbody>
+     <tfoot class="custom-footer">
+       <tr>
+         <td colspan="2">
+         </td>
+       </tr>
+     </tfoot>
+ </table>
 
 {% endblock %}
