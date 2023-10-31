@@ -124,7 +124,12 @@ def generate_sample_rents(num_rents):
             today = datetime.now()
             four_months_ago = today - timedelta(days=6 * 30)
 
+            # Generate a random date within the specified range
             rent_date = fake.date_time_between_dates(datetime_start=four_months_ago, datetime_end=today)
+
+            # Check if the generated date is a Sunday and regenerate if it is
+            while rent_date.weekday() == 6:
+                rent_date = fake.date_time_between_dates(datetime_start=four_months_ago, datetime_end=today)
 
             payment_method = random.choice(['Credit Card', 'Cash', 'Transfer'])
 

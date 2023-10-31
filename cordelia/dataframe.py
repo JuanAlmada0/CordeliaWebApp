@@ -72,67 +72,6 @@ def create_dataframes():
 df_dress, df_customer, df_rent, df_maintenance = create_dataframes()
 
 
-# Plot number of rents by month
-def monthly_rents():
-
-    if not df_rent.empty:
-
-        # Set the backend to non-GUI (e.g., Agg)
-        plt.switch_backend('Agg')
-
-        plt.style.use('ggplot')
-
-        df_rent['Rent Date'] = pd.to_datetime(df_rent['Rent Date'])
-        df_rent['YearMonth'] = df_rent['Rent Date'].dt.to_period('M')
-
-        # Create a single figure with a specified size (width: 12 units, height: 6 units)
-        fig, ax = plt.subplots(figsize=(8, 4))
-
-        # Set the background color
-        fig.set_facecolor('#DCC6B6') 
-
-        # Count the occurrences of each unique 'YearMonth' value and sort them in ascending order.
-        counts = df_rent['YearMonth'].value_counts().sort_index()
-        # Extract the ordinal values (integer representations) of the 'YearMonth' periods for plotting.
-        x_values = [period.ordinal for period in counts.index]
-
-        # Plot the bar chart
-        ax.bar(x_values, counts.values, color='#918272', label='Rents')
-
-        # Plot the line chart
-        ax.plot(x_values, counts.values, marker='o', linestyle='-', color='#a58d72')
-
-        # Change the background color of the axes
-        ax.set_facecolor("#b8b8b8dc")
-
-        # Add labels and title
-        ax.set_xlabel('Month')
-        ax.set_ylabel('Number of Rents')
-        ax.set_title('Rents per Month')
-
-        # Customize the x-axis tick labels
-        ax.set_xticks(x_values)
-        ax.set_xticklabels([period.strftime('%b') for period in counts.index])
-
-        # Show the legend
-        ax.legend()
-
-        # Automatically adjust the subplot parameters.
-        plt.tight_layout()
-
-        # Save the plot to a BytesIO object
-        buffer = BytesIO()
-        plt.savefig(buffer, format="png")
-        buffer.seek(0)
-
-        # Convert the plot to a base64-encoded image
-        image_data = base64.b64encode(buffer.read()).decode()
-        buffer.close()
-
-        return image_data
-    
-    return None
-
 
 # Plot top customers by rents & spending
 def top_customers():
@@ -155,7 +94,7 @@ def top_customers():
         top_customers_by_spending = customer_rentals.sort_values(by='Total Spending', ascending=False)
 
         # Create a subplot with two plots
-        fig, axs = plt.subplots(1, 2, figsize=(8, 4))
+        fig, axs = plt.subplots(1, 2, figsize=(9, 4))
 
         fig.set_facecolor('#DCC6B6') 
 
@@ -168,7 +107,14 @@ def top_customers():
         # Set xticklabels straight
         axs[0].set_xticklabels(axs[0].get_xticklabels(), rotation=0)
 
+        # Set the y-axis major locator to go up by 1
+        axs[0].yaxis.set_major_locator(MultipleLocator(1))
+
         axs[0].set_facecolor("#b8b8b8dc")
+
+        # Add grid lines 
+        axs[0].grid(True)
+        axs[0].grid(color='0.9')
 
         # Plot the top customers by total spending
         top_customers_by_spending.head(10).plot(kind='bar', y='Total Spending', legend=True, ax=axs[1], color='#a58d72')
@@ -184,9 +130,16 @@ def top_customers():
         min_spending = top_customers_by_spending.head(10)['Total Spending'].min()
 
         # Adjust the lower y-axis limit to be slightly below the minimum spending value
-        axs[1].set_ylim(min_spending - 100, max_spending)
+        axs[1].set_ylim(min_spending - 500, max_spending)
+
+        # Set the y-axis major locator to go up by 500
+        axs[1].yaxis.set_major_locator(MultipleLocator(500))
 
         axs[1].set_facecolor("#b8b8b8dc")
+
+        # Add grid lines
+        axs[1].grid(True)
+        axs[1].grid(color='0.9')
 
         plt.tight_layout()
 
@@ -200,6 +153,7 @@ def top_customers():
         return image_data
     
     return None
+
 
 
 # Plot earnings and costs from dress and maintenance
@@ -243,9 +197,10 @@ def costs_vs_earnings():
 
         plt.style.use('seaborn-dark')
 
-        fig, ax = plt.subplots(figsize=(8, 4))
+        fig, ax = plt.subplots(figsize=(9, 4))
 
         fig.set_facecolor('black')
+
         ax.grid(color='#2A3459')  # bluish dark grey
 
         colors = [
@@ -304,42 +259,53 @@ def costs_vs_earnings():
 
 
 
-# Plot percentage of rents by weekday
-def rents_by_weekday():
+def plot_combined_statistics():
 
     if df_rent is None or df_rent.empty:
         return None
 
     matplotlib.use('Agg')
-
-    # Convert the 'Rent Date' column to datetime
-    df_rent['Rent Date'] = pd.to_datetime(df_rent['Rent Date'])
-
-    # Group and count rents by day of the week
-    day_of_week_counts = df_rent['Rent Date'].dt.day_name().value_counts()
-
-    # Create a pie chart
-    labels = day_of_week_counts.index
-    sizes = day_of_week_counts.values
-    colors = ['#08F7FE', '#FE53BB', '#00ff41', '#8B4513', '#FFD700', '#FA8072', '#6495ED']
-    explode = (0.1, 0, 0, 0, 0, 0, 0)  # explode the 1st slice
-
     plt.style.use('seaborn-dark')
 
-    fig, ax = plt.subplots(figsize=(8, 4))
+    # Create a subplot with two plots
+    fig, axs = plt.subplots(1, 2, figsize=(9, 4))
 
-    fig.set_facecolor('grey')
+    fig.set_facecolor('#DCC6B6')
 
-    ax.set_facecolor('white')
+    # Plot number of rents by month
+    df_rent['Rent Date'] = pd.to_datetime(df_rent['Rent Date'])
+    df_rent['YearMonth'] = df_rent['Rent Date'].dt.to_period('M')
+
+    counts = df_rent['YearMonth'].value_counts().sort_index()
+    x_values = [period.ordinal for period in counts.index]
+
+    axs[0].bar(x_values, counts.values, color='#918272', label='Rents')
+    axs[0].plot(x_values, counts.values, marker='o', linestyle='-', color='#a58d72')
+
+    axs[0].set_facecolor("#b8b8b8dc")
+    axs[0].set_xlabel('Month')
+    axs[0].set_ylabel('Number of Rents')
+    axs[0].set_title('Rents per Month')
+    axs[0].set_xticks(x_values)
+    axs[0].set_xticklabels([period.strftime('%b') for period in counts.index])
+    axs[0].legend()
+
+    # Add grid lines
+    axs[0].grid(True)
+    axs[0].grid(color='0.9')
 
     # Plot the pie chart
-    ax.pie(sizes, explode=explode, labels=labels, colors=colors, autopct='%1.1f%%', shadow=True, startangle=140)
-    ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+    day_of_week_counts = df_rent['Rent Date'].dt.day_name().value_counts()
+    labels = day_of_week_counts.index
+    sizes = day_of_week_counts.values
+    colors = ['#08F7FE', '#FE53BB', '#00ff41', '#ff9900', '#b64fff', '#FA8072']
+    explode = (0.075, 0.05, 0.025, 0, 0, 0)
 
-    ax.set_title('Rents by Weekday', color='0.9', loc='left')
+    axs[1].pie(sizes, explode=explode, labels=labels, colors=colors, autopct='%1.1f%%', shadow=True, startangle=140)
+    axs[1].axis('equal')
+    axs[1].set_title('Rents by Weekday', color='black', loc='center')
 
-    # Set label color
-    for text in ax.texts:
+    for text in axs[1].texts:
         text.set_color('black')
 
     plt.tight_layout()

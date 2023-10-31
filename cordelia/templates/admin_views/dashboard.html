@@ -75,16 +75,13 @@
             <span class="text-left neon-text sand" style="color: #DCC6B6; font-size: 13px; font-family: 'Courier New', Courier, monospace">Query</span>
         </div>
         <div class="menu">
-            <a href="{{ url_for('admin.display_plot', img_num=1) }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Rents Per Month</a> 
+            <a href="{{ url_for('admin.display_plot', img_num=1) }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Earnings / Costs</a> 
         </div>
         <div class="menu">
             <a href="{{ url_for('admin.display_plot', img_num=2) }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Top Customers</a> 
         </div>
         <div class="menu">
-            <a href="{{ url_for('admin.display_plot', img_num=3) }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Costs VS Earnings</a> 
-        </div>
-        <div class="menu">
-            <a href="{{ url_for('admin.display_plot', img_num=4) }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Rents by Weekday</a> 
+            <a href="{{ url_for('admin.display_plot', img_num=3) }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Rents</a> 
         </div>
 
         <div class="footer">
@@ -109,80 +106,148 @@
                                   <ul class="pagination">
                                     {% if inventory.has_prev %}
                                     <li class="page-item ml-1">
-                                      <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.inventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">prev</a>
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.inventory', page=1, order_by=order_by_column) }}" aria-label="First Page">
+                                        &laquo;&laquo;
+                                      </a>
+                                    </li>
+                                    <li class="page-item ml-1">
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.inventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">
+                                        &laquo;
+                                      </a>
                                     </li>
                                     {% endif %}
                                     <li class="page-item ml-1">
-                                      <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="javascript:void(0);" aria-label="Current Page">{{ inventory.page }}</a>
+                                      <a class="btn btn-outline-light btn-sm btn-smaller btn-dark" href="javascript:void(0);" aria-label="Current Page">
+                                        {{ inventory.page }}
+                                      </a>
                                     </li>
                                     {% if inventory.has_next %}
-                                    <li class="page-item ml-2">
-                                      <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.inventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">next</a>
+                                    <li class="page-item ml-1">
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.inventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">
+                                        &raquo;
+                                      </a>
+                                    </li>
+                                    <li class="page-item ml-1">
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.inventory', page=inventory.pages, order_by=order_by_column) }}" aria-label="Last Page">
+                                        &raquo;&raquo;
+                                      </a>
                                     </li>
                                     {% endif %}
                                   </ul>
                                 </nav>
-                                {% endif %}          
+                                {% endif %}
+                                        
                               {% elif model == "Rent" %}
                                 {% if inventory.has_prev or inventory.has_next %}
                                 <nav aria-label="Inventory pagination">
                                   <ul class="pagination">
                                     {% if inventory.has_prev %}
                                     <li class="page-item ml-1">
-                                      <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.rentInventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">prev</a>
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.rentInventory', page=1, order_by=order_by_column) }}" aria-label="First Page">
+                                        &laquo;&laquo;
+                                      </a>
+                                    </li>
+                                    <li class="page-item ml-1">
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.rentInventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">
+                                        &laquo;
+                                      </a>
                                     </li>
                                     {% endif %}
                                     <li class="page-item ml-1">
-                                      <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="javascript:void(0);" aria-label="Current Page">{{ inventory.page }}</a>
+                                      <a class="btn btn-outline-light btn-sm btn-smaller btn-dark" href="javascript:void(0);" aria-label="Current Page">
+                                        {{ inventory.page }}
+                                      </a>
                                     </li>
                                     {% if inventory.has_next %}
-                                    <li class="page-item ml-2">
-                                      <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.rentInventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">next</a>
+                                    <li class="page-item ml-1">
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.rentInventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">
+                                        &raquo;
+                                      </a>
+                                    </li>
+                                    <li class="page-item ml-1">
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.rentInventory', page=inventory.pages, order_by=order_by_column) }}" aria-label="Last Page">
+                                        &raquo;&raquo;
+                                      </a>
                                     </li>
                                     {% endif %}
                                   </ul>
                                 </nav>
                                 {% endif %}
+
                               {% elif model == "Customer" %}
                                 {% if inventory.has_prev or inventory.has_next %}
                                 <nav aria-label="Inventory pagination">
                                   <ul class="pagination">
                                     {% if inventory.has_prev %}
                                     <li class="page-item ml-1">
-                                      <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.customerInventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">prev</a>
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.customerInventory', page=1, order_by=order_by_column) }}" aria-label="First Page">
+                                        &laquo;&laquo;
+                                      </a>
+                                    </li>
+                                    <li class="page-item ml-1">
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.customerInventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">
+                                        &laquo;
+                                      </a>
                                     </li>
                                     {% endif %}
                                     <li class="page-item ml-1">
-                                      <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="javascript:void(0);" aria-label="Current Page">{{ inventory.page }}</a>
+                                      <a class="btn btn-outline-light btn-sm btn-smaller btn-dark" href="javascript:void(0);" aria-label="Current Page">
+                                        {{ inventory.page }}
+                                      </a>
                                     </li>
                                     {% if inventory.has_next %}
-                                    <li class="page-item ml-2">
-                                      <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.customerInventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">next</a>
+                                    <li class="page-item ml-1">
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.customerInventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">
+                                        &raquo;
+                                      </a>
+                                    </li>
+                                    <li class="page-item ml-1">
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.customerInventory', page=inventory.pages, order_by=order_by_column) }}" aria-label="Last Page">
+                                        &raquo;&raquo;
+                                      </a>
                                     </li>
                                     {% endif %}
                                   </ul>
                                 </nav>
                                 {% endif %}
+
                               {% elif model == "Maintenance" %}
                                 {% if inventory.has_prev or inventory.has_next %}
                                 <nav aria-label="Inventory pagination">
                                   <ul class="pagination">
                                     {% if inventory.has_prev %}
                                     <li class="page-item ml-1">
-                                      <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.maintenance_inventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">prev</a>
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.maintenance_inventory', page=1, order_by=order_by_column) }}" aria-label="First Page">
+                                        &laquo;&laquo;
+                                      </a>
+                                    </li>
+                                    <li class="page-item ml-1">
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.maintenance_inventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">
+                                        &laquo;
+                                      </a>
                                     </li>
                                     {% endif %}
                                     <li class="page-item ml-1">
-                                      <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="javascript:void(0);" aria-label="Current Page">{{ inventory.page }}</a>
+                                      <a class="btn btn-outline-light btn-sm btn-smaller btn-dark" href="javascript:void(0);" aria-label="Current Page">
+                                        {{ inventory.page }}
+                                      </a>
                                     </li>
                                     {% if inventory.has_next %}
-                                    <li class="page-item ml-2">
-                                      <a class="btn btn-outline-light btn-sm btn-smaller btn-dark typewriter-button" href="{{ url_for('admin.maintenance_inventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">next</a>
+                                    <li class="page-item ml-1">
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.maintenance_inventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">
+                                        &raquo;
+                                      </a>
+                                    </li>
+                                    <li class="page-item ml-1">
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.maintenance_inventory', page=inventory.pages, order_by=order_by_column) }}" aria-label="Last Page">
+                                        &raquo;&raquo;
+                                      </a>
                                     </li>
                                     {% endif %}
                                   </ul>
                                 </nav>
                                 {% endif %}
+
                               {% endif %}
                             </div>
                         </th>
@@ -212,7 +277,7 @@
                                 <div class="modal-dialog modal-dialog-centered" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                          <h5 class="modal-title" id="maintenanceModalLabel">Maintenance</h5>
+                                          <h5 class="modal-title" id="maintenanceModalLabel" style="color: black;">Maintenance</h5>
         
                                           <button type="button" class="btn btn-dark btn-sm ml-auto" onclick="addDressId()">Add Dress</button>
         
@@ -228,7 +293,7 @@
                                               <div id="dress_ids">
                                                   {% for dress_id_field in maintenance_form.dress_ids %}
                                                       <div class="form-group">
-                                                          <label for="{{ dress_id_field.dress_id.id }}">{{ dress_id_field.dress_id.label }}</label>
+                                                          <label for="{{ dress_id_field.dress_id.id }}">{{ dress_id_field.dress_id.label(style="color: black;") }}</label>
                                                           {{ dress_id_field.dress_id(class="form-control") }}
                                                           <button type="button" class="btn btn-danger btn-sm" onclick="removeDressId(this)">Remove</button>
                                                       </div>
@@ -236,15 +301,15 @@
                                               </div>
                                               
                                               <div class="form-group ml-2">
-                                                  <label for="{{ maintenance_form.maintenanceDate.id }}">{{ maintenance_form.maintenanceDate.label }}</label>
+                                                  <label for="{{ maintenance_form.maintenanceDate.id }}">{{ maintenance_form.maintenanceDate.label(style="color: black;") }}</label>
                                                   {{ maintenance_form.maintenanceDate(class="form-control", autocomplete="off") }}
                                              
-                                                  <label for="{{ maintenance_form.maintenanceType.id }}">{{ maintenance_form.maintenanceType.label }}</label>
+                                                  <label for="{{ maintenance_form.maintenanceType.id }}">{{ maintenance_form.maintenanceType.label(style="color: black;") }}</label>
                                                   {{ maintenance_form.maintenanceType(class="form-control", autocomplete="off") }}
                                               </div>
                                               
                                               <div class="form-group ml-2">
-                                                <label for="{{ maintenance_form.maintenanceCost.id }}">{{ maintenance_form.maintenanceCost.label }}</label>
+                                                <label for="{{ maintenance_form.maintenanceCost.id }}">{{ maintenance_form.maintenanceCost.label(style="color: black;") }}</label>
                                                 {{ maintenance_form.maintenanceCost(class="form-control", autocomplete="off", type="number") }}
         
                                                 <button type="submit" class="btn btn-primary btn-dark btn-sm" name="submit">Submit</button>

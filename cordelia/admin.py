@@ -29,16 +29,14 @@ def downloadExcel():
 def display_plot(img_num):
     if Dress.query.first() and Rent.query.first() and Customer.query.first() and Maintenance.query.first():
         
-        from cordelia.dataframe import monthly_rents, top_customers, costs_vs_earnings, rents_by_weekday
+        from cordelia.dataframe import costs_vs_earnings, top_customers, plot_combined_statistics
 
         if img_num == 1:
-            image_data = monthly_rents()  # Get the plot image
+            image_data = costs_vs_earnings()  
         elif img_num == 2:
             image_data = top_customers()
         elif img_num == 3:
-            image_data = costs_vs_earnings()
-        elif img_num == 4:
-            image_data = rents_by_weekday()
+            image_data = plot_combined_statistics()
     
         return render_template('admin_views/plots_template.html', image_data=image_data)
     else:
