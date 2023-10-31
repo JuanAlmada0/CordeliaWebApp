@@ -16,189 +16,208 @@
 }
 
 .btn-smaller {
-    padding: 0.08rem 0.15rem;
-    font-size: 0.7rem;
-    background-color: #b8a495dc;
-    border: none;
-    box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.5)
-  }
+  padding: 0.08rem 0.15rem;
+  font-size: 0.7rem;
+  background-color: #b8a495dc;
+  border: none;
+  box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.5)
+}
 
-  .custom-btn {
-    position: relative;
-  }
+.custom-btn {
+  position: relative;
+}
 
-  .arrow-down {
-    border: solid #ffffff;
-    border-width: 0 3px 3px 0;
-    display: inline-block;
-    padding: 2px;
-    transform: rotate(45deg);
-    -webkit-transform: rotate(45deg);
-  }
+.arrow-down {
+  border: solid #ffffff;
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  padding: 2px;
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+}
 
-  /* Custom CSS for reducing space between text and arrow button */
-  .text-arrow-container {
-    display: flex;
-    align-items: center;
-  }
+/* Custom CSS for reducing space between text and arrow button */
+.text-arrow-container {
+  display: flex;
+  align-items: center;
+}
 
-  .text-arrow-container .text-left {
-    margin-right: 5px; 
-  }
-  .custom-form-control {
-    padding: 0.25rem 0.5rem; 
-    font-size: 0.7rem; 
-  }
+.text-arrow-container .text-left {
+  margin-right: 5px; 
+}
 
-  /* Custom CSS for breadcrumb */
-  .breadcrumb.file-cabinet {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0;
-    padding: 0;
-    background: none; /* Remove the background color */
-    box-shadow: none; /* Remove the box-shadow */
-  }
+.custom-form-control {
+  padding: 0.25rem 0.5rem; 
+  font-size: 0.7rem; 
+}
 
-  /* Custom CSS for breadcrumb items (links) */
-  .breadcrumb-item {
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 11.5px;
-    text-transform: uppercase;
-    padding: 3px 6px;
-    color: #ccbfb4;
-    border: none; /* Remove the border */
-    margin-right: 8px; /* Add some space between items */
-    text-decoration: none;
-    background: none; /* Remove the background color */
-    box-shadow: none;
-  }
+/* Custom CSS for breadcrumb */
+.breadcrumb.file-cabinet {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  background: none; /* Remove the background color */
+  box-shadow: none; /* Remove the box-shadow */
+}
 
-  .breadcrumb-item:hover {
-      color: black; /* Change the link color to black on hover */
-  }
+/* Custom CSS for breadcrumb items (links) */
+.breadcrumb-item {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  padding: 3px 6px;
+  color: #ccbfb4;
+  border: none; /* Remove the border */
+  margin-right: 8px; /* Add some space between items */
+  text-decoration: none;
+  background: none; /* Remove the background color */
+  box-shadow: none;
+}
 
-  /* Custom CSS for active breadcrumb item (current page) */
-  .breadcrumb-item.active {
-    color: #fff;
-    background: none;
-  /*  background-color: #817568;  */
-    border: none; /* Remove the border */
-  }
+.breadcrumb-item:hover {
+    color: black; /* Change the link color to black on hover */
+}
 
-  .custom-footer::before {
-    content: ""; 
-    display: block;
-    height: 20px; 
-  }
+/* Custom CSS for active breadcrumb item (current page) */
+.breadcrumb-item.active {
+  color: #fff;
+  background: none;
+/*  background-color: #817568;  */
+  border: none; /* Remove the border */
+}
 
-  .pagination-container {
-    flex: auto;
-    flex-direction: column;
-  }
+.custom-footer::before {
+  content: ""; 
+  display: block;
+  height: 20px; 
+}
 
-  .content-container {
-    border-radius: 8px;
-    padding: 4px;
-    background: #b8a495dc;
-    background-image: linear-gradient(to bottom, rgba(216, 216, 216, 0.4), rgba(184, 164, 149, 0.6));
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
+.pagination-container {
+  flex: auto;
+  flex-direction: column;
+}
 
-  .neon-text {
-    font-size: 11px;
-    animation: neon 1s infinite;
-    display: inline-block;
-    margin-right: 10px;
-  }
+.content-container {
+  border-radius: 8px;
+  padding: 4px;
+  background: #b8a495dc;
+  background-image: linear-gradient(to bottom, rgba(216, 216, 216, 0.4), rgba(184, 164, 149, 0.6));
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
 
-  .green {
-    text-shadow: 0 0 3px #00ff9d;
-    color: hsl(145, 71%, 68%);
-  }
+.neon-text {
+  font-size: 11px;
+  animation: neon 1s infinite;
+  display: inline-block;
+  margin-right: 10px;
+}
 
-  .sand {
-    text-shadow: 0 0 3px #b89875;
-    color: hsl(35, 19%, 83%);
-  }
+.green {
+  text-shadow: 0 0 3px #00ff9d;
+  color: hsl(145, 71%, 68%);
+}
 
-  .blue {
-    text-shadow: 0 0 3px #00ffff;
-    color: hsl(184, 100%, 50%);
-  }
+.sand {
+  text-shadow: 0 0 3px #b89875;
+  color: hsl(35, 19%, 83%);
+}
 
-  .clean-blue {
-    text-shadow: 0 0 3px #00ffc8;
-    color: hsl(165, 100%, 60%);
-  }
+.blue {
+  text-shadow: 0 0 3px #00ffff;
+  color: hsl(184, 100%, 50%);
+}
 
-  .clean-two {
-    text-shadow: 0 0 3px #ff9900;
-    color: hsl(35, 100%, 60%);
-  }
+.clean-blue {
+  text-shadow: 0 0 3px #00ffc8;
+  color: hsl(165, 100%, 60%);
+}
 
-  .clean-pink {
-    text-shadow: 0 0 3px #ff7ed8;
-    color: hsl(315, 100%, 60%);
-  }
+.clean-two {
+  text-shadow: 0 0 3px #ff9900;
+  color: hsl(35, 100%, 60%);
+}
 
-  .clean-purple {
-    text-shadow: 0 0 3px rgb(212, 0, 255);
-    color: hsl(285, 100%, 87%);
-  }
+.clean-pink {
+  text-shadow: 0 0 3px #ff7ed8;
+  color: hsl(315, 100%, 60%);
+}
 
-  .clean-white {
-    text-shadow: 0 0 3px rgb(255, 255, 255);
-    color: hsl(280, 26%, 96%);
-  }
+.clean-purple {
+  text-shadow: 0 0 3px rgb(212, 0, 255);
+  color: hsl(285, 100%, 87%);
+}
 
-  .clean-three {
-    text-shadow: 0 0 3px #2bff00;
-    color: hsl(88, 100%, 50%);
-  }
+.clean-white {
+  text-shadow: 0 0 3px rgb(255, 255, 255);
+  color: hsl(280, 26%, 96%);
+}
 
-  .dress-image {
-    height: 200px;
-    max-width: 100%;
-  }
+.clean-three {
+  text-shadow: 0 0 3px #2bff00;
+  color: hsl(88, 100%, 50%);
+}
 
-  .image-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 200px;
-    width: 150px;
-    background-color: #6b6b6b;
-    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
-  }
+.dress-image {
+  height: 200px;
+  max-width: 100%;
+}
 
-  @font-face {
-    font-family: 'Typewriter';
-    src: url(data:application/x-font-ttf;charset=utf-8;base64) format('truetype');
-  }
+.image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  width: 150px;
+  background-color: #6b6b6b;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
+}
 
-  .typewriter {
-    font-family: 'Typewriter', monospace;
-  }
+@font-face {
+  font-family: 'Typewriter';
+  src: url(data:application/x-font-ttf;charset=utf-8;base64) format('truetype');
+}
 
-  .btn.active {
-    background-color: #817467 !important;
-    border: none !important;
-    color: #000 !important; /* Set the text color to dark */
-  }
+.typewriter {
+  font-family: 'Typewriter', monospace;
+}
 
-  /* Style the active link inside buttons */
-  .btn.active .text-light {
-    color: #DCC6B6 !important;
-    text-shadow: 0 0 2px #B07D47;
-  }
+.btn.active {
+  background-color: #817467 !important;
+  border: none !important;
+  color: #000 !important; /* Set the text color to dark */
+}
 
-  .btn.active:hover {
-    color: #000 !important; /* Set the text color to dark on hover */
-  }
-  
-  /* Remove underline from the links inside buttons */
-  .btn.custom-link {
-    text-decoration: none;
-  }
+/* Style the active link inside buttons */
+.btn.active .text-light {
+  color: #DCC6B6 !important;
+  text-shadow: 0 0 2px #B07D47;
+}
+
+.btn.active:hover {
+  color: #000 !important; /* Set the text color to dark on hover */
+}
+
+/* Remove underline from the links inside buttons */
+.btn.custom-link {
+  text-decoration: none;
+}
+
+/* login form  */
+.login-container {
+  width: 25rem; 
+  padding: 3rem; 
+  border: 2px solid #B07D47; 
+  border-radius: 5px; 
+  color: #B07D47;
+}
+
+/* update form */
+.register-container {
+  width: 25rem;
+  padding: 3rem;
+  border: 1px solid #B07D47;
+  border-radius: 5px;
+  color: #B07D47;
+}
