@@ -2,12 +2,12 @@ import pandas as pd
 from cordelia.models import Dress, Rent, Customer, Maintenance
 import matplotlib
 import matplotlib.pyplot as plt 
-from matplotlib.ticker import MultipleLocator
+from matplotlib.ticker import FuncFormatter, MultipleLocator
 from io import BytesIO
 import base64
 
 
-
+# Create Dataframes
 def create_dataframes():
 
     dress_db = Dress.query.all()
@@ -69,7 +69,6 @@ def create_dataframes():
     return df_dress, df_customer, df_rent, df_maintenance
 
 
-# Create Dataframes
 df_dress, df_customer, df_rent, df_maintenance = create_dataframes()
 
 
@@ -118,6 +117,9 @@ def monthly_rents():
         # Show the legend
         ax.legend()
 
+        # Automatically adjust the subplot parameters.
+        plt.tight_layout()
+
         # Save the plot to a BytesIO object
         buffer = BytesIO()
         plt.savefig(buffer, format="png")
@@ -132,7 +134,7 @@ def monthly_rents():
     return None
 
 
-# Top customers plot # of rents and total spending
+# Plot top customers by rents & spending
 def top_customers():
 
     if not df_rent.empty:
@@ -155,7 +157,6 @@ def top_customers():
         # Create a subplot with two plots
         fig, axs = plt.subplots(1, 2, figsize=(8, 4))
 
-        # Set the background color
         fig.set_facecolor('#DCC6B6') 
 
         # Plot the top customers by number of rentals
@@ -178,10 +179,16 @@ def top_customers():
         # Set xticklabels straight
         axs[1].set_xticklabels(axs[1].get_xticklabels(), rotation=0)
 
-        # Set the y-axis ticks in steps of 1000
-        axs[1].yaxis.set_major_locator(MultipleLocator(1000))
+        # Find the maximum and minimum spending among the top customers
+        max_spending = top_customers_by_spending.head(10)['Total Spending'].max()
+        min_spending = top_customers_by_spending.head(10)['Total Spending'].min()
+
+        # Adjust the lower y-axis limit to be slightly below the minimum spending value
+        axs[1].set_ylim(min_spending - 100, max_spending)
 
         axs[1].set_facecolor("#b8b8b8dc")
+
+        plt.tight_layout()
 
         buffer = BytesIO()
         plt.savefig(buffer, format="png")
@@ -195,14 +202,13 @@ def top_customers():
     return None
 
 
-# Plot earnings from Rents and Costs from Dress and Maintenance
+# Plot earnings and costs from dress and maintenance
 def costs_vs_earnings():
 
     if not df_rent.empty and not df_maintenance.empty and not df_dress.empty:
 
         matplotlib.use('Agg')
 
-        plt.style.use('seaborn')
         # Convert date columns to datetime
         df_rent['Rent Date'] = pd.to_datetime(df_rent['Rent Date'])
         df_maintenance['Date'] = pd.to_datetime(df_maintenance['Date'])
@@ -235,33 +241,54 @@ def costs_vs_earnings():
         # Create a list of numerical values for the x-axis
         x_values = list(range(len(index)))
 
-        # Create a figure and axis
+        plt.style.use('seaborn-dark')
+
         fig, ax = plt.subplots(figsize=(8, 4))
 
-        # Plot earnings
-        ax.plot(x_values, df_costs_earnings['Earnings'], color='#00ff9d', label='Earnings')
+        fig.set_facecolor('black')
+        ax.grid(color='#2A3459')  # bluish dark grey
 
-        # Plot maintenance costs 
-        ax.plot(x_values, df_costs_earnings['Maintenance Costs'],label='Maintenance Costs')
+        colors = [
+            '#08F7FE',  # teal/cyan
+            '#FE53BB',  # pink
+            '#00ff41',  # matrix green
+        ]
 
-        # Plot dress acquisition costs
-        ax.plot(x_values, df_costs_earnings['Dress Acquisition Costs'], label='Dress Acquisition Costs')
+        ax.set_facecolor('black')
+        ax.xaxis.label.set_color('0.9')  # Text color
+        ax.yaxis.label.set_color('0.9')  # Text color
+        ax.xaxis.label.set_color('0.9')  # Text color
+        ax.tick_params(axis='x', colors='0.9')  # X-axis tick color
+        ax.tick_params(axis='y', colors='0.9')  # Y-axis tick color
+
+        # Plot earnings with a solid line style and marker
+        ax.plot(x_values, df_costs_earnings['Earnings'], marker='o', color=colors[2], linestyle='-', label='Earnings', linewidth=1)
+
+        # Plot maintenance costs with a dashed line style and marker
+        ax.plot(x_values, df_costs_earnings['Maintenance Costs'], marker='o', linestyle='--', color=colors[0], label='Maintenance Costs', linewidth=1)
+
+        # Plot dress acquisition costs with a solid line style and marker
+        ax.plot(x_values, df_costs_earnings['Dress Acquisition Costs'], marker='o', linestyle='-', color=colors[1], label='Dress Acquisition Costs', linewidth=1)
 
         # Set the x-axis labels
         ax.set_xticks(x_values)
-        ax.set_xticklabels(index)
+        ax.set_xticklabels(index, rotation=0)
 
-        # Add labels and title
-        ax.set_xlabel('Month')
-        ax.set_ylabel('Amount')
-        ax.set_title('Costs vs. Earnings by Month')
+        # Set the y-axis labels with comma as the thousands separator
+        ax.get_yaxis().set_major_formatter(FuncFormatter(lambda x, p: format(int(x), ',')))
 
-        # Set the y-axis ticks in steps of 1000
+        # Set the y-axis major locator to go up by 5k
         ax.yaxis.set_major_locator(MultipleLocator(5000))
 
-        ax.legend()
+        # Add labels and title
+        ax.set_ylabel('Amount')
+        ax.set_title('Costs vs. Earnings', color='0.9')
 
-        # Automatically adjust the subplot parameters.
+        # Configure the legend with white text color
+        legend = ax.legend(labels=['Earnings', 'Maintenance Costs', 'Dress Acquisition Costs'], loc='best', fontsize='small')
+        for text in legend.get_texts():
+            text.set_color('white')
+
         plt.tight_layout()
 
         buffer = BytesIO()
@@ -272,5 +299,60 @@ def costs_vs_earnings():
         buffer.close()
 
         return image_data
-    
+
     return None
+
+
+
+# Plot percentage of rents by weekday
+def rents_by_weekday():
+
+    if df_rent is None or df_rent.empty:
+        return None
+
+    matplotlib.use('Agg')
+
+    # Convert the 'Rent Date' column to datetime
+    df_rent['Rent Date'] = pd.to_datetime(df_rent['Rent Date'])
+
+    # Group and count rents by day of the week
+    day_of_week_counts = df_rent['Rent Date'].dt.day_name().value_counts()
+
+    # Create a pie chart
+    labels = day_of_week_counts.index
+    sizes = day_of_week_counts.values
+    colors = ['#08F7FE', '#FE53BB', '#00ff41', '#8B4513', '#FFD700', '#FA8072', '#6495ED']
+    explode = (0.1, 0, 0, 0, 0, 0, 0)  # explode the 1st slice
+
+    plt.style.use('seaborn-dark')
+
+    fig, ax = plt.subplots(figsize=(8, 4))
+
+    fig.set_facecolor('grey')
+
+    ax.set_facecolor('white')
+
+    # Plot the pie chart
+    ax.pie(sizes, explode=explode, labels=labels, colors=colors, autopct='%1.1f%%', shadow=True, startangle=140)
+    ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+
+    ax.set_title('Rents by Weekday', color='0.9', loc='left')
+
+    # Set label color
+    for text in ax.texts:
+        text.set_color('black')
+
+    plt.tight_layout()
+
+    buffer = BytesIO()
+    plt.savefig(buffer, format="png")
+    buffer.seek(0)
+
+    image_data = base64.b64encode(buffer.read()).decode()
+    buffer.close()
+
+    return image_data
+
+
+
+plt.style.use('default')

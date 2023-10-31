@@ -73,10 +73,6 @@ body {
 }
 
 .table {
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-blend-mode: multiply;
     width: 100%;
     table-layout: responsive;
     display: flex;

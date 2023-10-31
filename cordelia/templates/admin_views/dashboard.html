@@ -83,6 +83,9 @@
         <div class="menu">
             <a href="{{ url_for('admin.display_plot', img_num=3) }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Costs VS Earnings</a> 
         </div>
+        <div class="menu">
+            <a href="{{ url_for('admin.display_plot', img_num=4) }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Rents by Weekday</a> 
+        </div>
 
         <div class="footer">
             <span></span>
@@ -273,7 +276,7 @@
                                   }
                                 </style>
                                 {{ form.category(class="form-control form-control-sm custom-form-control mr-2", id="category-input", style="width: 10em;", style="background-color: #b8a495dc; color: #fff; font-family: 'Courier New', Courier, monospace") }}
-                                {{ form.search(class="form-control form-control-sm custom-form-control mr-2", type="search", placeholder="Search", style="font-family: 'Courier New', Courier, monospace; width: 10em;") }}
+                                {{ form.search(class="form-control form-control-sm custom-form-control mr-2 bg-dark", type="search", placeholder="Search", style="color: white; font-family: 'Courier New', Courier, monospace; width: 10em;") }}
                                 <button type="submit" class="btn btn-outline-light btn-smaller btn-dark" style="font-family: 'Courier New', Courier, monospace">Filter</button>
                               </div>
                             </form>
@@ -302,7 +305,7 @@
                                   }
                                 </style>
                                 {{ form.category(class="form-control form-control-sm custom-form-control mr-2", id="category-input", style="width: 10em;", style="background-color: #b8a495dc; color: #fff; font-family: 'Courier New', Courier, monospace") }}
-                                {{ form.search(class="form-control form-control-sm custom-form-control mr-2", type="search", placeholder="Search", style="font-family: 'Courier New', Courier, monospace; width: 10em;") }}
+                                {{ form.search(class="form-control form-control-sm custom-form-control mr-2 bg-dark", type="search", placeholder="Search", style="color: white; font-family: 'Courier New', Courier, monospace; width: 10em;") }}
                                 <button type="submit" class="btn btn-outline-light btn-smaller btn-dark" style="font-family: 'Courier New', Courier, monospace">Filter</button>
                               </div>
                             </form>
@@ -331,7 +334,7 @@
                                   }
                                 </style>
                                 {{ form.category(class="form-control form-control-sm custom-form-control mr-2", id="category-input", style="width: 10em;", style="background-color: #b8a495dc; color: #fff; font-family: 'Courier New', Courier, monospace") }}
-                                {{ form.search(class="form-control form-control-sm custom-form-control mr-2", type="search", placeholder="Search", style="font-family: 'Courier New', Courier, monospace; width: 10em;") }}
+                                {{ form.search(class="form-control form-control-sm custom-form-control mr-2 bg-dark", type="search", placeholder="Search", style="color: white; font-family: 'Courier New', Courier, monospace; width: 10em;") }}
                                 <button type="submit" class="btn btn-outline-light btn-smaller btn-dark" style="font-family: 'Courier New', Courier, monospace">Filter</button>
                               </div>
                             </form>
@@ -360,7 +363,7 @@
                                   }
                                 </style>
                                 {{ form.category(class="form-control form-control-sm custom-form-control mr-2", id="category-input", style="width: 10em;", style="background-color: #b8a495dc; color: #fff; font-family: 'Courier New', Courier, monospace") }}
-                                {{ form.search(class="form-control form-control-sm custom-form-control mr-2", type="search", placeholder="search", style="font-family: 'Courier New', Courier, monospace; width: 10em;") }}
+                                {{ form.search(class="form-control form-control-sm custom-form-control mr-2 bg-dark", type="search", placeholder="Search", style="color: white; font-family: 'Courier New', Courier, monospace; width: 10em;") }}
                                 <button type="submit" class="btn btn-outline-light btn-smaller btn-dark" style="font-family: 'Courier New', Courier, monospace">Filter</button>
                               </div>
                             </form>
