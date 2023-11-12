@@ -3,10 +3,10 @@
 {% block inventory_table_body %}
 
 <tr class="text-light text-left" style="font-size: 11px; font-family: 'Courier New', Courier, monospace; height: 20px; display: flex; align-items: center;">
-  <th style="flex: 2; margin-left: 40px;">ID</th>
-  <th style="flex: 2;">BRAND</th>
-  <th style="flex: 4;">STYLE</th>
-  <td style="flex: 4;">CURRENT STATUS</th>
+  <td style="flex: 2; margin-left: 40px;">ID</td>
+  <td style="flex: 2;">BRAND</td>
+  <td style="flex: 4;">STYLE</td>
+  <td style="flex: 4;">CURRENT STATUS</td>
 </tr>
 
 <tbody>
@@ -111,7 +111,9 @@
 
                 <!-- Third column, sellable badge -->
                 <div class="col-md-1 d-flex justify-content-center">
-                  {% if dress.sellable %}
+                  {% if dress.sold %}
+                    <span class="neon-text clean-purple typewriter py-2" style="font-size: 12px;">sold</span>
+                  {% elif dress.sellable %}
                     <span class="neon-text sand typewriter py-2" style="font-size: 12px;">sellable</span>
                   {% else %}
                     <span class="text text-dark" style="font-size: 12px;"></span>
@@ -119,28 +121,31 @@
                 </div>
                 
                 <!-- Fourth column, middle part of the card -->
-                
-                <div class="col-md-1 d-flex justify-content-center">
-                  {% if dress.check_maintenance_status() %}
-                    <button type="submit" class="neon-text clean-blue typewriter py-2" style="background: none; border: none; padding: 0; font-size: 14px;" disabled>
-                      @
-                    </button>
-                  {% elif dress.check_status() %}
-                      <span class="text-dark ml-auto typewriter" style="font-size: 11px;"></span>
-                  {% elif dress.rents %}
-                      {% if dress.get_last_rent() and dress.get_last_maintenance() and dress.get_last_rent().rentDate > dress.get_last_maintenance().date %}
-                        <span class="neon-text clean-pink ml-auto typewriter py-2" style="font-size: 11px;">check</span>
-                      {% elif dress.get_last_maintenance() == None %} 
-                        <span class="neon-text clean-pink ml-auto typewriter py-2" style="font-size: 11px;">check</span>
-                      {% else %}
-                        <span class="neon-text blue ml-auto typewriter py-2" style="font-size: 11px;">clean</span>
-                      {% endif %}
+              <div class="col-md-1 d-flex justify-content-center">
+                {% if dress.sold %}
+                  <!-- If the dress is sold, render nothing or set your desired content -->
+                {% elif dress.check_maintenance_status() %}
+                  <button type="submit" class="neon-text clean-blue typewriter py-2" style="background: none; border: none; padding: 0; font-size: 14px;" disabled>
+                    @
+                  </button>
+                {% elif dress.check_status() %}
+                  <span class="text-dark ml-auto typewriter" style="font-size: 11px;"></span>
+                {% elif dress.rents %}
+                  {% if dress.get_last_rent() and dress.get_last_maintenance() and dress.get_last_rent().rentDate > dress.get_last_maintenance().date %}
+                    <span class="neon-text clean-pink ml-auto typewriter py-2" style="font-size: 11px;">check</span>
+                  {% elif dress.get_last_maintenance() == None %} 
+                    <span class="neon-text clean-pink ml-auto typewriter py-2" style="font-size: 11px;">check</span>
                   {% else %}
-                    <span class="text-dark ml-auto typewriter" style="font-size: 11px;"></span>
+                    <span class="neon-text blue ml-auto typewriter py-2" style="font-size: 11px;">clean</span>
                   {% endif %}
-                </div>
-              
-                <div class="col-md-1 d-flex justify-content-center">
+                {% else %}
+                  <span class="text-dark ml-auto typewriter" style="font-size: 11px;"></span>
+                {% endif %}
+              </div>
+
+              <!-- Fifth column, middle part of the card -->
+              <div class="col-md-1 d-flex justify-content-center">
+                {% if not dress.sold %}
                   {% if not dress.check_status() %}
                     {% if not dress.check_maintenance_status() %}
                       <span class="neon-text green typewriter" style="font-size: 12px;">stock</span>
@@ -150,11 +155,12 @@
                   {% else %}
                     <span class="neon-text clean-two typewriter" style="font-size: 12px;">rented</span>
                   {% endif %}
-                </div>
-              
-                <!-- Fourth column, availability badge -->
-                <div class="col-md-1 d-flex justify-content-end">
-                  {% if not dress.check_status() and not dress.check_maintenance_status() %}
+                {% endif %}
+              </div>
+
+              <!-- Sixth column, availability badge -->
+              <div class="col-md-1 d-flex justify-content-end">
+                {% if not dress.sold and not dress.check_status() and not dress.check_maintenance_status() %}
                   <form method="POST" action="{{ url_for('admin.delete_object', dataBase='Dress', id=dress.id) }}" class="form-inline" onsubmit="return confirm('Are you sure you want to delete this dress? This action cannot be undone.');">
                     {{ delete_form.hidden_tag() }}
                     <input type="hidden" name="dataBase" value="Dress">
@@ -164,7 +170,7 @@
                       <span aria-hidden="true">&times;</span>
                     </button>
                   </form>
-                  {% else %}
+                {% else %}
                   <form method="POST" action="{{ url_for('admin.delete_object', dataBase='Dress', id=dress.id) }}" class="form-inline" onsubmit="return false;">
                     {{ delete_form.hidden_tag() }}
                     <input type="hidden" name="dataBase" value="Dress">
@@ -174,8 +180,9 @@
                       <span aria-hidden="true">&times;</span>
                     </button>
                   </form>
-                  {% endif %}
-                </div>
+                {% endif %}
+              </div>
+
                                               
               </div>
             </h6>
@@ -223,6 +230,14 @@
                           <tr>
                             <th scope="row">Times Rented:</th>
                             <td>{{ dress.timesRented }}</td>
+                          </tr>
+                          <tr>
+                            {% if dress.sold %}
+                              <th scope="row">Sold</th>
+                              {% if dress.sale %}
+                                  <td>{{ dress.sale[0].sale_date.strftime('%Y-%m-%d') }} {{ dress.sale }}</td>
+                              {% endif %}
+                            {% endif %}
                           </tr>
                         </tbody>
                       </table>

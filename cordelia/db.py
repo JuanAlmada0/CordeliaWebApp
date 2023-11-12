@@ -73,7 +73,7 @@ def init_db_command():
 @click.command('populate-db')
 @with_appcontext
 def populate_db_command():
-    from cordelia.sample_data import populate_db
+    from cordelia.sample_db import populate_db
     with current_app.app_context():
         populate_db()
         click.echo('Updated the database.')

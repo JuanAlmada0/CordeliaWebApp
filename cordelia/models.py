@@ -24,8 +24,10 @@ class Dress(db.Model):
     rentStatus = db.Column(db.Boolean, index=True, default=False)
     maintenanceStatus = db.Column(db.Boolean, index=True, default=False)
     imageData = db.Column(db.String(255), default=None)
+    sold = db.Column(db.Boolean, index=True, default=False)
 
     customers = db.relationship('Customer', secondary='rent', back_populates='dresses', viewonly=True) # Many-to-many relationship with Customer through Rent model
+    sale = db.relationship('DressSale', back_populates='dress')
 
     def __init__(self, *args, **kwargs):
         super(Dress, self).__init__(*args, **kwargs)
@@ -172,7 +174,8 @@ class Customer(db.Model):
     dateAdded = db.Column(db.DateTime(), index=True, default=datetime.utcnow)
 
     dresses = db.relationship('Dress', secondary='rent', back_populates='customers', viewonly=True) # Many-to-many relationship with Dress through Rent model
-    
+    sales = db.relationship('DressSale', back_populates='customer')
+
     def check_status(self):
         if self.rents:
             sorted_rents = sorted(self.rents, key=lambda rent: rent.rentDate, reverse=True)
@@ -248,6 +251,25 @@ class Rent(db.Model):
     def __repr__(self):
         return f"R-{self.id:02}"
     
+
+
+class DressSale(db.Model):
+    # Sale model representing Dress sales.
+    __tablename__ = 'dress_sale'
+    id = db.Column(db.Integer, primary_key=True)
+    sale_date = db.Column(db.DateTime, index=True, nullable=False)
+    sale_price = db.Column(db.Integer, index=True, nullable=False)
+
+    # Relationships
+    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
+    customer = db.relationship('Customer', back_populates='sales')
+
+    dress_id = db.Column(db.Integer, db.ForeignKey('dress.id'), nullable=False)
+    dress = db.relationship('Dress', back_populates='sale')
+
+    def __repr__(self):
+        return f"DressSale-{self.id:02}"
+
 
 
 class User(UserMixin, db.Model):

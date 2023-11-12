@@ -17,7 +17,7 @@
         </div>
         
         <div class="menu">
-            <a href="{{ url_for('admin.inventory') }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Dress</a>
+            <a href="{{ url_for('admin.dress_db') }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Dress</a>
             {% if model == "Dress" %}
             <span class="badge badge-light ml-2">{{ inventory.total if model == 'Dress'}}</span>
            
@@ -30,7 +30,7 @@
         </div>
 
         <div class="menu">
-            <a href="{{ url_for('admin.rentInventory') }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Rent</a>
+            <a href="{{ url_for('admin.rent_db') }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Rent</a>
             {% if model == 'Rent' %}
             <span class="badge badge-light ml-2">{{ inventory.total if model == 'Rent'}}</span>
 
@@ -43,7 +43,7 @@
         </div>
 
         <div class="menu">
-            <a href="{{ url_for('admin.customerInventory') }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Customer</a>
+            <a href="{{ url_for('admin.customer_db') }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Customer</a>
             {% if model == 'Customer' %}
             <span class="badge badge-light ml-2">{{ inventory.total if model == 'Customer' }}</span>
 
@@ -56,7 +56,7 @@
         </div>
 
         <div class="menu">
-            <a href="{{ url_for('admin.maintenance_inventory') }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Maintenance</a>
+            <a href="{{ url_for('admin.maintenance_db') }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Maintenance</a>
             {% if model == 'Maintenance' %}
             <span class="badge badge-light ml-2">{{ inventory.total if model == 'Maintenance' }}</span>
 
@@ -64,6 +64,16 @@
 
             {% endif %}
         </div>
+
+        <div class="menu">
+          <a href="{{ url_for('admin.sales_db') }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Sales</a>
+          {% if model == 'DressSale' %}
+          <span class="badge badge-light ml-2">{{ inventory.total if model == 'DressSale' }}</span>
+
+          <div class="spacer"></div>
+
+          {% endif %}
+      </div>
         
         <div class="footer">
             <span></span>
@@ -106,12 +116,12 @@
                                   <ul class="pagination">
                                     {% if inventory.has_prev %}
                                     <li class="page-item ml-1">
-                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.inventory', page=1, order_by=order_by_column) }}" aria-label="First Page">
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.dress_db', page=1, sort=order_by_column) }}" aria-label="First Page">
                                         &laquo;&laquo;
                                       </a>
                                     </li>
                                     <li class="page-item ml-1">
-                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.inventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.dress_db', page=inventory.prev_num, sort=order_by_column) }}" aria-label="Previous">
                                         &laquo;
                                       </a>
                                     </li>
@@ -123,12 +133,12 @@
                                     </li>
                                     {% if inventory.has_next %}
                                     <li class="page-item ml-1">
-                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.inventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.dress_db', page=inventory.next_num, sort=order_by_column) }}" aria-label="Next">
                                         &raquo;
                                       </a>
                                     </li>
                                     <li class="page-item ml-1">
-                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.inventory', page=inventory.pages, order_by=order_by_column) }}" aria-label="Last Page">
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.dress_db', page=inventory.pages, sort=order_by_column) }}" aria-label="Last Page">
                                         &raquo;&raquo;
                                       </a>
                                     </li>
@@ -143,12 +153,12 @@
                                   <ul class="pagination">
                                     {% if inventory.has_prev %}
                                     <li class="page-item ml-1">
-                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.rentInventory', page=1, order_by=order_by_column) }}" aria-label="First Page">
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.rent_db', page=1, sort=order_by_column) }}" aria-label="First Page">
                                         &laquo;&laquo;
                                       </a>
                                     </li>
                                     <li class="page-item ml-1">
-                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.rentInventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.rent_db', page=inventory.prev_num, sort=order_by_column) }}" aria-label="Previous">
                                         &laquo;
                                       </a>
                                     </li>
@@ -160,12 +170,12 @@
                                     </li>
                                     {% if inventory.has_next %}
                                     <li class="page-item ml-1">
-                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.rentInventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.rent_db', page=inventory.next_num, sort=order_by_column) }}" aria-label="Next">
                                         &raquo;
                                       </a>
                                     </li>
                                     <li class="page-item ml-1">
-                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.rentInventory', page=inventory.pages, order_by=order_by_column) }}" aria-label="Last Page">
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.rent_db', page=inventory.pages, sort=order_by_column) }}" aria-label="Last Page">
                                         &raquo;&raquo;
                                       </a>
                                     </li>
@@ -180,12 +190,12 @@
                                   <ul class="pagination">
                                     {% if inventory.has_prev %}
                                     <li class="page-item ml-1">
-                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.customerInventory', page=1, order_by=order_by_column) }}" aria-label="First Page">
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.customer_db', page=1, sort=order_by_column) }}" aria-label="First Page">
                                         &laquo;&laquo;
                                       </a>
                                     </li>
                                     <li class="page-item ml-1">
-                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.customerInventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.customer_db', page=inventory.prev_num, sort=order_by_column) }}" aria-label="Previous">
                                         &laquo;
                                       </a>
                                     </li>
@@ -197,12 +207,12 @@
                                     </li>
                                     {% if inventory.has_next %}
                                     <li class="page-item ml-1">
-                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.customerInventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.customer_db', page=inventory.next_num, sort=order_by_column) }}" aria-label="Next">
                                         &raquo;
                                       </a>
                                     </li>
                                     <li class="page-item ml-1">
-                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.customerInventory', page=inventory.pages, order_by=order_by_column) }}" aria-label="Last Page">
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.customer_db', page=inventory.pages, sort=order_by_column) }}" aria-label="Last Page">
                                         &raquo;&raquo;
                                       </a>
                                     </li>
@@ -217,12 +227,12 @@
                                   <ul class="pagination">
                                     {% if inventory.has_prev %}
                                     <li class="page-item ml-1">
-                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.maintenance_inventory', page=1, order_by=order_by_column) }}" aria-label="First Page">
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.maintenance_db', page=1, sort=order_by_column) }}" aria-label="First Page">
                                         &laquo;&laquo;
                                       </a>
                                     </li>
                                     <li class="page-item ml-1">
-                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.maintenance_inventory', page=inventory.prev_num, order_by=order_by_column) }}" aria-label="Previous">
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.maintenance_db', page=inventory.prev_num, sort=order_by_column) }}" aria-label="Previous">
                                         &laquo;
                                       </a>
                                     </li>
@@ -234,12 +244,49 @@
                                     </li>
                                     {% if inventory.has_next %}
                                     <li class="page-item ml-1">
-                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.maintenance_inventory', page=inventory.next_num, order_by=order_by_column) }}" aria-label="Next">
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.maintenance_db', page=inventory.next_num, sort=order_by_column) }}" aria-label="Next">
                                         &raquo;
                                       </a>
                                     </li>
                                     <li class="page-item ml-1">
-                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.maintenance_inventory', page=inventory.pages, order_by=order_by_column) }}" aria-label="Last Page">
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.maintenance_db', page=inventory.pages, sort=order_by_column) }}" aria-label="Last Page">
+                                        &raquo;&raquo;
+                                      </a>
+                                    </li>
+                                    {% endif %}
+                                  </ul>
+                                </nav>
+                                {% endif %}
+
+                                {% elif model == "DressSale" %}
+                                {% if inventory.has_prev or inventory.has_next %}
+                                <nav aria-label="Inventory pagination">
+                                  <ul class="pagination">
+                                    {% if inventory.has_prev %}
+                                    <li class="page-item ml-1">
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.sales_db', page=1, sort=order_by_column) }}" aria-label="First Page">
+                                        &laquo;&laquo;
+                                      </a>
+                                    </li>
+                                    <li class="page-item ml-1">
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.sales_db', page=inventory.prev_num, sort=order_by_column) }}" aria-label="Previous">
+                                        &laquo;
+                                      </a>
+                                    </li>
+                                    {% endif %}
+                                    <li class="page-item ml-1">
+                                      <a class="btn btn-outline-light btn-sm btn-smaller btn-dark" href="javascript:void(0);" aria-label="Current Page">
+                                        {{ inventory.page }}
+                                      </a>
+                                    </li>
+                                    {% if inventory.has_next %}
+                                    <li class="page-item ml-1">
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.sales_db', page=inventory.next_num, sort=order_by_column) }}" aria-label="Next">
+                                        &raquo;
+                                      </a>
+                                    </li>
+                                    <li class="page-item ml-1">
+                                      <a class="btn btn-sm btn-smaller btn-dark" href="{{ url_for('admin.sales_db', page=inventory.pages, sort=order_by_column) }}" aria-label="Last Page">
                                         &raquo;&raquo;
                                       </a>
                                     </li>
@@ -255,10 +302,10 @@
                             {% if model == 'Dress' %}
                         <th style="flex: 3;">
                             <div class="mx-auto breadcrumb file-cabinet">
-                              <a class="breadcrumb-item {% if order_by_column == 'default' %}active{% endif %}" href="{{ url_for('admin.inventory', order_by='default') }}">status</a>
-                              <a class="breadcrumb-item {% if order_by_column == 'id' %}active{% endif %}" href="{{ url_for('admin.inventory', order_by='id') }}">added</a>
-                              <a class="breadcrumb-item {% if order_by_column == 'times_rented' %}active{% endif %}" href="{{ url_for('admin.inventory', order_by='times_rented') }}">popular</a>
-                              <a class="breadcrumb-item {% if order_by_column == 'dress_cost' %}active{% endif %}" href="{{ url_for('admin.inventory', order_by='dress_cost') }}">cost</a>
+                              <a class="breadcrumb-item {% if order_by_column == 'default' %}active{% endif %}" href="{{ url_for('admin.dress_db', sort='status') }}">status</a>
+                              <a class="breadcrumb-item {% if order_by_column == 'id' %}active{% endif %}" href="{{ url_for('admin.dress_db', sort='id') }}">added</a>
+                              <a class="breadcrumb-item {% if order_by_column == 'times_rented' %}active{% endif %}" href="{{ url_for('admin.dress_db', sort='popularity') }}">popular</a>
+                              <a class="breadcrumb-item {% if order_by_column == 'dress_cost' %}active{% endif %}" href="{{ url_for('admin.dress_db', sort='cost') }}">cost</a>
                             </div>
                         </th>
 
@@ -327,11 +374,53 @@
                             <button type="button" class="btn btn-outline-light btn-sm btn-smaller btn-dark" data-toggle="modal" data-target="#maintenanceModal">
                               <i class="fas fa-wrench"></i>
                             </button>
+
+                        </th>
+
+                        <th style="flex: .5;">
+
+
+                            <!-- Button to trigger the "Sell Dress" modal -->
+                            <button type="button" class="btn btn-outline-light btn-sm btn-smaller btn-dark" data-toggle="modal" data-target="#sellDressModal">
+                              <i class="fas fa-dollar-sign"></i>
+                            </button>
+                          
+                            <!-- Sell Dress Modal -->
+                            <div class="modal fade" id="sellDressModal" tabindex="-1" role="dialog" aria-labelledby="sellDressModalLabel" aria-hidden="true">
+                              <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                  <div class="modal-header">
+                                    <h5 class="modal-title" id="sellDressModalLabel" style="color: black;">Sell Dress</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                      <span aria-hidden="true">&times;</span>
+                                    </button>
+                                  </div>
+                                  <div class="modal-body">
+                                    <!-- Sell Dress Form -->
+                                    <form method="post" action="{{ url_for('admin.sell_dress') }}">
+                                      {{ sell_dress_form.hidden_tag() }}
+                                      {{ sell_dress_form.csrf_token }}
+                                    
+                                      <!-- Other form fields here -->
+                                      <div>
+                                      {{ sell_dress_form.dress_id.label(style="color: black;") }} {{ sell_dress_form.dress_id(class="btn-dark") }}
+                                      {{ sell_dress_form.customer_id.label(style="color: black;") }} {{ sell_dress_form.customer_id(class="btn-dark") }}
+                                      </div>
+                                      <div>{{ sell_dress_form.sale_date.label(style="color: black;") }} {{ sell_dress_form.sale_date }}</div>
+                                      <div>{{ sell_dress_form.sale_price.label(style="color: black;") }} {{ sell_dress_form.sale_price }}</div>
+                                    
+                                      <button type="submit" class="btn btn-dark">Sell Dress</button>
+                                    </form>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
                         </th>
 
 
                         <th style="flex: 3;">
-                            <form method="POST" action="{{ url_for('admin.inventory') }}" class="form-inline">
+                            <form method="POST" action="{{ url_for('admin.dress_db') }}" class="form-inline">
                               {{ form.hidden_tag() }}
                               <div class="form-group" style="padding-right: 2.5px;">
                                 <style>
@@ -350,17 +439,17 @@
                             {% elif model == 'Maintenance' %}
                         <th style="flex: 3;">
                             <div class="breadcrumb file-cabinet">
-                              <a class="breadcrumb-item {% if order_by_column == 'default' %}active{% endif %}" href="{{ url_for('admin.maintenance_inventory', order_by='default') }}">status</a>
-                              <a class="breadcrumb-item {% if order_by_column == 'id' %}active{% endif %}" href="{{ url_for('admin.maintenance_inventory', order_by='date') }}">date</a>
-                              <a class="breadcrumb-item {% if order_by_column == 'dress_id' %}active{% endif %}" href="{{ url_for('admin.maintenance_inventory', order_by='type') }}">type</a>
-                              <a class="breadcrumb-item {% if order_by_column == 'user_lastName' %}active{% endif %}" href="{{ url_for('admin.maintenance_inventory', order_by='cost') }}">cost</a>
+                              <a class="breadcrumb-item {% if order_by_column == 'default' %}active{% endif %}" href="{{ url_for('admin.maintenance_db', sort='default') }}">status</a>
+                              <a class="breadcrumb-item {% if order_by_column == 'id' %}active{% endif %}" href="{{ url_for('admin.maintenance_db', sort='date') }}">date</a>
+                              <a class="breadcrumb-item {% if order_by_column == 'dress_id' %}active{% endif %}" href="{{ url_for('admin.maintenance_db', sort='type') }}">type</a>
+                              <a class="breadcrumb-item {% if order_by_column == 'user_lastName' %}active{% endif %}" href="{{ url_for('admin.maintenance_db', sort='cost') }}">cost</a>
                             </div>
                         </th>
 
                         <th></th>
 
                         <th style="flex: 3;">
-                            <form method="POST" action="{{ url_for('admin.maintenance_inventory') }}" class="form-inline">
+                            <form method="POST" action="{{ url_for('admin.maintenance_db') }}" class="form-inline">
                               {{ form.hidden_tag() }}
                               <div class="form-group" style="padding-right: 2.5px;">
                                 <style>
@@ -379,17 +468,17 @@
                             {% elif model == 'Rent' %}
                         <th style="flex: 3;">
                             <div class="breadcrumb file-cabinet">
-                              <a class="breadcrumb-item {% if order_by_column == 'default' %}active{% endif %}" href="{{ url_for('admin.rentInventory', order_by='default') }}">status</a>
-                              <a class="breadcrumb-item {% if order_by_column == 'id' %}active{% endif %}" href="{{ url_for('admin.rentInventory', order_by='id') }}">id</a>
-                              <a class="breadcrumb-item {% if order_by_column == 'dress_id' %}active{% endif %}" href="{{ url_for('admin.rentInventory', order_by='dress_id') }}">dress</a>
-                              <a class="breadcrumb-item {% if order_by_column == 'user_lastName' %}active{% endif %}" href="{{ url_for('admin.rentInventory', order_by='user_lastName') }}">user</a>
+                              <a class="breadcrumb-item {% if order_by_column == 'default' %}active{% endif %}" href="{{ url_for('admin.rent_db', sort='status') }}">status</a>
+                              <a class="breadcrumb-item {% if order_by_column == 'id' %}active{% endif %}" href="{{ url_for('admin.rent_db', sort='id') }}">id</a>
+                              <a class="breadcrumb-item {% if order_by_column == 'dress_id' %}active{% endif %}" href="{{ url_for('admin.rent_db', sort='dress_id') }}">dress</a>
+                              <a class="breadcrumb-item {% if order_by_column == 'user_lastName' %}active{% endif %}" href="{{ url_for('admin.rent_db', sort='customer_last_name') }}">user</a>
                             </div>
                         </th>
 
                         <th></th>
 
                         <th style="flex: 3;">
-                            <form method="POST" action="{{ url_for('admin.rentInventory') }}" class="form-inline">
+                            <form method="POST" action="{{ url_for('admin.rent_db') }}" class="form-inline">
                               {{ form.hidden_tag() }}
                               <div class="form-group" style="padding-right: 2.5px;">
                                 <style>
@@ -408,19 +497,19 @@
                             {% elif model == 'Customer' %}
                         <th style="flex: 3;">
                             <div class="breadcrumb file-cabinet">
-                              <a class="breadcrumb-item {% if order_by_column == 'default' %}active{% endif %}" href="{{ url_for('admin.customerInventory', order_by='default') }}">status</a>
-                              <a class="breadcrumb-item {% if order_by_column == 'date' %}active{% endif %}" href="{{ url_for('admin.customerInventory', order_by='date') }}">joined</a>
-                              <a class="breadcrumb-item {% if order_by_column == 'id' %}active{% endif %}" href="{{ url_for('admin.customerInventory', order_by='id') }}">id</a>
-                              <a class="breadcrumb-item {% if order_by_column == 'last_name' %}active{% endif %}" href="{{ url_for('admin.customerInventory', order_by='last_name') }}">last name</a>
+                              <a class="breadcrumb-item {% if order_by_column == 'default' %}active{% endif %}" href="{{ url_for('admin.customer_db', sort='default') }}">status</a>
+                              <a class="breadcrumb-item {% if order_by_column == 'date' %}active{% endif %}" href="{{ url_for('admin.customer_db', sort='date') }}">joined</a>
+                              <a class="breadcrumb-item {% if order_by_column == 'id' %}active{% endif %}" href="{{ url_for('admin.customer_db', sort='id') }}">id</a>
+                              <a class="breadcrumb-item {% if order_by_column == 'last_name' %}active{% endif %}" href="{{ url_for('admin.customer_db', sort='last_name') }}">last name</a>
                             </div>
                         </th>
 
                         <th></th>
 
                         <th style="flex: 3;">
-                            <form method="POST" action="{{ url_for('admin.customerInventory') }}" class="form-inline">
+                            <form method="POST" action="{{ url_for('admin.customer_db') }}" class="form-inline">
                               {{ form.hidden_tag() }}
-                              <div class="form-group" style="padding-right: 2px;">
+                              <div class="form-group" style="padding-right: 2.5px;">
                                 <style>
                                   /* Target the specific field and set the fixed width */
                                   #category-input {
@@ -432,8 +521,38 @@
                                 <button type="submit" class="btn btn-outline-light btn-smaller btn-dark" style="font-family: 'Courier New', Courier, monospace">Filter</button>
                               </div>
                             </form>
-                            {% endif %}
                         </th>
+
+                        {% elif model == 'DressSale' %}
+                        <th style="flex: 3;">
+                            <div class="breadcrumb file-cabinet">
+                              <a class="breadcrumb-item {% if order_by_column == 'default' %}active{% endif %}" href="{{ url_for('admin.sales_db', sort='id') }}">id</a>
+                              <a class="breadcrumb-item {% if order_by_column == 'id' %}active{% endif %}" href="{{ url_for('admin.sales_db', sort='date') }}">date</a>
+                              <a class="breadcrumb-item {% if order_by_column == 'dress_id' %}active{% endif %}" href="{{ url_for('admin.sales_db', sort='customer_id') }}">customer</a>
+                              <a class="breadcrumb-item {% if order_by_column == 'user_lastName' %}active{% endif %}" href="{{ url_for('admin.sales_db', sort='price') }}">price</a>
+                            </div>
+                        </th>
+
+                        <th></th>
+
+                        <th style="flex: 3;">
+                            <form method="POST" action="{{ url_for('admin.sales_db') }}" class="form-inline">
+                              {{ form.hidden_tag() }}
+                              <div class="form-group" style="padding-right: 2.5px;">
+                                <style>
+                                  /* Target the specific field and set the fixed width */
+                                  #category-input {
+                                    width: 10em; /* Set the desired width here, for example, 10em */
+                                  }
+                                </style>
+                                {{ form.category(class="form-control form-control-sm custom-form-control mr-2", id="category-input", style="width: 10em;", style="background-color: #b8a495dc; color: #fff; font-family: 'Courier New', Courier, monospace") }}
+                                {{ form.search(class="form-control form-control-sm custom-form-control mr-2 bg-dark", type="search", placeholder="Search", style="color: white; font-family: 'Courier New', Courier, monospace; width: 10em;") }}
+                                <button type="submit" class="btn btn-outline-light btn-smaller btn-dark" style="font-family: 'Courier New', Courier, monospace">Filter</button>
+                              </div>
+                            </form>
+                        </th>
+                        {% endif %}
+
                     </tr>
                 </thead> 
 

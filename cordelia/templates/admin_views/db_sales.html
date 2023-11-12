@@ -1,0 +1,125 @@
+{% extends "admin_views/dashboard.html" %}
+
+{% block inventory_table_body %}
+
+<tr class="text-light text-left" style="font-size: 11px; font-family: 'Courier New', Courier, monospace; height: 20px; display: flex; align-items: center;">
+  <td style="flex: 2; margin-left: 40px;">ID</td>
+  <td style="flex: 3;">DATE</td>
+  <td style="flex: 3;">CUSTOMER ID</td>
+  <td style="flex: 2;">PRICE</td>
+</tr>
+          
+<tbody>
+  {% for sale in inventory.items %}
+    <tr>
+      <td colspan="2">
+        <div class="accordion" id="accordion{{ loop.index }}">
+          <div class="card bg-dark">
+            <div class="card-header" id="heading{{ loop.index }}">
+              <h6 class="mb-0">
+                <div class="row align-items-center">
+                    <!-- First column, left part of the card -->
+                    <div class="col-md-2">
+                      <div class="d-flex justify-content-start">
+                          <button class="btn btn-sm" type="button" data-toggle="collapse" data-target="#collapse{{ loop.index }}" aria-expanded="true" aria-controls="collapse{{ loop.index }}">
+                            <span class="arrow-down"></span>
+                          </button>
+
+                          <div class="text-arrow-container ml-2">
+                            <div class="d-flex justify-content-start">
+                              <span class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ sale }}</span>
+                            </div>
+                          </div>
+                      </div>
+                    </div>
+                  
+                    <!-- Second column, middle part of the card -->
+                    <div class="col-md-4">
+                      <div class="d-flex justify-content-start">
+                        <div class="text-arrow-container">
+                          <span class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">
+                            {{ sale.sale_date.strftime('%d | %b | %Y') }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="d-flex justify-content-start">
+                        <div class="text-arrow-container">
+                          <span class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">C-{{ "{:02}".format(sale.customer_id) }}</span>
+                        </div>
+                      </div>
+                    </div>      
+                    
+                    <div class="col-md-1 d-flex justify-content-center">
+                          <span class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace;">{{ sale.sale_price }}$</span>
+                      </div>
+                  
+                
+                  <!-- Fifth column, delete button -->
+                  <div class="col-md-1 d-flex justify-content-end">
+                    <form method="POST" action="{{ url_for('admin.delete_object', dataBase='DressSale', id=sale.id) }}" class="form-inline" onsubmit="return confirm('Are you sure you want to delete this sale? This action cannot be undone.');">
+                      {{ delete_form.hidden_tag() }}
+                      <input type="hidden" name="dataBase" value="DressSale">
+                      <input type="hidden" name="id" value="{{ sale.id }}">
+                      <!-- Use the Bootstrap close button here -->
+                      <button type="submit" class="btn btn-dark btn-sm btn-smaller text-light" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </form>
+                  </div>                        
+                </div>
+              </h6>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div id="collapse{{ loop.index }}" class="collapse" aria-labelledby="heading{{ loop.index }}" data-parent="#accordion{{ loop.index }}">
+            <div class="card-body">
+              <table class="table table-striped table-hover table-sm table-dark" style="font-family: 'Courier New', Courier, monospace;">
+                <tbody style="font-size: 12px;">
+                  <tr>
+                    <td class="d-flex" style="padding-left: 10px;">
+                      <!-- Main table column -->
+                      <div class="col-6">
+                        <!-- Inner table with the content of the rows -->
+                        <table class="w-100" style="font-family: 'Courier New', Courier, monospace;">
+                          <thead style="font-size: 13px;">
+                            <tr>
+                              <th scope="row">{{ sale }}</th>
+                              <th></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                                <th scope="row">Dress:</th>
+                                <td>D-{{ sale.dress_id }}</td>
+                            </tr>
+                            <tr>
+                              <th scope="row">Customer:</th>
+                              <td>C-{{ sale.customer_id }}</td>
+                          </tr>
+                            <tr>
+                              <th scope="row">Date:</th>
+                              <td>{{ sale.sale_date.strftime('%d %b %Y') }}</td>
+                            </tr>
+                            <tr>
+                              <th scope="row">Price:</th>
+                              <td>{{ sale.sale_price }}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>                    
+                    </td>
+                  </tr>
+                </tbody>
+              </table>                                                           
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr>
+  {% endfor %}
+</tbody>
+
+{% endblock %}

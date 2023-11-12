@@ -3,11 +3,11 @@ from wtforms import (
     StringField, PasswordField, SubmitField, BooleanField, IntegerField, 
     SelectField, DateField, HiddenField, FileField, FieldList, FormField
     )
-from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Optional
+from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Optional, NumberRange
 from flask_wtf.file import FileAllowed
 import phonenumbers
 from phonenumbers.phonenumberutil import NumberParseException
-from cordelia.models import User, Customer
+from cordelia.models import User, Customer, Dress
 
 
 class RegistrationForm(FlaskForm):
@@ -68,12 +68,30 @@ class SearchForm(FlaskForm):
 class DressIdForm(FlaskForm):
     dress_id = IntegerField('Dress ID', validators=[Optional()])
 
+
 class MaintenanceForm(FlaskForm):
     dress_ids = FieldList(FormField(DressIdForm), min_entries=1)
     maintenanceDate = DateField('Date')
     maintenanceType = SelectField('Type', choices=[('None', None), ('Cleaning', 'Cleaning'), ('Repair', 'Repair'), ('Alteration', 'Alteration')])
     maintenanceCost = IntegerField('Cost')
     submit = SubmitField('Submit')
+
+
+class SaleForm(FlaskForm):
+    sale_date = DateField('Sale Date')
+    sale_price = IntegerField('Sale Price')
+    dress_id = SelectField('Dress', coerce=int)
+    customer_id = SelectField('Customer', coerce=int)
+    submit = SubmitField('Submit')
+
+    def __init__(self, *args, **kwargs):
+        super(SaleForm, self).__init__(*args, **kwargs)
+
+        # Populate dress choices
+        self.dress_id.choices = [(dress.id, f'D-{dress.id:02}') for dress in Dress.query.all()]
+
+        # Populate customer choices
+        self.customer_id.choices = [(customer.id, f'C-{customer.id:02}') for customer in Customer.query.all()]
 
 
 class DeleteForm(FlaskForm):

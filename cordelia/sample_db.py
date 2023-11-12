@@ -161,7 +161,7 @@ def create_weekly_maintenance():
 
         if returned_dresses:
             maintenance_type = random.choice(['Cleaning', 'Repair', 'Alteration'])
-            maintenance_cost = 80 * len(returned_dresses)
+            maintenance_cost = 120 * len(returned_dresses)
 
             maintenance = Maintenance(
                 date = lastDayOfTheWeek,
@@ -181,7 +181,7 @@ def create_weekly_maintenance():
 
 def populate_db():
     with current_app.app_context():
-        generate_random_dresses(70)
+        generate_random_dresses(100)
         generate_random_customers(80)
-        generate_sample_rents(125)
+        generate_sample_rents(225)
         create_weekly_maintenance()

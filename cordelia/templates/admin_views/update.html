@@ -9,11 +9,11 @@
     <div class="register-container">
         <div class="d-flex justify-content-start">
             {% if form_type == 'rent' %}
-                <a class="btn btn-primary btn-dark" href="{{ url_for('admin.rentInventory') }}">Back</a>
+                <a class="btn btn-primary btn-dark" href="{{ url_for('admin.rent_db') }}">Back</a>
             {% elif form_type == 'customer' %}
-                <a class="btn btn-primary btn-dark" href="{{ url_for('admin.customerInventory') }}">Back</a>
+                <a class="btn btn-primary btn-dark" href="{{ url_for('admin.customer_db') }}">Back</a>
             {% else %}
-                <a class="btn btn-primary btn-dark" href="{{ url_for('admin.inventory') }}">Back</a>
+                <a class="btn btn-primary btn-dark" href="{{ url_for('admin.dress_db') }}">Back</a>
             {% endif %}
         </div>
         <div class="d-flex justify-content-center">

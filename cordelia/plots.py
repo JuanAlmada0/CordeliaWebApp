@@ -80,8 +80,6 @@ def top_customers():
 
         matplotlib.use('Agg')
 
-        plt.style.use('seaborn-dark')
-
         # Group by customer ID and calculate total rentals and total spending
         customer_rentals = df_rent.groupby('Customer Id').agg({'Id': 'count', 'Payment Total': 'sum'})
 
@@ -90,8 +88,16 @@ def top_customers():
         # Sort customers by the number of rentals
         top_customers_by_rentals = customer_rentals.sort_values(by='Total Rentals', ascending=False)
 
+        # Get the top 15 customers
+        top_15_customers = top_customers_by_rentals.head(15)
+
+        # Reverse the order of the top 15 customers
+        top_15_customers = top_15_customers.iloc[::-1]
+
         # Sort customers by total spending
         top_customers_by_spending = customer_rentals.sort_values(by='Total Spending', ascending=False)
+
+        plt.style.use('ggplot')
 
         # Create a subplot with two plots
         fig, axs = plt.subplots(1, 2, figsize=(9, 4))
@@ -99,16 +105,16 @@ def top_customers():
         fig.set_facecolor('#DCC6B6') 
 
         # Plot the top customers by number of rentals
-        top_customers_by_rentals.head(10).plot(kind='bar', y='Total Rentals', legend=True, ax=axs[0], color='#a58d72')
+        top_15_customers.plot(kind='barh', y='Total Rentals', legend=True, ax=axs[0], color='#a58d72')
         axs[0].set_title('Top Customers by Number of Rentals')
-        axs[0].set_xlabel('Customer ID')
-        axs[0].set_ylabel('Total Rentals')
+        axs[0].set_ylabel('Customer ID')
+        axs[0].set_xlabel('Total Rentals')
 
         # Set xticklabels straight
         axs[0].set_xticklabels(axs[0].get_xticklabels(), rotation=0)
 
-        # Set the y-axis major locator to go up by 1
-        axs[0].yaxis.set_major_locator(MultipleLocator(1))
+        # Set the x-axis major locator to go up by 1
+        axs[0].xaxis.set_major_locator(MultipleLocator(2))
 
         axs[0].set_facecolor("#b8b8b8dc")
 
@@ -117,7 +123,7 @@ def top_customers():
         axs[0].grid(color='0.9')
 
         # Plot the top customers by total spending
-        top_customers_by_spending.head(10).plot(kind='bar', y='Total Spending', legend=True, ax=axs[1], color='#a58d72')
+        top_customers_by_spending.head(15).plot(kind='bar', y='Total Spending', legend=True, ax=axs[1], color='#a58d72')
         axs[1].set_title('Top Customers by Total Spending')
         axs[1].set_xlabel('Customer ID')
         axs[1].set_ylabel('Total Spending')
@@ -126,14 +132,14 @@ def top_customers():
         axs[1].set_xticklabels(axs[1].get_xticklabels(), rotation=0)
 
         # Find the maximum and minimum spending among the top customers
-        max_spending = top_customers_by_spending.head(10)['Total Spending'].max()
-        min_spending = top_customers_by_spending.head(10)['Total Spending'].min()
+        max_spending = top_customers_by_spending.head(15)['Total Spending'].max()
+        min_spending = top_customers_by_spending.head(15)['Total Spending'].min()
 
         # Adjust the lower y-axis limit to be slightly below the minimum spending value
         axs[1].set_ylim(min_spending - 500, max_spending)
 
         # Set the y-axis major locator to go up by 500
-        axs[1].yaxis.set_major_locator(MultipleLocator(500))
+        axs[1].yaxis.set_major_locator(MultipleLocator(1000))
 
         axs[1].set_facecolor("#b8b8b8dc")
 
@@ -195,7 +201,7 @@ def costs_vs_earnings():
         # Create a list of numerical values for the x-axis
         x_values = list(range(len(index)))
 
-        plt.style.use('seaborn-dark')
+        plt.style.use('ggplot')
 
         fig, ax = plt.subplots(figsize=(9, 4))
 
@@ -265,6 +271,7 @@ def plot_combined_statistics():
         return None
 
     matplotlib.use('Agg')
+    
     plt.style.use('seaborn-dark')
 
     # Create a subplot with two plots
@@ -289,6 +296,15 @@ def plot_combined_statistics():
     axs[0].set_xticks(x_values)
     axs[0].set_xticklabels([period.strftime('%b') for period in counts.index])
     axs[0].legend()
+
+    # Set the y-axis major locator to go up by 5k
+    axs[0].yaxis.set_major_locator(MultipleLocator(2))
+
+    # Find the minimum number of rents per month
+    min_rents = counts.min()
+    
+    # Adjust the lower y-axis limit to be slightly less than the month with min rents
+    axs[0].set_ylim(min_rents - 4)
 
     # Add grid lines
     axs[0].grid(True)
