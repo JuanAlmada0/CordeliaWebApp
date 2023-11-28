@@ -15,10 +15,10 @@ def app():
         'TESTING': True,
         'SQLALCHEMY_DATABASE_URI': f'sqlite:///{db_path}',
         'SQLALCHEMY_TRACK_MODIFICATIONS': False,
+        'WTF_CSRF_ENABLED':False
     }
+    
     app = create_app(test_config)
-
-    app.config['WTF_CSRF_ENABLED'] = False
 
     # Before each test, set up the database session and engine
     with app.app_context():
@@ -86,7 +86,6 @@ class AuthActions(object):
 
     def logout(self):
         return self._client.get('/auth/logout')
-
 
 
 

@@ -1,5 +1,5 @@
 import pandas as pd
-from cordelia.models import Dress, Rent, Customer, Maintenance
+from cordelia.models import Dress, Rent, Customer, Maintenance, Sale
 import matplotlib
 import matplotlib.pyplot as plt 
 from matplotlib.ticker import FuncFormatter, MultipleLocator
@@ -14,6 +14,7 @@ def create_dataframes():
     customer_db = Customer.query.all()
     rent_db = Rent.query.all()
     maintenance_db = Maintenance.query.all()
+    sale_db = Sale.query.all()
 
     if dress_db:
         dress_data = {
@@ -65,11 +66,21 @@ def create_dataframes():
             'Total Cost': [maintenance.cost for maintenance in maintenance_db]
         }
         df_maintenance = pd.DataFrame(maintenance_data)
+
+    if sale_db:
+        sale_data = {
+            'Id': [sale.id for sale in sale_db],
+            'Customer Id': [sale.customer_id for sale in sale_db],
+            'Dress Id': [sale.dress_id for sale in sale_db],
+            'Sale Date': [sale.sale_date for sale in sale_db],
+            'Sale Price': [sale.sale_price for sale in sale_db]
+        }
+        df_sale = pd.DataFrame(sale_data)
         
-    return df_dress, df_customer, df_rent, df_maintenance
+    return df_dress, df_customer, df_rent, df_maintenance, df_sale
 
 
-df_dress, df_customer, df_rent, df_maintenance = create_dataframes()
+df_dress, df_customer, df_rent, df_maintenance, df_sale= create_dataframes()
 
 
 
@@ -162,10 +173,9 @@ def top_customers():
 
 
 
-# Plot earnings and costs from dress and maintenance
 def costs_vs_earnings():
 
-    if not df_rent.empty and not df_maintenance.empty and not df_dress.empty:
+    if not df_rent.empty and not df_maintenance.empty and not df_dress.empty and not df_sale.empty:
 
         matplotlib.use('Agg')
 
@@ -173,11 +183,13 @@ def costs_vs_earnings():
         df_rent['Rent Date'] = pd.to_datetime(df_rent['Rent Date'])
         df_maintenance['Date'] = pd.to_datetime(df_maintenance['Date'])
         df_dress['Date Added'] = pd.to_datetime(df_dress['Date Added'])
+        df_sale['Sale Date'] = pd.to_datetime(df_sale['Sale Date'])
 
         # Create the 'YearMonth' column for each dataframe
         df_rent['YearMonth'] = df_rent['Rent Date'].dt.to_period('M')
         df_maintenance['YearMonth'] = df_maintenance['Date'].dt.to_period('M')
         df_dress['YearMonth'] = df_dress['Date Added'].dt.to_period('M')
+        df_sale['YearMonth'] = df_sale['Sale Date'].dt.to_period('M')
 
         # Convert 'YearMonth' to ordinal for use as x-values
         df_costs_earnings = pd.DataFrame(index=df_rent['YearMonth'].unique())
@@ -187,11 +199,13 @@ def costs_vs_earnings():
         rents_by_month = df_rent.groupby('YearMonth')['Payment Total'].sum()
         maintenance_by_month = df_maintenance.groupby('YearMonth')['Total Cost'].sum()
         dress_costs_by_month = df_dress.groupby('YearMonth')['Cost'].sum()
+        sales_by_month = df_sale.groupby('YearMonth')['Sale Price'].sum()
 
         # Combine the data into a single dataframe
         df_costs_earnings['Earnings'] = rents_by_month
         df_costs_earnings['Maintenance Costs'] = maintenance_by_month
         df_costs_earnings['Dress Acquisition Costs'] = dress_costs_by_month
+        df_costs_earnings['Sales'] = sales_by_month
         df_costs_earnings = df_costs_earnings.fillna(0)
 
         # Sort the data and x-axis labels in chronological order
@@ -213,6 +227,7 @@ def costs_vs_earnings():
             '#08F7FE',  # teal/cyan
             '#FE53BB',  # pink
             '#00ff41',  # matrix green
+            '#FFD700',  # gold for sales
         ]
 
         ax.set_facecolor('black')
@@ -229,7 +244,10 @@ def costs_vs_earnings():
         ax.plot(x_values, df_costs_earnings['Maintenance Costs'], marker='o', linestyle='--', color=colors[0], label='Maintenance Costs', linewidth=1)
 
         # Plot dress acquisition costs with a solid line style and marker
-        ax.plot(x_values, df_costs_earnings['Dress Acquisition Costs'], marker='o', linestyle='-', color=colors[1], label='Dress Acquisition Costs', linewidth=1)
+        ax.plot(x_values, df_costs_earnings['Dress Acquisition Costs'], marker='o', linestyle='--', color=colors[1], label='Dress Acquisition Costs', linewidth=1)
+
+        # Plot sales with a solid line style and marker
+        ax.plot(x_values, df_costs_earnings['Sales'], marker='o', linestyle='-', color=colors[3], label='Sales', linewidth=1)
 
         # Set the x-axis labels
         ax.set_xticks(x_values)
@@ -239,14 +257,14 @@ def costs_vs_earnings():
         ax.get_yaxis().set_major_formatter(FuncFormatter(lambda x, p: format(int(x), ',')))
 
         # Set the y-axis major locator to go up by 5k
-        ax.yaxis.set_major_locator(MultipleLocator(5000))
+        ax.yaxis.set_major_locator(MultipleLocator(10000))
 
         # Add labels and title
         ax.set_ylabel('Amount')
         ax.set_title('Costs vs. Earnings', color='0.9')
 
         # Configure the legend with white text color
-        legend = ax.legend(labels=['Earnings', 'Maintenance Costs', 'Dress Acquisition Costs'], loc='best', fontsize='small')
+        legend = ax.legend(labels=['Earnings', 'Maintenance Costs', 'Dress Acquisition Costs', 'Sales'], loc='best', fontsize='small')
         for text in legend.get_texts():
             text.set_color('white')
 
@@ -262,6 +280,7 @@ def costs_vs_earnings():
         return image_data
 
     return None
+
 
 
 
@@ -298,7 +317,7 @@ def plot_combined_statistics():
     axs[0].legend()
 
     # Set the y-axis major locator to go up by 5k
-    axs[0].yaxis.set_major_locator(MultipleLocator(2))
+    axs[0].yaxis.set_major_locator(MultipleLocator(4))
 
     # Find the minimum number of rents per month
     min_rents = counts.min()

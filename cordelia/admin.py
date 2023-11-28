@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request
 from sqlalchemy import case, desc, func
 from cordelia.auth import login_required, admin_required
 from cordelia.db import db
-from cordelia.models import Dress, Customer, Rent, Maintenance, maintenance_association, DressSale
+from cordelia.models import Dress, Customer, Rent, Maintenance, maintenance_association, Sale
 from cordelia.forms import SearchForm, DressForm, RentForm, CustomerForm, MaintenanceForm, DeleteForm, SaleForm
 from base64 import b64encode
 
@@ -305,27 +305,31 @@ def customer_db():
 @adminBp.route('/dashboard/sales-db', methods=['GET', 'POST'])
 @login_required
 def sales_db():
-    model = 'DressSale'
+    model = 'Sale'
 
-    model_columns = DressSale.__table__.columns.keys()
+    model_columns = Sale.__table__.columns.keys()
 
     page = request.args.get('page', 1, type=int)
     items_per_page = 12
 
     order_by_column = request.args.get('sort', default='id')
 
-    inventory_query = DressSale.query
+    inventory_query = Sale.query
+
+    # Add joins to include related Customer and Dress objects
+    inventory_query = inventory_query.join(Customer)
+    inventory_query = inventory_query.join(Dress)
 
     if order_by_column =='date':
-        inventory_query = inventory_query.order_by(DressSale.sale_date.desc())
+        inventory_query = inventory_query.order_by(Sale.sale_date.desc())
     elif order_by_column == 'customer':
-        inventory_query = inventory_query.order_by(DressSale.customer_id)
+        inventory_query = inventory_query.order_by(Customer.lastName)
     elif order_by_column == 'price':
-        inventory_query = inventory_query.order_by(DressSale.sale_price.desc())
+        inventory_query = inventory_query.order_by(Sale.sale_price.desc())
     else:
-        inventory_query = inventory_query.order_by(DressSale.id.desc())
+        inventory_query = inventory_query.order_by(Sale.id.desc())
 
-    inventory_query, form = handle_search_form(inventory_query, model_columns, DressSale)
+    inventory_query, form = handle_search_form(inventory_query, model_columns, Sale)
 
     inventory = inventory_query.paginate(page=page, per_page=items_per_page)
 
@@ -335,7 +339,7 @@ def sales_db():
 
     if delete_form.validate_on_submit():
         sale_id = delete_form.id.data
-        return redirect(url_for('admin.delete_object', dataBase='DressSale', id=sale_id))
+        return redirect(url_for('admin.delete_object', dataBase='Sale', id=sale_id))
 
     return render_template('admin_views/db_sales.html', 
                            inventory=inventory, 
@@ -347,7 +351,7 @@ def sales_db():
 
 
 
-@adminBp.route("/dashboard/update-db/<string:title>/<string:form_type>", methods=['GET','POST'])
+@adminBp.route("/dashboard/update/<string:title>/<string:form_type>", methods=['GET','POST'])
 @login_required
 def update(title, form_type):
     # Initialize form based on form_type
@@ -576,8 +580,8 @@ def delete_object(dataBase, id):
         else:
             flash("Cannot delete this maintenance.", 'danger')
 
-    elif dataBase == 'DressSale':
-        sale = DressSale.query.get(int(id))
+    elif dataBase == 'Sale':
+        sale = Sale.query.get(int(id))
 
         if sale:
             db.session.delete(sale)
@@ -606,8 +610,8 @@ def sell_dress():
             # Mark the dress as sold
             dress.sold = True
 
-            # Create a new entry in the DressSale model
-            sale = DressSale(
+            # Create a new entry in the Sale model
+            sale = Sale(
                 dress_id=dress.id,
                 customer_id=form.customer_id.data,
                 sale_date=form.sale_date.data,

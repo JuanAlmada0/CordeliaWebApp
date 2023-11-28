@@ -1,4 +1,4 @@
-from cordelia.models import Dress, Customer, Rent, Maintenance
+from cordelia.models import Dress, Customer, Rent, Maintenance, Sale
 from cordelia.db import db
 from faker import Faker
 import random
@@ -176,12 +176,51 @@ def create_weekly_maintenance():
 
         lastDayOfTheWeek += timedelta(weeks=1)
         firstDayOfTheWeek += timedelta(weeks=1)
+
+
+
+def generate_sample_sales(num_sales):
+    for _ in range(num_sales):
+        # Select a dress that is sellable
+        sellable_dress = Dress.query.filter_by(sellable=True).order_by(db.func.random()).first()
+
+        if sellable_dress and not sellable_dress.rentStatus and not sellable_dress.maintenanceStatus and not sellable_dress.sold:
+            customer = Customer.query.order_by(db.func.random()).first()
+
+            today = datetime.utcnow()
+
+            # Generate a random date within the specified range
+            sale_date = fake.date_time_between_dates(datetime_start=sellable_dress.get_last_rent().rentDate + timedelta(days=3), datetime_end=today)
+
+            # Check if the generated date is a Sunday and regenerate if it is
+            while sale_date.weekday() == 6:
+                sale_date = fake.date_time_between_dates(datetime_start=sellable_dress.get_last_rent().rentDate + timedelta(days=3), datetime_end=today)
+
+            # Create a sale object
+            sale = Sale(
+                dress_id=sellable_dress.id,
+                customer_id=customer.id,
+                sale_date=sale_date,
+                sale_price=round(sellable_dress.cost - (sellable_dress.cost * 0.3),1)
+            )
+
+            sellable_dress.sold = True
+
+            db.session.add(sale)
+            db.session.commit()
+
+
+def update_dress_db():
+    Dress.update_statuses()
+    db.session.commit()
     
 
 
 def populate_db():
     with current_app.app_context():
-        generate_random_dresses(100)
-        generate_random_customers(80)
-        generate_sample_rents(225)
+        generate_random_dresses(400)
+        generate_random_customers(250)
+        generate_sample_rents(620)
         create_weekly_maintenance()
+        update_dress_db()
+        generate_sample_sales(120)

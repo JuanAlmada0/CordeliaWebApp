@@ -6,7 +6,6 @@ from flask_login import UserMixin
 
 
 class Dress(db.Model):
-    # Dress model representing a dress item in the database
     __tablename__ = 'dress'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -26,8 +25,10 @@ class Dress(db.Model):
     imageData = db.Column(db.String(255), default=None)
     sold = db.Column(db.Boolean, index=True, default=False)
 
-    customers = db.relationship('Customer', secondary='rent', back_populates='dresses', viewonly=True) # Many-to-many relationship with Customer through Rent model
-    sale = db.relationship('DressSale', back_populates='dress')
+    # Relationship with Customer through the Rent association table with customers in the dress model
+    customers = db.relationship('Customer', secondary='rent', back_populates='dresses', viewonly=True) 
+    # One-to-One relationship with DressSale, allowing a dress to be sold only once
+    sale = db.relationship('Sale', uselist=False, back_populates='dress')
 
     def __init__(self, *args, **kwargs):
         super(Dress, self).__init__(*args, **kwargs)
@@ -124,26 +125,24 @@ class Dress(db.Model):
         return f"D-{self.id:02}"
 
 
-
-# Association table for the many-to-many relationship between Dress and Maintenance
+# Explicitly defined association table for the many-to-many relationship between Dress and Maintenance
 maintenance_association = db.Table('maintenance_association',
     db.Column('maintenance_id', db.Integer, db.ForeignKey('maintenance.id'), primary_key=True),
     db.Column('dress_id', db.Integer, db.ForeignKey('dress.id'), primary_key=True)
 )
 
 
-
 class Maintenance(db.Model):
-    # Maintenance model representing maintenances for dresses in the database
     __tablename__ = 'maintenance'
     
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, index=True, nullable=False)
-    returnDate = db.Column(db.Date, index=True)
+    returnDate = db.Column(db.Date, index=True, nullable=False)
     maintenance_type = db.Column(db.String(20), index=True, nullable=False)
     cost = db.Column(db.Integer(), index=True, nullable=False)
     
-    dresses = db.relationship('Dress', secondary=maintenance_association, backref='maintenances') # Many Dresses to One Maintenace relationship
+    # Many-to-Many relationship with Dress through the explicitly defined maintenance_association
+    dresses = db.relationship('Dress', secondary=maintenance_association, backref='maintenances')
 
     def __init__(self, *args, **kwargs):
         super(Maintenance, self).__init__(*args, **kwargs)
@@ -159,11 +158,9 @@ class Maintenance(db.Model):
 
     def __repr__(self):
         return f"M-{self.id:02}"
-
-
+    
 
 class Customer(db.Model):
-    # Customer model representing a customer in the database
     __tablename__ = 'customer'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -173,8 +170,10 @@ class Customer(db.Model):
     phoneNumber = db.Column(db.Integer, index=True, unique=True)
     dateAdded = db.Column(db.DateTime(), index=True, default=datetime.utcnow)
 
-    dresses = db.relationship('Dress', secondary='rent', back_populates='customers', viewonly=True) # Many-to-many relationship with Dress through Rent model
-    sales = db.relationship('DressSale', back_populates='customer')
+    # Many-to-Many relationship with Dress through the implicit association table 'rent'
+    dresses = db.relationship('Dress', secondary='rent', back_populates='customers', viewonly=True)
+    # One-to-Many relationship with DressSale
+    sales = db.relationship('Sale', back_populates='customer')
 
     def check_status(self):
         if self.rents:
@@ -205,11 +204,27 @@ class Customer(db.Model):
 
     def __repr__(self):
         return f"C-{self.id:02}"
+    
 
+class Sale(db.Model):
+    __tablename__ = 'sale'
+    id = db.Column(db.Integer, primary_key=True)
+    sale_date = db.Column(db.DateTime, index=True, nullable=False)
+    sale_price = db.Column(db.Integer, index=True, nullable=False)
+
+    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
+    # Many-to-One relationship with Customer
+    customer = db.relationship('Customer', back_populates='sales')
+
+    dress_id = db.Column(db.Integer, db.ForeignKey('dress.id'), unique=True, nullable=False)
+    # One-to-One relationship with Dress
+    dress = db.relationship('Dress', back_populates='sale')
+
+    def __repr__(self):
+        return f"S-{self.id:02}"
 
 
 class Rent(db.Model):
-    # Rent model representing a dress rental transaction in the database
     __tablename__ = 'rent'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -220,10 +235,10 @@ class Rent(db.Model):
     paymentMethod = db.Column(db.String(20), index=True, nullable=False)
     paymentTotal = db.Column(db.Integer, index=True)
 
-    # Many Dress to Many Customer relationship associated through dressId and clientId.
-
-    dress = db.relationship('Dress', backref='rents')     # One Dress to Many Rents relationship for Dress
-    customer = db.relationship('Customer', backref='rents')     # One User to Many Rents relationship for Customer
+    # Many-to-One relationship with Dress
+    dress = db.relationship('Dress', backref='rents')
+    # Many-to-One relationship with Customer
+    customer = db.relationship('Customer', backref='rents')
 
     def __init__(self, *args, **kwargs):
         super(Rent, self).__init__(*args, **kwargs)
@@ -250,30 +265,9 @@ class Rent(db.Model):
     
     def __repr__(self):
         return f"R-{self.id:02}"
-    
-
-
-class DressSale(db.Model):
-    # Sale model representing Dress sales.
-    __tablename__ = 'dress_sale'
-    id = db.Column(db.Integer, primary_key=True)
-    sale_date = db.Column(db.DateTime, index=True, nullable=False)
-    sale_price = db.Column(db.Integer, index=True, nullable=False)
-
-    # Relationships
-    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
-    customer = db.relationship('Customer', back_populates='sales')
-
-    dress_id = db.Column(db.Integer, db.ForeignKey('dress.id'), nullable=False)
-    dress = db.relationship('Dress', back_populates='sale')
-
-    def __repr__(self):
-        return f"DressSale-{self.id:02}"
-
 
 
 class User(UserMixin, db.Model):
-    # User model representing a user in the database
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(25), index=True, unique=True)
     email = db.Column(db.String(60), index=True, unique=True)

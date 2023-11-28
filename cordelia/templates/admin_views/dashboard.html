@@ -67,8 +67,8 @@
 
         <div class="menu">
           <a href="{{ url_for('admin.sales_db') }}" class="text-left text-light" style="font-size: 12px; font-family: 'Courier New', Courier, monospace">Sales</a>
-          {% if model == 'DressSale' %}
-          <span class="badge badge-light ml-2">{{ inventory.total if model == 'DressSale' }}</span>
+          {% if model == 'Sale' %}
+          <span class="badge badge-light ml-2">{{ inventory.total if model == 'Sale' }}</span>
 
           <div class="spacer"></div>
 
@@ -258,7 +258,7 @@
                                 </nav>
                                 {% endif %}
 
-                                {% elif model == "DressSale" %}
+                                {% elif model == "Sale" %}
                                 {% if inventory.has_prev or inventory.has_next %}
                                 <nav aria-label="Inventory pagination">
                                   <ul class="pagination">
@@ -523,12 +523,12 @@
                             </form>
                         </th>
 
-                        {% elif model == 'DressSale' %}
+                        {% elif model == 'Sale' %}
                         <th style="flex: 3;">
                             <div class="breadcrumb file-cabinet">
                               <a class="breadcrumb-item {% if order_by_column == 'default' %}active{% endif %}" href="{{ url_for('admin.sales_db', sort='id') }}">id</a>
                               <a class="breadcrumb-item {% if order_by_column == 'id' %}active{% endif %}" href="{{ url_for('admin.sales_db', sort='date') }}">date</a>
-                              <a class="breadcrumb-item {% if order_by_column == 'dress_id' %}active{% endif %}" href="{{ url_for('admin.sales_db', sort='customer_id') }}">customer</a>
+                              <a class="breadcrumb-item {% if order_by_column == 'dress_id' %}active{% endif %}" href="{{ url_for('admin.sales_db', sort='customer') }}">customer</a>
                               <a class="breadcrumb-item {% if order_by_column == 'user_lastName' %}active{% endif %}" href="{{ url_for('admin.sales_db', sort='price') }}">price</a>
                             </div>
                         </th>

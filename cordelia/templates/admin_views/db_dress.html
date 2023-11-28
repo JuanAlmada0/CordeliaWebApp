@@ -235,7 +235,15 @@
                             {% if dress.sold %}
                               <th scope="row">Sold</th>
                               {% if dress.sale %}
-                                  <td>{{ dress.sale[0].sale_date.strftime('%Y-%m-%d') }} {{ dress.sale }}</td>
+                                  <td>{{ dress.sale.sale_date.strftime('%Y-%m-%d') }} | Sold for: {{ dress.sale.sale_price }}$</td>
+                              {% endif %}
+                            {% endif %}
+                          </tr>
+                          <tr>
+                            {% if dress.sold %}
+                              <th scope="row">Sale ID</th>
+                              {% if dress.sale %}
+                                  <td>{{ dress.sale }}</td>
                               {% endif %}
                             {% endif %}
                           </tr>
@@ -254,12 +262,13 @@
                           </tr>
                         </thead>
                         <tbody class="text-left text-light" style="font-size: 11px;">
-                          {% for rent in dress.rents %}
-                          <tr>
-                              <td>{{ rent.rentDate.strftime('%d %b %Y') }}</td>
-                              <td>{{ rent }}</td>
-                              <td>{{ rent.customer }}</td>
-                          </tr>
+                          {% set sorted_rents = dress.rents | sort(attribute='rentDate', reverse=True) %}
+                          {% for rent in sorted_rents %}
+                              <tr>
+                                  <td>{{ rent.rentDate.strftime('%d %b %Y') }}</td>
+                                  <td>{{ rent }}</td>
+                                  <td>{{ rent.customer }}</td>
+                              </tr>
                           {% endfor %}
                         </tbody>
                         {% endif %}
@@ -274,7 +283,8 @@
                           </tr>
                         </thead>
                         <tbody class="text-left text-light" style="font-size: 11px;">
-                          {% for maintenance in dress.maintenances %}
+                          {% set sorted_maintenances = dress.maintenances | sort(attribute='date', reverse=True) %}
+                          {% for maintenance in sorted_maintenances %}
                           <tr>
                               <td>{{ maintenance.date.strftime('%d %b %Y') }}</td>
                               <td>{{ maintenance }}</td>

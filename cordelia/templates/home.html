@@ -7,11 +7,9 @@
             <h1 class="display-2 neon-text-2 sand" style="font-family: 'Courier New', Courier, monospace;">V.0.0.1</h1>
             <hr class="my-4">
             <p></p>
-            {% if current_user.is_authenticated %}
-            <a class="btn btn-primary btn-lg btn-dark " href="{{ url_for('admin.dress_db') }}" role="button">Dashboard</a>
-            {% else %}
-            <a class="btn btn-primary btn-lg btn-dark " href="{{ url_for('auth.login', next=url_for('admin.dress_db')) }}" role="button">Login</a>
-            {% endif %}
+            
+            <a class="btn btn-primary btn-sm btn-dark " href="{{ url_for('admin.dress_db') }}" role="button">Dashboard</a>
+
         </div>
     </div>  
     

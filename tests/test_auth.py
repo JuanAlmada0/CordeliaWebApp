@@ -1,18 +1,21 @@
 from urllib.parse import urlparse
 
 
+
 def test_login_redirect(auth):
     response = auth.login()
     assert response.status_code == 200
     assert b'Logged in successfully.' in response.data
+
 
 def test_login_valid_credentials(auth):
     response = auth.login(password='incorrect_password')
     assert response.status_code == 200
     assert b'Invalid email or password.' in response.data
 
+
 def test_login_redirect_next_page(auth):
-    next_page = 'http://127.0.0.1:5000/home'
+    next_page = 'https://127.0.0.1:5000/home'
     response = auth.login(next=next_page)
     
     # Check that the response indicates a redirection

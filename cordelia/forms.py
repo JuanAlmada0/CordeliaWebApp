@@ -3,7 +3,7 @@ from wtforms import (
     StringField, PasswordField, SubmitField, BooleanField, IntegerField, 
     SelectField, DateField, HiddenField, FileField, FieldList, FormField
     )
-from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Optional, NumberRange
+from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Optional
 from flask_wtf.file import FileAllowed
 import phonenumbers
 from phonenumbers.phonenumberutil import NumberParseException

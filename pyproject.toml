@@ -22,6 +22,7 @@ dependencies = [
     "itsdangerous",
     "jinja2",
     "markupsafe",
+    "matplotlib",
     "numpy",
     "openpyxl",
     "packaging",

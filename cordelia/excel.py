@@ -1,10 +1,8 @@
-from flask import current_app, send_file, request, jsonify
+from flask import current_app, send_file
 import pandas as pd
-import json
 import os
 from datetime import datetime
 from cordelia.models import Dress, Rent, Customer, Maintenance
-from cordelia.db import db
 
 
 
@@ -103,59 +101,3 @@ def excel_download():
         as_attachment=True,
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
-
-
-
-def excel_upload():
-
-    # Check if the file is present in the request
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file part in the request'}), 400
-
-    file = request.files['file']
-
-    # Check if a file is selected and it has a supported extension
-    if file.filename == '' or not file.filename.endswith('.xlsx'):
-        return jsonify({'error': 'Please select a valid XLSX file'}), 400
-    
-    try:
-        df_dress = pd.read_excel(file, sheet_name='Dresses')
-        df_rents = pd.read_excel(file, sheet_name='Rents')
-        df_customers = pd.read_excel(file, sheet_name='Customers')
-        # Convert column names to lowercase to ensure case-insensitivity
-        df_dress.columns = df_dress.columns.str.lower()
-        df_rents.columns = df_rents.columns.str.lower()
-        df_customers.columns = df_customers.columns.str.lower()
-
-        if df_dress:
-            for index, row in df_dress.iterrows():
-                dress_id = row['dress id'] 
-                dress = Dress.query.get(dress_id)
-
-                if dress:
-                    dress.size = row['size']
-                    dress.color = row['color']
-                    dress.style = row['style']
-                    dress.brand = row['brand']
-                    dress.cost = row['cost']
-                    dress.marketPrice = row['market price'] if row['market price'] else None
-                    dress.rentPrice = row['rent price']
-                else:
-                    dress = Dress(
-                        id = dress_id,
-                        size = row['size'],
-                        color = row['color'],
-                        style = row['style'],
-                        brand = row['brand'],
-                        cost = row['cost'],
-                        marketPrice = row['market price'] if row['market price'] else None,
-                        rentPrice = row['rent price'],
-                    )
-                    db.session.add(dress)
-        # Commit the changes to the database
-        db.session.commit()
-
-        return jsonify({'message': 'Database updated successfully'}), 200
-
-    except Exception as e:
-        return jsonify({'error': 'Failed to update database. Error: ' + str(e)}), 500

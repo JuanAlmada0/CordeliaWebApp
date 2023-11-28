@@ -1,6 +1,5 @@
 import os
 from flask import Flask
-from flask_wtf.csrf import CSRFProtect
 import secrets
 
 import logging
@@ -17,11 +16,7 @@ def create_app(test_config=None):
         SERVER_NAME='127.0.0.1:5000',
         PREFERRED_URL_SCHEME='https',
         WTF_CSRF_ENABLED=True,
-        FLASK_ENV='development'
     )
-    
-    csrf = CSRFProtect()
-    csrf.init_app(app)
 
     if test_config is None:
         # load the instance config, if it exists, when not testing

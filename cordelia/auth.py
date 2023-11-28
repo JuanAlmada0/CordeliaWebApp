@@ -9,7 +9,6 @@ from flask_login import current_user
 import logging
 
 
-# Create auth blueprint
 authBp = Blueprint('auth', __name__, url_prefix='/auth')
 
 
