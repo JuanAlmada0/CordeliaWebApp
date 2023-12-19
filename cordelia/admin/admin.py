@@ -18,7 +18,7 @@ adminBp = Blueprint('admin', __name__, url_prefix='/admin')
 @admin_required
 def downloadExcel():
 
-    from cordelia.excel import excel_download
+    from cordelia.admin.excel import excel_download
 
     return excel_download()
 
@@ -639,7 +639,7 @@ def sell_dress():
 def display_plot(img_num):
     if Dress.query.first() and Rent.query.first() and Customer.query.first() and Maintenance.query.first():
         
-        from cordelia.plots import costs_vs_earnings, top_customers, plot_combined_statistics
+        from cordelia.admin.plots import costs_vs_earnings, top_customers, plot_combined_statistics
 
         if img_num == 1:
             image_data = costs_vs_earnings()  
