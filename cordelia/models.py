@@ -209,7 +209,7 @@ class Customer(db.Model):
 class Sale(db.Model):
     __tablename__ = 'sale'
     id = db.Column(db.Integer, primary_key=True)
-    sale_date = db.Column(db.DateTime, index=True, nullable=False)
+    sale_date = db.Column(db.Date, index=True, nullable=False)
     sale_price = db.Column(db.Integer, index=True, nullable=False)
 
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)

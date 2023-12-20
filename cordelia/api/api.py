@@ -2,12 +2,14 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy import func
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.exceptions import HTTPException
-from ..models import Dress  
+from ..models import Dress
 import logging
 
 api_dress_bp = Blueprint('api_dress', __name__, url_prefix='/api/dresses')
 
 
+
+# Function to convert filtered list of dresses into a dictionary
 def dress_model_to_dict(dresses):
     dress_list = []
 
@@ -25,20 +27,23 @@ def dress_model_to_dict(dresses):
             'sellable': dress.sellable,
             'dateAdded': dress.dateAdded.isoformat(),
             'timesRented': dress.timesRented,
-            'rentStatus': dress.rentStatus,
-            'maintenanceStatus': dress.maintenanceStatus,
-            'sold': dress.sold
+            'rent_status': dress.rentStatus,
+            'maintenance_status': dress.maintenanceStatus,
+            'sold': dress.sold,
+            "image_data": dress.imageData
         }
         dress_list.append(dress_info)
     return dress_list
 
 
+# helper for additional query parameters not included explicitly in the model's columns
 def additional_filters(query, *filters):
     for filter_condition in filters:
         query = query.filter(filter_condition)
     
     dresses = query.all()
     return dress_model_to_dict(dresses)
+
 
 
 @api_dress_bp.route('/all', methods=['GET'])
@@ -50,12 +55,15 @@ def get_all_dresses():
     return jsonify({'dresses': dress_list})
 
 
+
 @api_dress_bp.route('/<int:dress_id>', methods=['GET'])
 def get_dress_by_id(dress_id):
     try:
         dress = Dress.query.get_or_404(dress_id)
         dress_info = dress_model_to_dict([dress])[0]
+
         return jsonify(dress_info)
+    
     except HTTPException as e:
         # Handle the exception
         if e.code == 404:
@@ -64,6 +72,7 @@ def get_dress_by_id(dress_id):
         else:
             # Other HTTP exceptions
             return jsonify({'error': 'An unexpected error occurred'}), 500
+
 
 
 @api_dress_bp.route('/search', methods=['GET'])
@@ -122,3 +131,89 @@ def search_dresses():
         logging.error(f'An unexpected error occurred: {str(e)}')
         return jsonify({'error': 'An unexpected error occurred.'}), 500
     
+
+
+@api_dress_bp.route('/<int:dress_id>/rents', methods=['GET'])
+def get_dress_rents(dress_id):
+    dress = Dress.query.get(dress_id)
+
+    if dress is None:
+        return jsonify({'message': 'No dress found with the selected ID.'}), 404
+
+    if dress.rents:
+        rents = dress.rents
+
+        rent_list = []
+        for rent in rents:
+            rent_info = {
+                'id': rent.id,
+                'rentDate': rent.rentDate.isoformat(),
+                'returnDate': rent.returnDate.isoformat(),
+                'paymentMethod': rent.paymentMethod,
+                'paymentTotal': rent.paymentTotal,
+                'customer': {
+                    'id': rent.customer.id,
+                    'name': rent.customer.name,
+                    'lastName': rent.customer.lastName,
+                    'email': rent.customer.email
+                }
+            }
+            rent_list.append(rent_info)
+
+        return jsonify({'rents': rent_list})
+
+    else:
+        return jsonify({'message': 'No rents found for the selected Dress.'})
+
+
+@api_dress_bp.route('/<int:dress_id>/maintenances', methods=['GET'])
+def get_dress_maintenances(dress_id):
+    dress = Dress.query.get(dress_id)
+
+    if dress is None:
+        return jsonify({'message': 'No dress found with the selected ID.'}), 404
+
+    if dress.maintenances:
+        maintenances = dress.maintenances
+
+        maintenance_list = []
+        for maintenance in maintenances:
+            maintenance_info = {
+                'id': maintenance.id,
+                'date': maintenance.date.isoformat(),
+                'returnDate': maintenance.returnDate.isoformat(),
+                'maintenanceType': maintenance.maintenance_type,
+                'cost': maintenance.cost
+            }
+            maintenance_list.append(maintenance_info)
+
+        return jsonify({'maintenances': maintenance_list})
+    
+    else:
+        return jsonify({'message': 'No maintenances found for the selected Dress.'})
+
+
+
+@api_dress_bp.route('/<int:dress_id>/sale', methods=['GET'])
+def get_dress_sale(dress_id):
+    dress = Dress.query.get(dress_id)
+
+    if dress is None:
+        return jsonify({'message': 'No dress found with the selected ID.'}), 404
+    
+    if dress.sale:
+
+        sale = dress.sale
+
+        sale_dict = {
+            'id': sale.id,
+            'sale_date': sale.sale_date.isoformat(),
+            'sale_price': sale.sale_price,
+            'customer_id': sale.customer_id,
+            'dress_id': sale.dress_id
+        }
+
+        return jsonify({'sale': sale_dict})
+    
+    else:
+        return jsonify({'message': 'No Sale found matching the selected Dress.'})

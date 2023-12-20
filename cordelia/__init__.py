@@ -43,7 +43,7 @@ def create_app(test_config=None):
     from cordelia import home
     from cordelia.api import api
     
-    # Register blueprintS
+    # Register blueprints
     app.register_blueprint(auth.authBp)
     app.register_blueprint(admin.adminBp)
     app.register_blueprint(home.homeBp)
@@ -52,19 +52,16 @@ def create_app(test_config=None):
     # Initialize the LoginManager
     auth.init_app(app)
 
-
     log_dir = os.path.join(app.instance_path, 'logs')
     os.makedirs(log_dir, exist_ok=True)
 
     log_file_path = os.path.join(log_dir, 'debug.log')
 
     logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s - %(levelname)s - %(message)s',
+                    format='%(asctime)s - %(levelname)s - %(module)s.%(funcName)s - %(message)s',
                     handlers=[
                         logging.StreamHandler(), 
                         logging.FileHandler(log_file_path, mode='w')
                     ])
-
-
 
     return app
