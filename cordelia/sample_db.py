@@ -218,9 +218,9 @@ def update_dress_db():
 
 def populate_db():
     with current_app.app_context():
-        generate_random_dresses(400)
-        generate_random_customers(250)
-        generate_sample_rents(620)
+        generate_random_dresses(180)
+        generate_random_customers(200)
+        generate_sample_rents(420)
         create_weekly_maintenance()
         update_dress_db()
-        generate_sample_sales(120)
+        generate_sample_sales(80)

@@ -5,7 +5,7 @@ from werkzeug.exceptions import HTTPException
 from ..models import Dress
 import logging
 
-api_dress_bp = Blueprint('api_dress', __name__, url_prefix='/api/dresses')
+api_inventory_bp = Blueprint('api_inventory', __name__, url_prefix='/api/inventory')
 
 
 
@@ -46,7 +46,7 @@ def additional_filters(query, *filters):
 
 
 
-@api_dress_bp.route('/all', methods=['GET'])
+@api_inventory_bp.route('/dresses/all', methods=['GET'])
 def get_all_dresses():
     dresses = Dress.query.all()
     dress_list = dress_model_to_dict(dresses)
@@ -56,7 +56,7 @@ def get_all_dresses():
 
 
 
-@api_dress_bp.route('/<int:dress_id>', methods=['GET'])
+@api_inventory_bp.route('/dresses/<int:dress_id>', methods=['GET'])
 def get_dress_by_id(dress_id):
     try:
         dress = Dress.query.get_or_404(dress_id)
@@ -65,7 +65,7 @@ def get_dress_by_id(dress_id):
         return jsonify(dress_info)
     
     except HTTPException as e:
-        # Handle the exception
+        # Handle the exception (from get_or_404)
         if e.code == 404:
             # Dress not found
             return jsonify({'error': 'Dress not found'}), 404
@@ -75,7 +75,7 @@ def get_dress_by_id(dress_id):
 
 
 
-@api_dress_bp.route('/search', methods=['GET'])
+@api_inventory_bp.route('/dresses/search', methods=['GET'])
 def search_dresses():
     try:
         # Example: /api/dresses/search?size=9&color=blue&brand=Valentino&min_cost=800&max_cost=3000
@@ -133,7 +133,7 @@ def search_dresses():
     
 
 
-@api_dress_bp.route('/<int:dress_id>/rents', methods=['GET'])
+@api_inventory_bp.route('/dresses/<int:dress_id>/rents', methods=['GET'])
 def get_dress_rents(dress_id):
     dress = Dress.query.get(dress_id)
 
@@ -166,7 +166,7 @@ def get_dress_rents(dress_id):
         return jsonify({'message': 'No rents found for the selected Dress.'})
 
 
-@api_dress_bp.route('/<int:dress_id>/maintenances', methods=['GET'])
+@api_inventory_bp.route('/dresses/<int:dress_id>/maintenances', methods=['GET'])
 def get_dress_maintenances(dress_id):
     dress = Dress.query.get(dress_id)
 
@@ -194,7 +194,7 @@ def get_dress_maintenances(dress_id):
 
 
 
-@api_dress_bp.route('/<int:dress_id>/sale', methods=['GET'])
+@api_inventory_bp.route('/dresses/<int:dress_id>/sale', methods=['GET'])
 def get_dress_sale(dress_id):
     dress = Dress.query.get(dress_id)
 

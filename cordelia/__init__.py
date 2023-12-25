@@ -41,13 +41,14 @@ def create_app(test_config=None):
     from cordelia import auth
     from cordelia.admin import admin
     from cordelia import home
-    from cordelia.api import api
+    from cordelia.api import api_inventory, api_transactions
     
     # Register blueprints
     app.register_blueprint(auth.authBp)
     app.register_blueprint(admin.adminBp)
     app.register_blueprint(home.homeBp)
-    app.register_blueprint(api.api_dress_bp)
+    app.register_blueprint(api_inventory.api_inventory_bp)
+    app.register_blueprint(api_transactions.api_transactions_bp)
     
     # Initialize the LoginManager
     auth.init_app(app)
